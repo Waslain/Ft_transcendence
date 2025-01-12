@@ -1,0 +1,56 @@
+services:
+  # db:
+  #   image: postgres:17
+  #   environment:
+  #     POSTGRES_DB: ${DATABASE_NAME}
+  #     POSTGRES_USER: ${DATABASE_USERNAME}
+  #     POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+  #   ports:
+  #     - "5432:5432"
+  #   networks:
+  #     - transcendance
+  #   volumes:
+  #     - postgres_data:/var/lib/posgresql/data
+  #   env_file:
+  #     - .env
+
+  django:
+    build: ./srcs
+    container_name: django
+    ports:
+      - "8000:8000"
+    networks:
+      - transcendance
+    # depends_on:
+    #   - db
+    environment:
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+      DEBUG: ${DEBUG}
+      DJANGO_LOGLEVEL: ${DJANGO_LOGLEVEL}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
+      DATABASE_ENGINE: ${DATABASE_ENGINE}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_PORT: ${DATABASE_PORT}
+    env_file:
+      - .env
+
+  web:
+    image: nginx
+    depends_on:
+      - django
+    ports:
+      - "8080:80"
+    networks:
+      - transcendance
+    restart: unless-stopped
+    env_file: .env
+
+# volumes:
+#   postgres_data:
+
+networks:
+  transcendance:
+    name: transcendance
