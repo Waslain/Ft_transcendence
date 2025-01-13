@@ -10,6 +10,11 @@ RUN apk update && apk add --no-cache \
 
 RUN mkdir -p /app
 
+COPY ./tools/requirements.txt /app
+
+RUN python3 -m venv .venv
+RUN .venv/bin/pip install -r /app/requirements.txt
+
 COPY ./tools/run_server.sh /app
 COPY ./django_app /app
 
