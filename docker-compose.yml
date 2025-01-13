@@ -1,18 +1,18 @@
 services:
-  # db:
-  #   image: postgres:17
-  #   environment:
-  #     POSTGRES_DB: ${DATABASE_NAME}
-  #     POSTGRES_USER: ${DATABASE_USERNAME}
-  #     POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-  #   ports:
-  #     - "5432:5432"
-  #   networks:
-  #     - transcendance
-  #   volumes:
-  #     - postgres_data:/var/lib/posgresql/data
-  #   env_file:
-  #     - .env
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    ports:
+      - "5432:5432"
+    networks:
+      - transcendance
+    volumes:
+      - postgres_data:/var/lib/posgresql/data
+    env_file:
+      - .env
 
   django:
     build: ./srcs
@@ -21,8 +21,8 @@ services:
       - "8000:8000"
     networks:
       - transcendance
-    # depends_on:
-    #   - db
+    depends_on:
+      - db
     environment:
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
       DEBUG: ${DEBUG}
@@ -48,8 +48,8 @@ services:
     restart: unless-stopped
     env_file: .env
 
-# volumes:
-#   postgres_data:
+volumes:
+  postgres_data:
 
 networks:
   transcendance:

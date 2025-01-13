@@ -12,8 +12,12 @@ RUN mkdir -p /app
 
 COPY ./tools/requirements.txt /app
 
-RUN python3 -m venv .venv
-RUN .venv/bin/pip install -r /app/requirements.txt
+RUN python3 -m venv venv
+RUN source venv/bin/activate
+ENV PATH="/venv/bin:$PATH"
+
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r /app/requirements.txt
 
 COPY ./tools/run_server.sh /app
 COPY ./django_app /app
