@@ -7,16 +7,20 @@ services:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
     ports:
       - "5432:5432"
+    networks:
+      - transcendance
     volumes:
       - postgres_data:/var/lib/posgresql/data
     env_file:
       - .env
 
   django:
-    build: ./django
+    build: ./srcs
     container_name: django
     ports:
       - "8000:8000"
+    networks:
+      - transcendance
     depends_on:
       - db
     environment:
@@ -31,9 +35,13 @@ services:
       DATABASE_HOST: ${DATABASE_HOST}
       DATABASE_PORT: ${DATABASE_PORT}
     volumes:
-      - ./django/server:/app
+      - ./srcs/django_app:/app
     env_file:
       - .env
 
 volumes:
   postgres_data:
+
+networks:
+  transcendance:
+    name: transcendance

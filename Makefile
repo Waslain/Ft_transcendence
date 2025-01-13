@@ -1,10 +1,10 @@
 all: run
 
 run:
-	docker compose -f ./srcs/docker-compose.yml up --build
+	docker compose -f ./docker-compose.yml up --build
 
 stop:
-	@docker compose -f ./srcs/docker-compose.yml down
+	@docker compose -f ./docker-compose.yml down
 
 clean: stop
 	@-docker stop `docker ps -qa` 2>/dev/null || true
@@ -16,3 +16,5 @@ clean: stop
 
 vclean: stop
 	@rm -rf /var/lib/docker/volumes/srcs_postgres_data
+
+re: clean all

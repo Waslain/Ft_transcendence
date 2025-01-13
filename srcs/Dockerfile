@@ -21,7 +21,7 @@ COPY --from=builder /usr/local/bin /usr/local/bin/
 
 WORKDIR /app
 
-COPY --chown=appuser:appuser server/ .
+COPY --chown=appuser:appuser django_app/ .
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
@@ -30,4 +30,4 @@ USER appuser
 
 EXPOSE 8000
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "server.wsgi:application"]
+CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "django_app.asgi:application"]
