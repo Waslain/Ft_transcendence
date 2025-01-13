@@ -37,17 +37,6 @@ services:
     env_file:
       - .env
 
-  web:
-    image: nginx
-    depends_on:
-      - django
-    ports:
-      - "8080:80"
-    networks:
-      - transcendance
-    restart: unless-stopped
-    env_file: .env
-
 volumes:
   postgres_data:
 
