@@ -8,19 +8,19 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - transcendance
+      - transcendence
     volumes:
       - postgres_data:/var/lib/posgresql/data
     env_file:
       - .env
 
   django:
-    build: ./srcs
+    build: ./srcs/django
     container_name: django
     ports:
       - "8000:8000"
     networks:
-      - transcendance
+      - transcendence
     depends_on:
       - db
     environment:
@@ -35,13 +35,21 @@ services:
       DATABASE_HOST: ${DATABASE_HOST}
       DATABASE_PORT: ${DATABASE_PORT}
     volumes:
-      - ./srcs/django_app:/app
+      - ./srcs/django/django_app:/app
     env_file:
       - .env
+
+  nginx:
+    build: ./srcs/nginx
+    container_name: nginx
+    ports:
+      - "80:80"
+    networks:
+      - transcendence
 
 volumes:
   postgres_data:
 
 networks:
-  transcendance:
-    name: transcendance
+  transcendence:
+    name: transcendence
