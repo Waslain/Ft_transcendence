@@ -3,12 +3,39 @@ DOCKER = docker compose -f $(COMPOSE_FILE)
 
 all: run
 
+# Builds and starts everything
 run:
 	$(DOCKER) up --build
+#	$(DOCKER) exec django python manage.py migrate --noinput
 
+# Database management
+# Usage: make makemigrations without restart the containers
+
+# Creates migration files when you change models
+makemigrations:
+	$(DOCKER) exec django python manage.py makemigrations
+# Apply migrations to the database
+migrate:
+	$(DOCKER) exec django python manage.py migrate
+
+# Combined target for full database update
+db-update: makemigrations migrate
+
+# Stop services only
 stop:
-	$(DOCKER) down
+	$(DOCKER) stop
 
+# Remove all containers and volumes
+clean:
+	$(DOCKER) down --volumes
+
+# Remove all containers, images, volumes, networks, and prune unused data
+fclean:
+	@docker system prune -af --volumes
+	@rm -rf /var/lib/docker/volumes/srcs_postgres_data
+
+# Full
+re: fclean all
 
 # View all logs (with option to follow)
 logs:
@@ -22,26 +49,11 @@ logs-django:
 	$(DOCKER) logs -f django
 
 logs-db:
-	$(DOCKER) logs -f postgresql
-
+	$(DOCKER) logs -f db
 
 # Show running containers		
 ps:
 	$(DOCKER) ps
-
-# Remove all containers, images, volumes, networks, and prune unused data
-clean: stop
-	@-docker stop `docker ps -qa` 2>/dev/null || true
-	@-docker rm `docker ps -qa` 2>/dev/null || true
-	@-docker image rm `docker image ls -qa` 2>/dev/null || true
-	@-docker volume rm `docker volume ls -q` 2>/dev/null || true
-	@-docker network rm `docker network ls -q` 2>/dev/null || true
-	@docker system prune -af
-
-vclean: stop
-	@rm -rf /var/lib/docker/volumes/srcs_postgres_data
-
-re: clean all
 
 setup-dev:
 	python -m venv venv
@@ -51,7 +63,7 @@ run-dev:
 	. venv/bin/activate && python srcs/django/django_app/manage.py runserver
 
 run-dev-docker:
-	docker compose -f ./docker-compose.yml up --build -d
+	$(DOCKER) up --build -d
 	@echo "🚀 Development server running with hot-reload enabled"
 	@echo "📝 You can now edit your code and see changes immediately"
 	@echo "🔍 View logs with: docker compose logs -f"
@@ -72,4 +84,4 @@ help:
 	@echo "  fclean     	: Full cleanup"
 	@echo "  re         	: Rebuild all"
 
-.PHONY: all build down logs logs-nginx logs-django logs-db ps clean fclean re help
+.PHONY: all run stop clean fclean re logs logs-nginx logs-django logs-db ps help
