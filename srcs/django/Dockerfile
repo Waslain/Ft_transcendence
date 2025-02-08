@@ -1,6 +1,7 @@
 FROM python:3.13-slim AS builder
 
 RUN mkdir /app
+RUN mkdir -p srcs/django/django_app/static_files
 WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -12,15 +13,18 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 FROM python:3.13-slim
 
-RUN useradd -m -r appuser && \
+# Create non-root user with UID 4242 (same as nginx)
+RUN useradd -m -r appuser -u 4242 && \
 	mkdir /app && \
 	chown -R appuser /app
 
-COPY --from=builder /usr/local/lib/python3.13/site-packages/ /usr/local/lib//python3.13/site-packages/
+# Copy installed packages from builder
+COPY --from=builder /usr/local/lib/python3.13/site-packages/ /usr/local/lib/python3.13/site-packages/
 COPY --from=builder /usr/local/bin /usr/local/bin/
 
 WORKDIR /app
 
+# Copy application code and set ownership
 COPY --chown=appuser:appuser django_app/ .
 
 ENV PYTHONDONTWRITEBYTECODE=1
