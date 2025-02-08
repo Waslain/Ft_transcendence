@@ -10,9 +10,21 @@ services:
     networks:
       - transcendence
     volumes:
-      - postgres_data:/var/lib/posgresql/data
+      - postgres_data:/var/lib/postgresql/data
     env_file:
       - .env
+    restart: "no"
+    # Path of the log file: /var/lib/docker/containers/<container-id>/<container-id>-json.log
+    logging:
+      driver: "json-file"    # Format of the log files
+      options:
+        max-size: "10m"      # Rotate when log file reaches 10MB
+        max-file: "3"        # Keep only 3 log files
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USERNAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   django:
     build: ./srcs/django
@@ -36,20 +48,52 @@ services:
       DATABASE_PORT: ${DATABASE_PORT}
     volumes:
       - ./srcs/django/django_app:/app
+      - static_volume:/app/static
     env_file:
       - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             python manage.py runserver 0.0.0.0:8000"
+    restart: "no"
 
   nginx:
-    build: ./srcs/nginx
+    image: nginx
     container_name: nginx
+    build:
+      context: ./srcs/nginx
+      dockerfile: Dockerfile
     ports:
-      - "80:80"
+      - "443:443"
     networks:
       - transcendence
+    restart: "no"
+    depends_on:
+      - django
+    volumes:
+      - static_volume:/app/static
+      - ./srcs/nginx/ssl:/etc/nginx/ssl     #bind mount for ssl certificates
+      - ./srcs/nginx/conf.d:/etc/nginx/conf.d #bind mount for nginx configuration
+    healthcheck:
+      test: "curl -kfsSL https://localhost:443"
+      interval: 5s
+      timeout: 1s
+      retries: 10
+      start_period: 5s
+#bind mount is a way to mount a directory from the host machine into the container
+#it is more secure and easier to manage than using volumes
+#it is also faster than volumes
+#it is also easier to update the configuration without having to rebuild the image
 
 volumes:
   postgres_data:
+  static_volume:
 
 networks:
   transcendence:
     name: transcendence
+    driver: bridge
