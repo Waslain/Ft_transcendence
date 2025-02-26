@@ -1,9 +1,10 @@
 import Main from "./views/Main.js";
 import Page1 from "./views/Page1.js";
 import Page2 from "./views/Page2.js";
+import WaitingRoom from "./views/WaitingRoom.js";
 import Pong from "./views/Pong.js";
 
-const navigateTo = (url) => {
+export const navigateTo = (url) => {
   history.pushState(null, null, url);
   router();
 };
@@ -15,13 +16,14 @@ const router = async () => {
     { path: "/", view: Main },
     { path: "/page1", view: Page1 },
     { path: "/page2", view: Page2 },
-    { path: "/pong", view: Pong },
+    { path: "/pong", view: WaitingRoom },
+    { path: "/pong/:room_id", view: Pong },
   ];
 
   const potentialMatches = routes.map((route) => {
     return {
       route: route,
-      isMatch: location.pathname === route.path,
+      isMatch: checkMatch(route.path),
     };
   });
 
@@ -53,3 +55,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   router();
 });
+
+const checkMatch = (path) => {
+  const regex = new RegExp(
+    "^" + path.replace(/\//g, "\\/").replace(/:\w+/g, "([^\\/]+)") + "$"
+  );
+  if (location.pathname === path) return true;
+  else if (location.pathname.match(regex)) {
+    return true;
+  }
+  return false;
+};
