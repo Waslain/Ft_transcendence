@@ -21,23 +21,27 @@ const router = async () => {
   ];
 
   const potentialMatches = routes.map((route) => {
+    const resultMatch = checkMatch(route.path);
     return {
       route: route,
-      isMatch: checkMatch(route.path),
+      result: resultMatch,
     };
   });
 
-  let match = potentialMatches.find((potentialMatch) => potentialMatch.isMatch);
+  let match = potentialMatches.find(
+    (potentialMatch) => potentialMatch.result !== null
+  );
 
   if (!match) {
     match = {
       route: routes[0],
-      isMatch: true,
+      result: [location.pathname],
     };
   }
 
   await view?.cleanUp?.();
-  view = new match.route.view();
+  const params = getParams(match);
+  view = new match.route.view(params);
 
   document.querySelector("#app").innerHTML = await view.getHtml();
   await view.getJavaScript();
@@ -56,13 +60,21 @@ document.addEventListener("DOMContentLoaded", () => {
   router();
 });
 
+const getParams = (match) => {
+  const values = match.result.slice(1);
+  if (!values) return {};
+  const keys = [...match.route.path.matchAll(/:(\w+)/g)].map(
+    (result) => result[1]
+  );
+  return keys.reduce((acc, key, i) => {
+    acc[key] = values[i];
+    return acc;
+  }, {});
+};
+
 const checkMatch = (path) => {
   const regex = new RegExp(
     "^" + path.replace(/\//g, "\\/").replace(/:\w+/g, "([^\\/]+)") + "$"
   );
-  if (location.pathname === path) return true;
-  else if (location.pathname.match(regex)) {
-    return true;
-  }
-  return false;
+  return location.pathname.match(regex);
 };

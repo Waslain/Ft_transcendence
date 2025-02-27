@@ -31,15 +31,15 @@ export default class extends AbstractView {
         encodeURIComponent(name)
     );
 
-    this.waitingRoomSocket.onopen = function (e) {
+    this.waitingRoomSocket.onopen = (e) => {
       console.log("Connected to the waiting room:", roomName);
     };
 
-    this.waitingRoomSocket.onclose = function (e) {
+    this.waitingRoomSocket.onclose = (e) => {
       console.log("Waiting room socket closed");
     };
 
-    this.waitingRoomSocket.onmessage = function (e) {
+    this.waitingRoomSocket.onmessage = (e) => {
       console.log(e.data);
       const data = JSON.parse(e.data);
       if (data.count !== undefined) {
@@ -48,7 +48,7 @@ export default class extends AbstractView {
       }
       if (data.uuid !== undefined) {
         console.log(data.uuid);
-        navigateTo("/pong/" + data.uuid);
+        navigateTo("/pong/" + data.uuid + "?name=" + encodeURIComponent(name));
       }
     };
   }
