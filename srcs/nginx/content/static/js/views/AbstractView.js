@@ -5,9 +5,15 @@ export default class {
     document.title = title;
   }
 
+  async getStyle() {
+    return "";
+  }
+
   async getHtml() {
     return "";
   }
 
-  async getJavaScript() {}
+  async getJavaScript() {
+    return "";
+  }
 }

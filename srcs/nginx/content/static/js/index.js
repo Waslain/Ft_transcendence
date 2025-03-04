@@ -3,6 +3,7 @@ import Page1 from "./views/Page1.js";
 import Page2 from "./views/Page2.js";
 import WaitingRoom from "./views/WaitingRoom.js";
 import Pong from "./views/Pong.js";
+import { loadAndSetFont } from "./views/pong/utils/font.js";
 
 export const navigateTo = (url) => {
   history.pushState(null, null, url);
@@ -40,9 +41,11 @@ const router = async () => {
   }
 
   await view?.cleanUp?.();
+  await loadAndSetFont("/static/js/views/pong/utils/typeFont/typeFont.json");
   const params = getParams(match);
   view = new match.route.view(params);
 
+  document.querySelector("#style").innerHTML = await view.getStyle();
   document.querySelector("#app").innerHTML = await view.getHtml();
   await view.getJavaScript();
 };
