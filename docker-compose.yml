@@ -46,6 +46,8 @@ services:
       - "8080:80"
     networks:
       - transcendence
+    volumes:
+      - ./srcs/nginx/content:/usr/share/nginx/html
 
 volumes:
   postgres_data:
