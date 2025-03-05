@@ -5,6 +5,7 @@ WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV PIP_ROOT_USER_ACTION=ignore
 
 COPY tools/requirements.txt /app/
 RUN pip install --upgrade pip
@@ -25,6 +26,7 @@ COPY --chown=appuser:appuser django_app/ .
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV PIP_ROOT_USER_ACTION=ignore
 
 USER appuser
 
