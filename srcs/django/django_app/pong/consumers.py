@@ -59,13 +59,15 @@ class PlayerConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
         if not self.uuid in PlayerConsumer.games:
-            PlayerConsumer.games[self.uuid] = {"players" : [], "ball" : {"x" : 0, "z" : 0}}
+            PlayerConsumer.games[self.uuid] = {"loop" : None, "players" : [], "ball" : {"x" : 0, "z" : 0, "dx" : 0.1, "dz" : 0.1}}
         PlayerConsumer.games[self.uuid]["players"].append({"name" : self.name, "up" : False, "down" : False, "paddle" : {"x" : 13.5, "z" : 0}})
         if len(PlayerConsumer.games[self.uuid]["players"]) == 1:
             PlayerConsumer.games[self.uuid]["players"][0]["paddle"]["x"] = -13.5
         await self.accept()
 
-        self.loopGame = asyncio.create_task(self.sendLoopGame())
+        if len(PlayerConsumer.games[self.uuid]["players"]) >= 2:
+            if PlayerConsumer.games[self.uuid]["loop"] is None:
+                PlayerConsumer.games[self.uuid]["loop"] = asyncio.create_task(self.sendLoopGame())
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
@@ -74,21 +76,21 @@ class PlayerConsumer(AsyncWebsocketConsumer):
                 if player["name"] is self.name:
                     PlayerConsumer.games[self.uuid]["players"].remove(player)
             if not PlayerConsumer.games[self.uuid]["players"]:
+                if PlayerConsumer.games[self.uuid]["loop"] is not None:
+                    PlayerConsumer.games[self.uuid]["loop"].cancel()
                 del PlayerConsumer.games[self.uuid]
-
-        self.loopGame.cancel()
 
     async def receive(self, text_data):
         data = json.loads(text_data)
         if data["action"] == "keys":
             for player in PlayerConsumer.games[self.uuid]["players"]:
                 if player["name"] is self.name:
-                    if data["params"]["key"] == "z":
+                    if data["params"]["key"] == "z" or data["params"]["key"] == "ArrowUp":
                         if data["params"]["type"] == "keydown":
                             player["up"] = True
                         else:
                             player["up"] = False
-                    if data["params"]["key"] == "s":
+                    if data["params"]["key"] == "s" or data["params"]["key"] == "ArrowDown":
                         if data["params"]["type"] == "keydown":
                             player["down"] = True
                         else:
@@ -96,12 +98,33 @@ class PlayerConsumer(AsyncWebsocketConsumer):
 
     async def sendLoopGame(self):
         while True:
-            await self.send(text_data=json.dumps({"action" : "loop" ,"params" : PlayerConsumer.games[self.uuid]}))
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'gameUpdate',
+                    'players': PlayerConsumer.games[self.uuid]["players"],
+                    'ball': PlayerConsumer.games[self.uuid]["ball"]
+                }
+            )
             for player in PlayerConsumer.games[self.uuid]["players"]:
                 if player["up"] == True:
-                    player["paddle"]["z"] -= 0.1
-                    # PlayerConsumer.games[self.uuid]["ball"]["z"] += 0.1
+                    if player["paddle"]["z"] > -8:
+                        player["paddle"]["z"] -= 0.1
                 if player["down"] == True:
-                    player["paddle"]["z"] += 0.1
-                    # PlayerConsumer.games[self.uuid]["ball"]["x"] += 0.1
+                    if player["paddle"]["z"] < 8:
+                        player["paddle"]["z"] += 0.1
+            ball = PlayerConsumer.games[self.uuid]["ball"]
+            ball["x"] += ball["dx"]
+            ball["z"] += ball["dz"]
+            if ball["x"] > 14.1 or ball["x"] < -14.1:
+                ball["dx"] *= -1
+                # ball["x"] = 0
+                # ball["z"] = 0
+            if ball["z"] > 9.1 or ball["z"] < -9.1:
+                ball["dz"] *= -1
             await asyncio.sleep(0.01)
+
+    async def gameUpdate(self, event):
+        players = event['players']
+        ball = event['ball']
+        await self.send(text_data=json.dumps({"action": "loop", "params": {"players" : players,"ball" : ball}}))

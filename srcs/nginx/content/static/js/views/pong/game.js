@@ -29,8 +29,8 @@ export const game = (socket) => {
 
   const keys = new Keys(socket);
 
-  const playerName1 = "Player 1";
-  const playerName2 = "Player 2";
+  const playerName1 = "";
+  const playerName2 = "";
 
   const objectManager = {
     background: createBackground(),
@@ -61,6 +61,23 @@ export const game = (socket) => {
   socket.onmessage = (e) => {
     const data = JSON.parse(e.data);
     if (data.action === "loop") {
+      if (data.params.players[0].name !== objectManager.player1.name)
+        updateName(
+          objectManager.player1,
+          1,
+          scene,
+          data.params.players[0].name
+        );
+      if (
+        data.params.players.length >= 2 &&
+        data.params.players[1].name !== objectManager.player2.name
+      )
+        updateName(
+          objectManager.player2,
+          2,
+          scene,
+          data.params.players[1].name
+        );
       objectManager.ball.object.position.set(
         data.params.ball.x,
         0.3,
@@ -178,6 +195,24 @@ const ballDirection = (objectManager, scene) => {
   );
 
   objectManager.ball.object.position.add(vector);
+};
+
+const updateName = (player, nb, scene, newName) => {
+  console.log(player, newName);
+  player.name = newName;
+  scene.remove(player.name3D.object);
+  player.name3D.object.geometry.dispose();
+  player.name3D.object.material.dispose();
+
+  const newName3D = createText(newName, 10, 1);
+  player.name3D = newName3D;
+
+  player.name3D.object.rotation.x = -0.5;
+  if (nb == 1) player.name3D.object.position.set(-14, 1.5, -10);
+  else if (nb == 2)
+    player.name3D.object.position.set(14 - player.name3D.size.x, 1.5, -10);
+
+  scene.add(player.name3D.object);
 };
 
 const updateScore = (player, scene, index) => {
