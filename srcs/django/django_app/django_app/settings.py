@@ -40,10 +40,17 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 	'chat',
 	'rest_framework',
+	'rest_framework.authtoken',
 	'users',
 ]
 
 AUTH_USER_MODEL = 'users.User'
+
+REST_FRAMEWORK = {
+	'DEFAULT_AUTHENTICATION_CLASSES': [
+		'rest_framework.authentication.TokenAuthentication',
+	]
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
