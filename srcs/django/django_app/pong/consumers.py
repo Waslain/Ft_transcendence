@@ -60,7 +60,7 @@ class PlayerConsumer(AsyncWebsocketConsumer):
 
         if not self.uuid in PlayerConsumer.games:
             PlayerConsumer.games[self.uuid] = {"loop" : None, "players" : [], "ball" : {"x" : 0, "z" : 0, "dx" : 0.1, "dz" : 0.1}}
-        PlayerConsumer.games[self.uuid]["players"].append({"name" : self.name, "up" : False, "down" : False, "paddle" : {"x" : 13.5, "z" : 0}})
+        PlayerConsumer.games[self.uuid]["players"].append({"name" : self.name, "score" : 0, "up" : False, "down" : False, "paddle" : {"x" : 13.5, "z" : 0}})
         if len(PlayerConsumer.games[self.uuid]["players"]) == 1:
             PlayerConsumer.games[self.uuid]["players"][0]["paddle"]["x"] = -13.5
         await self.accept()
@@ -97,15 +97,10 @@ class PlayerConsumer(AsyncWebsocketConsumer):
                             player["down"] = False
 
     async def sendLoopGame(self):
+        await self.groupSend("names", [player["name"] for player in PlayerConsumer.games[self.uuid]["players"]])
+        await self.groupSend("scores", [player["score"] for player in PlayerConsumer.games[self.uuid]["players"]])
         while True:
-            await self.channel_layer.group_send(
-                self.room_group_name,
-                {
-                    'type': 'gameUpdate',
-                    'players': PlayerConsumer.games[self.uuid]["players"],
-                    'ball': PlayerConsumer.games[self.uuid]["ball"]
-                }
-            )
+            await self.groupSend("data", {"ball": PlayerConsumer.games[self.uuid]["ball"] ,"players": [player["paddle"] for player in PlayerConsumer.games[self.uuid]["players"]]})
             for player in PlayerConsumer.games[self.uuid]["players"]:
                 if player["up"] == True:
                     if player["paddle"]["z"] > -8:
@@ -117,14 +112,45 @@ class PlayerConsumer(AsyncWebsocketConsumer):
             ball["x"] += ball["dx"]
             ball["z"] += ball["dz"]
             if ball["x"] > 14.1 or ball["x"] < -14.1:
+                if len(PlayerConsumer.games[self.uuid]["players"]) >= 2:
+                    if ball["x"] > 14.1:
+                        PlayerConsumer.games[self.uuid]["players"][0]["score"] += 1
+                        await self.groupSend("scores", [player["score"] for player in PlayerConsumer.games[self.uuid]["players"]])
+                        if PlayerConsumer.games[self.uuid]["players"][0]["score"] >= 10:
+                            await self.groupSend("winner", PlayerConsumer.games[self.uuid]["players"][0]["name"])
+                            break
+                    elif ball["x"] < -14.1:
+                        PlayerConsumer.games[self.uuid]["players"][1]["score"] += 1
+                        await self.groupSend("scores", [player["score"] for player in PlayerConsumer.games[self.uuid]["players"]])
+                        if PlayerConsumer.games[self.uuid]["players"][1]["score"] >= 10:
+                            await self.groupSend("winner", PlayerConsumer.games[self.uuid]["players"][1]["name"])
+                            break
                 ball["dx"] *= -1
-                # ball["x"] = 0
-                # ball["z"] = 0
+                ball["x"] = 0
+                ball["z"] = 0
             if ball["z"] > 9.1 or ball["z"] < -9.1:
                 ball["dz"] *= -1
             await asyncio.sleep(0.01)
 
+    async def groupSend(self, name, data):
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'gameUpdate',
+                name: data
+            }
+        )
+
     async def gameUpdate(self, event):
-        players = event['players']
-        ball = event['ball']
-        await self.send(text_data=json.dumps({"action": "loop", "params": {"players" : players,"ball" : ball}}))
+        if "names" in event:
+            await self.send(text_data=json.dumps({"action": "names", "params": {"names": event["names"]}}))
+            return
+        if "scores" in event:
+            await self.send(text_data=json.dumps({"action": "scores", "params": {"scores": event["scores"]}}))
+            return
+        if "data" in event:
+            await self.send(text_data=json.dumps({"action": "loop", "params": {"data": event["data"]}}))
+            return
+        if "winner" in event:
+            await self.send(text_data=json.dumps({"action": "win", "params": {"winner": event["winner"]}}))
+            return

@@ -4,10 +4,10 @@ import { OrbitControls } from "three/addons/controls/OrbitControls";
 import { Keys } from "./utils/Keys.js";
 import { createBackground } from "./utils/createBackground.js";
 import { createPlayground } from "./utils/createPlayground.js";
+import { createPlayer } from "./utils/createPlayer.js";
 import { createBall } from "./utils/createBall.js";
 import { createText } from "./utils/createText.js";
 import { soundBtn } from "./utils/sound.js";
-import { helpers } from "./utils/helpers.js";
 
 export const game = (socket) => {
   const scene = new THREE.Scene();
@@ -29,20 +29,15 @@ export const game = (socket) => {
 
   const keys = new Keys(socket);
 
-  const playerName1 = "";
-  const playerName2 = "";
-
   const objectManager = {
     background: createBackground(),
     playground: createPlayground(),
-    player1: createPlayer(-1, playerName1),
-    player2: createPlayer(1, playerName2),
+    player1: createPlayer(1),
+    player2: createPlayer(2),
     ball: createBall(),
     wallhit: 1,
     playerhit: 1,
   };
-
-  // helpers(objectManager, scene);
 
   scene.add(
     objectManager.background.object,
@@ -60,50 +55,51 @@ export const game = (socket) => {
 
   socket.onmessage = (e) => {
     const data = JSON.parse(e.data);
-    if (data.action === "loop") {
-      if (data.params.players[0].name !== objectManager.player1.name)
-        updateName(
-          objectManager.player1,
-          1,
-          scene,
-          data.params.players[0].name
-        );
-      if (
-        data.params.players.length >= 2 &&
-        data.params.players[1].name !== objectManager.player2.name
-      )
-        updateName(
-          objectManager.player2,
-          2,
-          scene,
-          data.params.players[1].name
-        );
-      objectManager.ball.object.position.set(
-        data.params.ball.x,
-        0.3,
-        data.params.ball.z
-      );
-      objectManager.player1.object.position.set(
-        data.params.players[0].paddle.x,
-        0.3,
-        data.params.players[0].paddle.z
-      );
-      if (data.params.players.length > 1) {
-        objectManager.player2.object.position.set(
-          data.params.players[1].paddle.x,
+    switch (data.action) {
+      case "names":
+        objectManager.player1.name = data.params.names[0];
+        updateName(objectManager.player1, 1, scene);
+        objectManager.player2.name = data.params.names[1];
+        updateName(objectManager.player2, 2, scene);
+        break;
+      case "scores":
+        if (data.params.scores[0] !== objectManager.player1.score) {
+          objectManager.player1.score = data.params.scores[0];
+          updateScore(objectManager.player1, 1, scene);
+        }
+        if (
+          data.params.scores.length >= 2 &&
+          data.params.scores[1] !== objectManager.player2.score
+        ) {
+          objectManager.player2.score = data.params.scores[1];
+          updateScore(objectManager.player2, 2, scene, 1);
+        }
+        break;
+      case "loop":
+        objectManager.ball.object.position.set(
+          data.params.data.ball.x,
           0.3,
-          data.params.players[1].paddle.z
+          data.params.data.ball.z
         );
-      }
+        objectManager.player1.object.position.set(
+          data.params.data.players[0].x,
+          0.3,
+          data.params.data.players[0].z
+        );
+        objectManager.player2.object.position.set(
+          data.params.data.players[1].x,
+          0.3,
+          data.params.data.players[1].z
+        );
+        break;
+      case "win":
+        displayWinner(data.params.winner, scene);
+        break;
     }
   };
 
   const animate = () => {
     controls.update();
-    // keys.rotate(objectManager);
-    // objectManager.player1.hitbox.setFromObject(objectManager.player1.object);
-    // objectManager.player2.hitbox.setFromObject(objectManager.player2.object);
-    // ballDirection(objectManager, scene);
     renderer.render(scene, camera);
   };
 
@@ -120,37 +116,6 @@ export const game = (socket) => {
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
   }
-};
-
-const createPlayer = (index, name) => {
-  const geometry = new THREE.CapsuleGeometry(0.3, 2, 20, 20);
-  const material = new THREE.MeshLambertMaterial({ color: 0xffffff });
-
-  const player = {
-    object: new THREE.Mesh(geometry, material),
-    hitbox: new THREE.Box3(),
-    name,
-    name3D: createText(name, 10, 1),
-    score: 0,
-    score3D: createText("0", 10, 6),
-  };
-
-  player.object.rotateX((Math.PI / 2) * 3);
-  player.object.position.set(13.5 * index, 0.3, 0);
-
-  player.name3D.object.rotation.x = -0.5;
-  player.score3D.object.rotation.z = -0.5 * index;
-  player.score3D.object.rotateY((Math.PI / 2) * 3);
-  player.score3D.object.position.set(15 * index, 1.5, -2.5);
-
-  if (index < 0) player.name3D.object.position.set(-14, 1.5, -10);
-  else player.name3D.object.position.set(14 - player.name3D.size.x, 1.5, -10);
-
-  const pointLight = new THREE.PointLight(0xc2c2c2, 1.5, 50);
-  player.object.add(pointLight);
-  pointLight.position.set(-1 * index, 0, 0.3);
-
-  return player;
 };
 
 const ballDirection = (objectManager, scene) => {
@@ -197,14 +162,12 @@ const ballDirection = (objectManager, scene) => {
   objectManager.ball.object.position.add(vector);
 };
 
-const updateName = (player, nb, scene, newName) => {
-  console.log(player, newName);
-  player.name = newName;
+const updateName = (player, nb, scene) => {
   scene.remove(player.name3D.object);
   player.name3D.object.geometry.dispose();
   player.name3D.object.material.dispose();
 
-  const newName3D = createText(newName, 10, 1);
+  const newName3D = createText(player.name, 10, 1);
   player.name3D = newName3D;
 
   player.name3D.object.rotation.x = -0.5;
@@ -215,7 +178,7 @@ const updateName = (player, nb, scene, newName) => {
   scene.add(player.name3D.object);
 };
 
-const updateScore = (player, scene, index) => {
+const updateScore = (player, nb, scene) => {
   scene.remove(player.score3D.object);
   player.score3D.object.geometry.dispose();
   player.score3D.object.material.dispose();
@@ -227,13 +190,23 @@ const updateScore = (player, scene, index) => {
   );
   player.score3D = newScore3D;
 
-  player.score3D.object.rotation.z = -0.5 * index;
-  player.score3D.object.rotateY((Math.PI / 2) * 3 * index);
-  player.score3D.object.position.set(
-    15 * index,
-    1.5,
-    -2.5 * ("" + player.score).length * index
-  );
+  if (nb == 1) {
+    player.score3D.object.rotation.z = 0.5;
+    player.score3D.object.rotateY((Math.PI / 2) * -3);
+    player.score3D.object.position.set(
+      -15,
+      1.5,
+      2.5 * ("" + player.score).length
+    );
+  } else if (nb == 2) {
+    player.score3D.object.rotation.z = -0.5;
+    player.score3D.object.rotateY((Math.PI / 2) * 3);
+    player.score3D.object.position.set(
+      15,
+      1.5,
+      -2.5 * ("" + player.score).length
+    );
+  }
 
   scene.add(player.score3D.object);
 };
