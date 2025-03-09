@@ -28,6 +28,8 @@ DEBUG = bool(os.environ.get("DEBUG", default=0))
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_TRUST_ALL_ORIGINS = True
 
 # Application definition
 
@@ -38,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+	'corsheaders',
 	'chat',
 	'pong',
 	'rest_framework',
@@ -54,6 +57,7 @@ REST_FRAMEWORK = {
 }
 
 MIDDLEWARE = [
+	'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
