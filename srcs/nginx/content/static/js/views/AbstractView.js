@@ -1,12 +1,19 @@
 export default class {
-	constructor() {
-	}
+  constructor() {}
 
-	setTitle(title) {
-		document.title = title;
-	}
+  setTitle(title) {
+    document.title = title;
+  }
 
-	async getHtml() {
-		return "";
-	}
+  async getStyle() {
+    return "";
+  }
+
+  async getHtml() {
+    return "";
+  }
+
+  async getJavaScript() {
+    return "";
+  }
 }

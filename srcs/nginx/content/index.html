@@ -1,12 +1,23 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Transcendence</title>
-</head>
-<body>
-	<script type="module" src="/static/js/index.js"></script>
-	<div id="app"></div>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Transcendence</title>
+    <style id="style"></style>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@v0.149.0/build/three.module.js",
+          "three/addons/controls/OrbitControls": "https://cdn.jsdelivr.net/npm/three@v0.149.0/examples/jsm/controls/OrbitControls.js",
+          "three/addons/geometries/TextGeometry": "https://cdn.jsdelivr.net/npm/three@v0.149.0/examples/jsm/geometries/TextGeometry.js",
+          "three/addons/loaders/FontLoader": "https://cdn.jsdelivr.net/npm/three@v0.149.0/examples/jsm/loaders/FontLoader.js"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <script type="module" src="/static/js/index.js"></script>
+    <div id="app"></div>
+  </body>
 </html>

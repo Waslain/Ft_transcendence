@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 	'chat',
+	'pong',
 	'rest_framework',
 	'rest_framework.authtoken',
 	'users',
