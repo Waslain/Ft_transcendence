@@ -33,6 +33,8 @@ clean:
 fclean:
 	@docker system prune -af --volumes
 	@rm -rf /var/lib/docker/volumes/srcs_postgres_data
+	@rm -rf ./srcs/nginx/ssl
+	@rm -rf ./srcs/nginx/conf.d
 
 # Full
 re: fclean all

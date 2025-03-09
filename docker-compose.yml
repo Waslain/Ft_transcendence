@@ -13,7 +13,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
     env_file:
       - .env
-    restart: "no"
+    restart: unless-stopped
     # Path of the log file: /var/lib/docker/containers/<container-id>/<container-id>-json.log
     logging:
       driver: "json-file"    # Format of the log files
@@ -56,10 +56,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-    command: >
-      sh -c "python manage.py migrate --noinput &&
-             python manage.py runserver 0.0.0.0:8000"
-    restart: "no"
+    restart: unless-stopped
 
   nginx:
     image: nginx
@@ -71,12 +68,12 @@ services:
       - "443:443"
     networks:
       - transcendence
-    restart: "no"
+    restart: unless-stopped
     depends_on:
       - django
     volumes:
-      - static_volume:/app/static
-      - ./srcs/nginx/ssl:/etc/nginx/ssl     #bind mount for ssl certificates
+      - static_volume:/app/static             #share static files between django and nginx
+      - ./srcs/nginx/ssl:/etc/nginx/ssl       #bind mount for ssl certificates
       - ./srcs/nginx/conf.d:/etc/nginx/conf.d #bind mount for nginx configuration
     healthcheck:
       test: "curl -kfsSL https://localhost:443"
