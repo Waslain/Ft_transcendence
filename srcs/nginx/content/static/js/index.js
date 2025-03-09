@@ -1,6 +1,5 @@
 import Main from "./views/Main.js";
-import Page1 from "./views/Page1.js";
-import Page2 from "./views/Page2.js";
+import Login from "./views/Login.js";
 import WaitingRoom from "./views/WaitingRoom.js";
 import Pong from "./views/Pong.js";
 import { loadAndSetFont } from "./views/pong/utils/font.js";
@@ -15,8 +14,7 @@ let view = null;
 const router = async () => {
   const routes = [
     { path: "/", view: Main },
-    { path: "/page1", view: Page1 },
-    { path: "/page2", view: Page2 },
+    { path: "/login", view: Login },
     { path: "/pong", view: WaitingRoom },
     { path: "/pong/:room_id", view: Pong },
   ];

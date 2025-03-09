@@ -9,9 +9,8 @@ export default class extends AbstractView {
   async getHtml() {
     return `
 			<h1>Hi, I am a sample page !</h1>
-			<a href="/page1" class="nav__link" data-link>page 1</a>
-			<a href="/page2" class="nav__link" data-link>page 2</a>
-			<a href="/pong" class="nav__link" data-link>pong</a>
+			<a href="/login" class="nav__link" data-link>login</a><br>
+			<a href="/pong" class="nav__link" data-link>pong</a><br>
 		`;
   }
 }

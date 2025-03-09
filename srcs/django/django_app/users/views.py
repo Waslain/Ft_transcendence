@@ -17,6 +17,7 @@ class RegisterUserAPIView(generics.CreateAPIView):
 	permission_classes = [permissions.AllowAny]
 
 class LoginUserAPIView(APIView):
+	permission_classes = [permissions.AllowAny]
 	def post(self, request):
 		user = authenticate(
 			username=request.data['username'],
