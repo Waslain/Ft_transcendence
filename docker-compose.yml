@@ -49,8 +49,6 @@ services:
       - ./srcs/nginx/content:/usr/share/nginx/html
     networks:
       - transcendence
-    volumes:
-      - ./srcs/nginx/content:/usr/share/nginx/html
 
 volumes:
   postgres_data:
