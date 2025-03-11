@@ -1,6 +1,7 @@
 import json
 import uuid
 import asyncio
+from typing import Dict, List
 from urllib import parse
 
 from channels.generic.websocket import AsyncWebsocketConsumer
@@ -48,8 +49,62 @@ class WaitingRoomConsumer(AsyncWebsocketConsumer):
             'count': count,
         }))
 
+class Playground:
+    radius = 0.5
+    width = 30
+    height = 20
+
+class MovingEntity:
+    def __init__(self):
+        self.x = 0
+        self.z = 0
+
+    def toDict(self):
+        return {"x": self.x, "z": self.z}
+
+    def setPos(self, x, z):
+        self.x = x
+        self.z = z
+
+class Ball(MovingEntity):
+    def __init__(self):
+        super().__init__()
+        self.radius = 0.3
+        self.dx = 0.02
+        self.dz = 0.02
+
+class Paddle(MovingEntity):
+    def __init__(self):
+        super().__init__()
+        self.radius = 0.3
+        self.length = 2
+        self.speed = 0.1
+
+class Player:
+    def __init__(self, name):
+        self.name = name
+        self.keyUp = False
+        self.keyDown = False
+        self.score = 0
+        self.paddle = Paddle()
+
+    def movePlayer(self, playground):
+        if self.keyUp == True:
+            if self.paddle.z >= -(playground.height / 2 - playground.radius * 2 - self.paddle.length / 2):
+                self.paddle.z -= self.paddle.speed
+        if self.keyDown == True:
+            if self.paddle.z <= playground.height / 2 - playground.radius * 2 - self.paddle.length / 2:
+                self.paddle.z += self.paddle.speed
+
+class GameManager:
+    def __init__(self):
+        self.playground = Playground()
+        self.ball = Ball()
+        self.loop = None
+        self.players : List[Player] = []
+
 class PlayerConsumer(AsyncWebsocketConsumer):
-    games = {}
+    games : Dict[str, GameManager] = {}
 
     async def connect(self):
         queryString = parse.parse_qs(self.scope["query_string"].decode())
@@ -59,77 +114,74 @@ class PlayerConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
         if not self.uuid in PlayerConsumer.games:
-            PlayerConsumer.games[self.uuid] = {"loop" : None, "players" : [], "ball" : {"x" : 0, "z" : 0, "dx" : 0.1, "dz" : 0.1}}
-        PlayerConsumer.games[self.uuid]["players"].append({"name" : self.name, "score" : 0, "up" : False, "down" : False, "paddle" : {"x" : 13.5, "z" : 0}})
-        if len(PlayerConsumer.games[self.uuid]["players"]) == 1:
-            PlayerConsumer.games[self.uuid]["players"][0]["paddle"]["x"] = -13.5
+            PlayerConsumer.games[self.uuid] = GameManager()
+        PlayerConsumer.games[self.uuid].players.append(Player(self.name))
         await self.accept()
 
-        if len(PlayerConsumer.games[self.uuid]["players"]) >= 2:
-            if PlayerConsumer.games[self.uuid]["loop"] is None:
-                PlayerConsumer.games[self.uuid]["loop"] = asyncio.create_task(self.sendLoopGame())
+        if len(PlayerConsumer.games[self.uuid].players) >= 2:
+            if PlayerConsumer.games[self.uuid].loop is None:
+                PlayerConsumer.games[self.uuid].loop = asyncio.create_task(self.sendLoopGame())
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
         if self.uuid in PlayerConsumer.games:
-            for player in PlayerConsumer.games[self.uuid]["players"]:
-                if player["name"] is self.name:
-                    PlayerConsumer.games[self.uuid]["players"].remove(player)
-            if not PlayerConsumer.games[self.uuid]["players"]:
-                if PlayerConsumer.games[self.uuid]["loop"] is not None:
-                    PlayerConsumer.games[self.uuid]["loop"].cancel()
+            for player in PlayerConsumer.games[self.uuid].players:
+                if player.name is self.name:
+                    PlayerConsumer.games[self.uuid].players.remove(player)
+            if not PlayerConsumer.games[self.uuid].players:
+                if PlayerConsumer.games[self.uuid].loop is not None:
+                    PlayerConsumer.games[self.uuid].loop.cancel()
                 del PlayerConsumer.games[self.uuid]
 
     async def receive(self, text_data):
         data = json.loads(text_data)
         if data["action"] == "keys":
-            for player in PlayerConsumer.games[self.uuid]["players"]:
-                if player["name"] is self.name:
+            for player in PlayerConsumer.games[self.uuid].players:
+                if player.name is self.name:
                     if data["params"]["key"] == "z" or data["params"]["key"] == "ArrowUp":
                         if data["params"]["type"] == "keydown":
-                            player["up"] = True
+                            player.keyUp = True
                         else:
-                            player["up"] = False
+                            player.keyUp = False
                     if data["params"]["key"] == "s" or data["params"]["key"] == "ArrowDown":
                         if data["params"]["type"] == "keydown":
-                            player["down"] = True
+                            player.keyDown = True
                         else:
-                            player["down"] = False
+                            player.keyDown = False
 
     async def sendLoopGame(self):
-        await self.groupSend("names", [player["name"] for player in PlayerConsumer.games[self.uuid]["players"]])
-        await self.groupSend("scores", [player["score"] for player in PlayerConsumer.games[self.uuid]["players"]])
+        await self.groupSend("names", [player.name for player in PlayerConsumer.games[self.uuid].players])
+        await self.groupSend("scores", [player.score for player in PlayerConsumer.games[self.uuid].players])
+        playground = PlayerConsumer.games[self.uuid].playground
+        ball = PlayerConsumer.games[self.uuid].ball
+        paddleLeft = PlayerConsumer.games[self.uuid].players[0].paddle
+        paddleRight = PlayerConsumer.games[self.uuid].players[1].paddle
+        paddleLeft.setPos(-(playground.width / 2 - playground.radius - paddleLeft.length / 2), 0)
+        paddleRight.setPos(playground.width / 2 - playground.radius - paddleRight.length / 2, 0)
         while True:
-            await self.groupSend("data", {"ball": PlayerConsumer.games[self.uuid]["ball"] ,"players": [player["paddle"] for player in PlayerConsumer.games[self.uuid]["players"]]})
-            for player in PlayerConsumer.games[self.uuid]["players"]:
-                if player["up"] == True:
-                    if player["paddle"]["z"] > -8:
-                        player["paddle"]["z"] -= 0.1
-                if player["down"] == True:
-                    if player["paddle"]["z"] < 8:
-                        player["paddle"]["z"] += 0.1
-            ball = PlayerConsumer.games[self.uuid]["ball"]
-            ball["x"] += ball["dx"]
-            ball["z"] += ball["dz"]
-            if ball["x"] > 14.1 or ball["x"] < -14.1:
-                if len(PlayerConsumer.games[self.uuid]["players"]) >= 2:
-                    if ball["x"] > 14.1:
-                        PlayerConsumer.games[self.uuid]["players"][0]["score"] += 1
-                        await self.groupSend("scores", [player["score"] for player in PlayerConsumer.games[self.uuid]["players"]])
-                        if PlayerConsumer.games[self.uuid]["players"][0]["score"] >= 10:
-                            await self.groupSend("winner", PlayerConsumer.games[self.uuid]["players"][0]["name"])
+            await self.groupSend("data", {"ball": PlayerConsumer.games[self.uuid].ball.toDict() ,"players": [player.paddle.toDict() for player in PlayerConsumer.games[self.uuid].players]})
+            for player in PlayerConsumer.games[self.uuid].players:
+                player.movePlayer(playground)
+            ball.x += ball.dx
+            ball.z += ball.dz
+            if ball.x >= (playground.width / 2 - playground.radius - ball.radius) or ball.x <= -(playground.width / 2 - playground.radius - ball.radius):
+                if len(PlayerConsumer.games[self.uuid].players) >= 2:
+                    if ball.x >= playground.width / 2 - playground.radius - ball.radius:
+                        PlayerConsumer.games[self.uuid].players[0].score += 1
+                        await self.groupSend("scores", [player.score for player in PlayerConsumer.games[self.uuid].players])
+                        if PlayerConsumer.games[self.uuid].players[0].score >= 10:
+                            await self.groupSend("winner", PlayerConsumer.games[self.uuid].players[0].name)
                             break
-                    elif ball["x"] < -14.1:
-                        PlayerConsumer.games[self.uuid]["players"][1]["score"] += 1
-                        await self.groupSend("scores", [player["score"] for player in PlayerConsumer.games[self.uuid]["players"]])
-                        if PlayerConsumer.games[self.uuid]["players"][1]["score"] >= 10:
-                            await self.groupSend("winner", PlayerConsumer.games[self.uuid]["players"][1]["name"])
+                    elif ball.x <= -(playground.width / 2 - playground.radius - ball.radius):
+                        PlayerConsumer.games[self.uuid].players[1].score += 1
+                        await self.groupSend("scores", [player.score for player in PlayerConsumer.games[self.uuid].players])
+                        if PlayerConsumer.games[self.uuid].players[1].score >= 10:
+                            await self.groupSend("winner", PlayerConsumer.games[self.uuid].players[1].name)
                             break
-                ball["dx"] *= -1
-                ball["x"] = 0
-                ball["z"] = 0
-            if ball["z"] > 9.1 or ball["z"] < -9.1:
-                ball["dz"] *= -1
+                ball.dx *= -1
+                ball.setPos(0, 0)
+            if ball.z >= (playground.height / 2 - playground.radius - ball.radius) or ball.z <= -(playground.height / 2 - playground.radius - ball.radius):
+                ball.dz *= -1
             await asyncio.sleep(0.01)
 
     async def groupSend(self, name, data):

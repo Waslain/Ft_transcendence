@@ -9,7 +9,7 @@ import { createBall } from "./utils/createBall.js";
 import { createText } from "./utils/createText.js";
 import { soundBtn } from "./utils/sound.js";
 
-export const game = (socket) => {
+export const game = (socket, signal) => {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(
     75,
@@ -106,10 +106,16 @@ export const game = (socket) => {
   renderer.setAnimationLoop(animate);
   document.getElementById("app").appendChild(renderer.domElement);
 
-  window.addEventListener("keyup", (e) => keys.keyManager(e));
-  window.addEventListener("keydown", (e) => keys.keyManager(e));
+  window.addEventListener("keyup", (e) => keys.keyManager(e), {
+    signal: signal,
+  });
+  window.addEventListener("keydown", (e) => keys.keyManager(e), {
+    signal: signal,
+  });
 
-  window.addEventListener("resize", onWindowResize);
+  window.addEventListener("resize", onWindowResize, {
+    signal: signal,
+  });
 
   function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
