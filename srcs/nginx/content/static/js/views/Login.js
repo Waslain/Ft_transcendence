@@ -26,17 +26,17 @@ export default class extends AbstractView {
                     <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Sign into your account</h5>
   
                     <div data-mdb-input-init class="form-outline mb-4">
-                      <input type="username" id="username" class="form-control form-control-lg" />
+                      <input type="text" id="username" name="username" class="form-control form-control-lg" />
                       <label class="username">Username</label>
                     </div>
   
                     <div data-mdb-input-init class="form-outline mb-4">
-                      <input type="password" id="password" class="form-control form-control-lg" />
+                      <input type="password" id="password" name="password" class="form-control form-control-lg" />
                       <label class="password">Password</label>
                     </div>
   
                     <div class="pt-1 mb-4">
-                      <button data-mdb-button-init data-mdb-ripple-init class="btn btn-dark btn-lg btn-block" type="button">Login</button>
+                      <button data-mdb-button-init data-mdb-ripple-init class="btn btn-dark btn-lg btn-block" type="submit">Login</button>
                     </div>
                     <p class="mb-5 pb-lg-2" style="color: #393f81;">Don't have an account? <a href="#!"
                         style="color: #393f81;">Register here</a></p>
@@ -67,11 +67,10 @@ export default class extends AbstractView {
 				return response.json();
 			})
 			.then(data => {
-				document.getElementById('response').innerText = JSON.stringify(data);
+				console.log(data.Message);
 			})
 			.catch(error => {
-				console.error('Error:', error);
-				document.getElementById('response').innerText = 'An error occurred.';
+				console.error('Error');
 			});
 		});
 	}
