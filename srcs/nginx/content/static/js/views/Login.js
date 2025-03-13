@@ -8,15 +8,47 @@ export default class extends AbstractView {
 
 	async getHtml() {
 	return `
-		<a href="/" class="nav__link" data-link>return to main page</a><br>
-			<form id="loginForm">
-				<label for="username">Username:</label><br>
-				<input type="text" id="username" name="username"><br>
-				<label for="password">Password:</label><br>
-				<input type="text" id="password" name="password"><br>
-				<input type="submit" value="Login">
-			</form>
-			<div id="response"></div>
+	<div class="container py-5 h-100">
+      <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col col-xl-10">
+          <div class="card" style="border-radius: 1rem;">
+            <div class="row g-0">
+              <div class="col-md-6 col-lg-7 d-flex align-items-center">
+                <div class="card-body p-4 p-lg-5 text-black">
+  
+                  <form id="loginForm">
+  
+                    <div class="d-flex align-items-center mb-3 pb-1">
+                      <i class="bi bi-people" style="color: #ffffff;"></i>
+                      <span class="h1 fw-bold mb-0">Login</span>
+                    </div>
+  
+                    <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Sign into your account</h5>
+  
+                    <div data-mdb-input-init class="form-outline mb-4">
+                      <input type="username" id="username" class="form-control form-control-lg" />
+                      <label class="username">Username</label>
+                    </div>
+  
+                    <div data-mdb-input-init class="form-outline mb-4">
+                      <input type="password" id="password" class="form-control form-control-lg" />
+                      <label class="password">Password</label>
+                    </div>
+  
+                    <div class="pt-1 mb-4">
+                      <button data-mdb-button-init data-mdb-ripple-init class="btn btn-dark btn-lg btn-block" type="button">Login</button>
+                    </div>
+                    <p class="mb-5 pb-lg-2" style="color: #393f81;">Don't have an account? <a href="#!"
+                        style="color: #393f81;">Register here</a></p>
+                  </form>
+  
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 		`;
 	}
 
