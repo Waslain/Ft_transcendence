@@ -19,27 +19,23 @@ export default class extends AbstractView {
                   <form id="loginForm">
   
                     <div class="d-flex align-items-center mb-3 pb-1">
-                      <i class="bi bi-people" style="color: #ffffff;"></i>
                       <span class="h1 fw-bold mb-0">Login</span>
                     </div>
   
                     <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Sign into your account</h5>
   
                     <div data-mdb-input-init class="form-outline mb-4">
-                      <input type="text" id="username" name="username" class="form-control form-control-lg" />
-                      <label class="username">Username</label>
+                      <input type="text" id="username" name="username" class="form-control form-control-lg" placeholder="Username">
                     </div>
   
                     <div data-mdb-input-init class="form-outline mb-4">
-                      <input type="password" id="password" name="password" class="form-control form-control-lg" />
-                      <label class="password">Password</label>
+                      <input type="password" id="password" name="password" class="form-control form-control-lg" placeholder="Password">
                     </div>
   
                     <div class="pt-1 mb-4">
                       <button data-mdb-button-init data-mdb-ripple-init class="btn btn-dark btn-lg btn-block" type="submit">Login</button>
                     </div>
-                    <p class="mb-5 pb-lg-2" style="color: #393f81;">Don't have an account? <a href="#!"
-                        style="color: #393f81;">Register here</a></p>
+                    <p class="mb-5 pb-lg-2" style="color: #000000;">Don't have an account? <a href="#!"
                   </form>
   
                 </div>
