@@ -3,6 +3,7 @@ import uuid
 import asyncio
 from typing import Dict, List
 from urllib import parse
+import math
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 
@@ -50,9 +51,10 @@ class WaitingRoomConsumer(AsyncWebsocketConsumer):
         }))
 
 class Playground:
-    radius = 0.5
-    width = 30
-    height = 20
+    radiusWall = 0.5
+    radiusWidth = 15
+    radiusHeight = 10
+    diffBorderPlayer = 1.5
 
 class MovingEntity:
     def __init__(self):
@@ -63,21 +65,25 @@ class MovingEntity:
         return {"x": self.x, "z": self.z}
 
     def setPos(self, x, z):
-        self.x = x
-        self.z = z
+        self.x = round(x, 2)
+        self.z = round(z, 2)
 
 class Ball(MovingEntity):
     def __init__(self):
         super().__init__()
         self.radius = 0.3
-        self.dx = 0.02
-        self.dz = 0.02
+        self.dx = 0.1
+        self.dz = 0.1
+    
+    def setDirection(self, dx, dz):
+        self.dx = dx
+        self.dz = dz
 
 class Paddle(MovingEntity):
     def __init__(self):
         super().__init__()
-        self.radius = 0.3
-        self.length = 2
+        self.radiusWidth = 0.3
+        self.radiusHeight = 1
         self.speed = 0.1
 
 class Player:
@@ -90,11 +96,11 @@ class Player:
 
     def movePlayer(self, playground):
         if self.keyUp == True:
-            if self.paddle.z >= -(playground.height / 2 - playground.radius * 2 - self.paddle.length / 2):
-                self.paddle.z -= self.paddle.speed
+            if self.paddle.z >= -(round(playground.radiusHeight - playground.radiusWall * 2 - self.paddle.radiusHeight + (self.paddle.radiusWidth / 2), 2)):
+                self.paddle.z = round(self.paddle.z - self.paddle.speed, 2)
         if self.keyDown == True:
-            if self.paddle.z <= playground.height / 2 - playground.radius * 2 - self.paddle.length / 2:
-                self.paddle.z += self.paddle.speed
+            if self.paddle.z <= round(playground.radiusHeight - playground.radiusWall * 2 - self.paddle.radiusHeight + (self.paddle.radiusWidth / 2), 2):
+                self.paddle.z = round(self.paddle.z + self.paddle.speed, 2)
 
 class GameManager:
     def __init__(self):
@@ -149,38 +155,54 @@ class PlayerConsumer(AsyncWebsocketConsumer):
                         else:
                             player.keyDown = False
 
+    async def updateScore(self, player, ball):
+        player.score += 1
+        await self.groupSend("scores", [player.score for player in PlayerConsumer.games[self.uuid].players])
+        if player.score >= 10:
+            await self.groupSend("winner", player.name)
+            return "win"
+        ball.dx *= -1
+        ball.setPos(0, 0)
+        return None
+
     async def sendLoopGame(self):
         await self.groupSend("names", [player.name for player in PlayerConsumer.games[self.uuid].players])
         await self.groupSend("scores", [player.score for player in PlayerConsumer.games[self.uuid].players])
         playground = PlayerConsumer.games[self.uuid].playground
         ball = PlayerConsumer.games[self.uuid].ball
+        paddle = Paddle()
         paddleLeft = PlayerConsumer.games[self.uuid].players[0].paddle
         paddleRight = PlayerConsumer.games[self.uuid].players[1].paddle
-        paddleLeft.setPos(-(playground.width / 2 - playground.radius - paddleLeft.length / 2), 0)
-        paddleRight.setPos(playground.width / 2 - playground.radius - paddleRight.length / 2, 0)
+        paddleLeft.setPos(-(round(playground.radiusWidth - playground.radiusWall - paddle.radiusHeight, 2)), 0)
+        paddleRight.setPos(round(playground.radiusWidth - playground.radiusWall - paddle.radiusHeight, 2), 0)
+        playgroundWidthLimit = round(playground.radiusWidth - playground.radiusWall - ball.radius, 2)
+        playgroundHeightLimit = round(playground.radiusHeight - playground.radiusWall - ball.radius, 2)
+        paddleLimit = round(playground.radiusWidth - playground.diffBorderPlayer - paddle.radiusWidth - ball.radius, 2)
+        negPaddleRadius = paddle.radiusHeight - paddle.radiusWidth
+        posPaddleRadius = paddle.radiusHeight + paddle.radiusWidth
+
         while True:
             await self.groupSend("data", {"ball": PlayerConsumer.games[self.uuid].ball.toDict() ,"players": [player.paddle.toDict() for player in PlayerConsumer.games[self.uuid].players]})
             for player in PlayerConsumer.games[self.uuid].players:
                 player.movePlayer(playground)
-            ball.x += ball.dx
-            ball.z += ball.dz
-            if ball.x >= (playground.width / 2 - playground.radius - ball.radius) or ball.x <= -(playground.width / 2 - playground.radius - ball.radius):
-                if len(PlayerConsumer.games[self.uuid].players) >= 2:
-                    if ball.x >= playground.width / 2 - playground.radius - ball.radius:
-                        PlayerConsumer.games[self.uuid].players[0].score += 1
-                        await self.groupSend("scores", [player.score for player in PlayerConsumer.games[self.uuid].players])
-                        if PlayerConsumer.games[self.uuid].players[0].score >= 10:
-                            await self.groupSend("winner", PlayerConsumer.games[self.uuid].players[0].name)
-                            break
-                    elif ball.x <= -(playground.width / 2 - playground.radius - ball.radius):
-                        PlayerConsumer.games[self.uuid].players[1].score += 1
-                        await self.groupSend("scores", [player.score for player in PlayerConsumer.games[self.uuid].players])
-                        if PlayerConsumer.games[self.uuid].players[1].score >= 10:
-                            await self.groupSend("winner", PlayerConsumer.games[self.uuid].players[1].name)
-                            break
-                ball.dx *= -1
-                ball.setPos(0, 0)
-            if ball.z >= (playground.height / 2 - playground.radius - ball.radius) or ball.z <= -(playground.height / 2 - playground.radius - ball.radius):
+            ball.setPos(round(ball.x + ball.dx, 2), round(ball.z + ball.dz, 2))
+            if ball.x >= paddleLimit and round(paddleRight.z - negPaddleRadius, 2) <= ball.z <= round(paddleRight.z + posPaddleRadius, 2):
+                relIntersect = (ball.z - paddleRight.z) / paddle.radiusHeight
+                newAngle = relIntersect * math.radians(45)
+                speed = math.sqrt(ball.dx**2 + ball.dz**2)
+                ball.setDirection(-(speed) * math.cos(newAngle), speed * math.sin(newAngle))
+            elif ball.x <= -(paddleLimit) and round(paddleLeft.z - negPaddleRadius, 2) <= ball.z <= round(paddleLeft.z + posPaddleRadius, 2):
+                relIntersect = (ball.z - paddleLeft.z) / paddle.radiusHeight
+                newAngle = relIntersect * math.radians(45)
+                speed = math.sqrt(ball.dx**2 + ball.dz**2)
+                ball.setDirection(speed * math.cos(newAngle), speed * math.sin(newAngle))
+            if ball.x >= playgroundWidthLimit:
+                if await self.updateScore(PlayerConsumer.games[self.uuid].players[0], ball) == "win":
+                    break
+            elif ball.x <= -(playgroundWidthLimit):
+                if await self.updateScore(PlayerConsumer.games[self.uuid].players[1], ball) == "win":
+                    break
+            if ball.z >= playgroundHeightLimit or ball.z <= -(playgroundHeightLimit):
                 ball.dz *= -1
             await asyncio.sleep(0.01)
 
