@@ -92,8 +92,12 @@ export const game = (socket, signal) => {
           data.params.data.players[1].z
         );
         break;
-      case "win":
-        displayWinner(data.params.winner, scene);
+      case "message":
+        displayMessage(
+          data.params.messages.first,
+          data.params.messages.second,
+          scene
+        );
         break;
     }
   };
@@ -225,7 +229,7 @@ const checkScore = (objectManager, scene) => {
     (objectManager.player2.score >= scoreMin &&
       objectManager.player2.score - 2 >= objectManager.player1.score)
   ) {
-    displayWinner(
+    displayMessage(
       objectManager.player1.score > objectManager.player2.score
         ? objectManager.player1.name
         : objectManager.player2.name,
@@ -236,15 +240,14 @@ const checkScore = (objectManager, scene) => {
   return true;
 };
 
-const displayWinner = (name, scene) => {
-  const text = createText(name, name.length, 3);
-  text.object.position.set(-(text.size.x / 2), 3, -15);
-  text.object.rotation.x = -0.5;
+const displayMessage = (firstStr, SecondStr, scene) => {
+  const firstMsg = createText(firstStr, firstStr.length, 3);
+  firstMsg.object.position.set(-(firstMsg.size.x / 2), 7, -16);
+  firstMsg.object.rotation.x = -0.5;
 
-  const winMsg = "And the winner is";
-  const textDef = createText(winMsg, winMsg.length, 3);
-  textDef.object.position.set(-(textDef.size.x / 2), 7, -16);
-  textDef.object.rotation.x = -0.5;
+  const secondMsg = createText(SecondStr, SecondStr.length, 3);
+  secondMsg.object.position.set(-(secondMsg.size.x / 2), 3, -15);
+  secondMsg.object.rotation.x = -0.5;
 
-  scene.add(text.object, textDef.object);
+  scene.add(firstMsg.object, secondMsg.object);
 };

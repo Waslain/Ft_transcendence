@@ -89,6 +89,7 @@ class Paddle(MovingEntity):
 class Player:
     def __init__(self, name):
         self.name = name
+        self.connected = True
         self.keyUp = False
         self.keyDown = False
         self.score = 0
@@ -128,13 +129,19 @@ class PlayerConsumer(AsyncWebsocketConsumer):
             if PlayerConsumer.games[self.uuid].loop is None:
                 PlayerConsumer.games[self.uuid].loop = asyncio.create_task(self.sendLoopGame())
 
+    def isEveryoneOffline(self, players):
+        for player in players:
+            if player.connected == True:
+                return False
+        return True
+
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
         if self.uuid in PlayerConsumer.games:
             for player in PlayerConsumer.games[self.uuid].players:
                 if player.name is self.name:
-                    PlayerConsumer.games[self.uuid].players.remove(player)
-            if not PlayerConsumer.games[self.uuid].players:
+                    player.connected = False
+            if self.isEveryoneOffline(PlayerConsumer.games[self.uuid].players):
                 if PlayerConsumer.games[self.uuid].loop is not None:
                     PlayerConsumer.games[self.uuid].loop.cancel()
                 del PlayerConsumer.games[self.uuid]
@@ -159,11 +166,20 @@ class PlayerConsumer(AsyncWebsocketConsumer):
         player.score += 1
         await self.groupSend("scores", [player.score for player in PlayerConsumer.games[self.uuid].players])
         if player.score >= 10:
-            await self.groupSend("winner", player.name)
+            await self.groupSend("messages", {"first": "Winner is", "second": player.name})
             return "win"
-        ball.dx *= -1
-        ball.setPos(0, 0)
+        ball.setDirection(ball.dx * -1, ball.dz)
+        ball.setPos(0, ball.z)
         return None
+
+    async def isPlayerOffline(self, players):
+        if not players[0].connected:
+            await self.groupSend("messages", {"first": players[0].name + " is Disconnected", "second": "Winner is " + players[1].name})
+            return True
+        elif not players[1].connected:
+            await self.groupSend("messages", {"first": players[1].name + " is Disconnected", "second": "Winner is " + players[0].name})
+            return True
+        return False
 
     async def sendLoopGame(self):
         await self.groupSend("names", [player.name for player in PlayerConsumer.games[self.uuid].players])
@@ -178,20 +194,19 @@ class PlayerConsumer(AsyncWebsocketConsumer):
         playgroundWidthLimit = round(playground.radiusWidth - playground.radiusWall - ball.radius, 2)
         playgroundHeightLimit = round(playground.radiusHeight - playground.radiusWall - ball.radius, 2)
         paddleLimit = round(playground.radiusWidth - playground.diffBorderPlayer - paddle.radiusWidth - ball.radius, 2)
-        negPaddleRadius = paddle.radiusHeight - paddle.radiusWidth
-        posPaddleRadius = paddle.radiusHeight + paddle.radiusWidth
+        paddleRadius = round(paddle.radiusHeight + paddle.radiusWidth + ball.radius, 2)
 
         while True:
             await self.groupSend("data", {"ball": PlayerConsumer.games[self.uuid].ball.toDict() ,"players": [player.paddle.toDict() for player in PlayerConsumer.games[self.uuid].players]})
             for player in PlayerConsumer.games[self.uuid].players:
                 player.movePlayer(playground)
             ball.setPos(round(ball.x + ball.dx, 2), round(ball.z + ball.dz, 2))
-            if ball.x >= paddleLimit and round(paddleRight.z - negPaddleRadius, 2) <= ball.z <= round(paddleRight.z + posPaddleRadius, 2):
+            if ball.x >= paddleLimit and round(paddleRight.z - paddleRadius, 2) <= ball.z <= round(paddleRight.z + paddleRadius, 2):
                 relIntersect = (ball.z - paddleRight.z) / paddle.radiusHeight
                 newAngle = relIntersect * math.radians(45)
                 speed = math.sqrt(ball.dx**2 + ball.dz**2)
                 ball.setDirection(-(speed) * math.cos(newAngle), speed * math.sin(newAngle))
-            elif ball.x <= -(paddleLimit) and round(paddleLeft.z - negPaddleRadius, 2) <= ball.z <= round(paddleLeft.z + posPaddleRadius, 2):
+            elif ball.x <= -(paddleLimit) and round(paddleLeft.z - paddleRadius, 2) <= ball.z <= round(paddleLeft.z + paddleRadius, 2):
                 relIntersect = (ball.z - paddleLeft.z) / paddle.radiusHeight
                 newAngle = relIntersect * math.radians(45)
                 speed = math.sqrt(ball.dx**2 + ball.dz**2)
@@ -202,6 +217,8 @@ class PlayerConsumer(AsyncWebsocketConsumer):
             elif ball.x <= -(playgroundWidthLimit):
                 if await self.updateScore(PlayerConsumer.games[self.uuid].players[1], ball) == "win":
                     break
+            if await self.isPlayerOffline(PlayerConsumer.games[self.uuid].players):
+                break
             if ball.z >= playgroundHeightLimit or ball.z <= -(playgroundHeightLimit):
                 ball.dz *= -1
             await asyncio.sleep(0.01)
@@ -225,6 +242,6 @@ class PlayerConsumer(AsyncWebsocketConsumer):
         if "data" in event:
             await self.send(text_data=json.dumps({"action": "loop", "params": {"data": event["data"]}}))
             return
-        if "winner" in event:
-            await self.send(text_data=json.dumps({"action": "win", "params": {"winner": event["winner"]}}))
+        if "messages" in event:
+            await self.send(text_data=json.dumps({"action": "message", "params": {"messages": event["messages"]}}))
             return
