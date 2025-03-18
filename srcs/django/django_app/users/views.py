@@ -6,12 +6,13 @@ from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from users.serializers import UserSerializer
 from users.models import User
+from rest_framework.decorators import api_view
 
 
 class UserViewSet(viewsets.ModelViewSet):
 	queryset = User.objects.all()
 	serializer_class = UserSerializer
-	permission_classes = [permissions.IsAuthenticated]
+	# permission_classes = [permissions.IsAuthenticated]
 
 class RegisterUserAPIView(generics.CreateAPIView):
 	serializer_class = UserSerializer
@@ -38,3 +39,29 @@ class LoginUserAPIView(APIView):
 		return Response({
 			'Message':'Invalid Username or Password'},
 			status=401)
+
+@api_view(['GET'])
+def mutual_friends(request, user_id_1, user_id_2):
+	try:
+		user1 = User.objects.get(id=user_id_1)
+		user2 = User.objects.get(id=user_id_2)
+	except User.DoesNotExist:
+		return Response(status=status.HTTP_404_NOT_FOUND)
+
+	are_mutual_friends = user_id_2 in user1.friends and user_id_1 in user2.friends
+	return Response({'are_mutual_friends': are_mutual_friends}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def add_friend(request, user_id_1, user_id_2):
+	try:
+		user1 = User.objects.get(id=user_id_1)
+		user2 = User.objects.get(id=user_id_2)
+	except User.DoesNotExist:
+		return Response(status=status.HTTP_404_NOT_FOUND)
+
+	if user_id_2 not in user1.friends:
+		user1.friends.append(user_id_2)
+		user1.save()
+		return Response({'status': 'friend added'}, status=status.HTTP_200_OK)
+	else:
+		return Response({'status': 'friend already in list'}, status=status.HTTP_400_BAD_REQUEST)
