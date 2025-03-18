@@ -6,7 +6,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 
 	class Meta:
 		model = User
-		fields = ['url', 'id', 'username', 'password']
+		fields = ['url', 'id', 'username', 'password', 'friends']
 
 	def validate_username(self, value):
 		if len(value) > 20:
