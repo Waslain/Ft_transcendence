@@ -11,6 +11,7 @@ export const navigateTo = (url) => {
 };
 
 let view = null;
+let fontLoad = false;
 
 const router = async () => {
   const routes = [
@@ -41,7 +42,10 @@ const router = async () => {
   }
 
   await view?.cleanUp?.();
-  await loadAndSetFont("/static/js/views/pong/utils/typeFont/typeFont.json");
+  if (!fontLoad) {
+    await loadAndSetFont("/static/js/views/pong/utils/typeFont/typeFont.json");
+    fontLoad = true;
+  }
   const params = getParams(match);
   view = new match.route.view(params);
 
