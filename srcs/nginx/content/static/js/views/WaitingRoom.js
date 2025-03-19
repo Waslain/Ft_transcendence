@@ -23,13 +23,12 @@ export default class extends AbstractView {
 
   async #webSocket(name) {
     const roomName = "waitingRoom";
-
-    this.waitingRoomSocket = new WebSocket(
-      "ws://" +
+    const url = "wss://" +
         window.location.hostname +
-        ":8000/ws/pong/waitingRoom/?name=" +
-        encodeURIComponent(name)
-    );
+        "/ws/pong/waitingRoom/?name=" +
+        encodeURIComponent(name);
+
+    this.waitingRoomSocket = new WebSocket(url);
 
     this.waitingRoomSocket.onopen = (e) => {
       console.log("Connected to the waiting room:", roomName);

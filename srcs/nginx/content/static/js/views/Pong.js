@@ -102,15 +102,14 @@ export default class extends AbstractView {
 
   async #webSocket(name) {
     const roomName = "pongRoom";
-
-    this.pongRoomSocket = new WebSocket(
-      "ws://" +
+	const url = "wss://" +
         window.location.hostname +
-        ":8000/ws/pong/pongRoom/?uuid=" +
+        "/ws/pong/pongRoom/?uuid=" +
         encodeURIComponent(this.params.room_id) +
         "&name=" +
-        name
-    );
+        name;
+
+    this.pongRoomSocket = new WebSocket(url);
 
     this.pongRoomSocket.onopen = (e) => {
       console.log("Connected to the pong room:", roomName);

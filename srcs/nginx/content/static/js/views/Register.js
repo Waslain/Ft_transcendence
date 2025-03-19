@@ -16,13 +16,13 @@ export default class extends AbstractView {
               <div class="col-md-6 col-lg-7 d-flex align-items-center">
                 <div class="card-body p-4 p-lg-5 text-black">
   
-                  <form id="loginForm">
+                  <form id="registerForm">
   
                     <div class="d-flex align-items-center mb-3 pb-1">
-                      <span class="h1 fw-bold mb-0">Login</span>
+                      <span class="h1 fw-bold mb-0">Register</span>
                     </div>
   
-                    <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Sign into your account</h5>
+                    <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Create a new account</h5>
   
                     <div data-mdb-input-init class="form-outline mb-4">
                       <input type="text" id="username" name="username" class="form-control form-control-lg" placeholder="Username" maxlength="20">
@@ -33,13 +33,15 @@ export default class extends AbstractView {
                       <input type="password" id="password" name="password" class="form-control form-control-lg" placeholder="Password" maxlength="20">
 					  <div id="passwordCheck" style="color:#dd0000"></div>
                     </div>
+
+                    <div data-mdb-input-init class="form-outline mb-4">
+                      <input type="password" id="confirmPassword" name="confirmPassword" class="form-control form-control-lg" placeholder="Confirm password" maxlength="20">
+					  <div id="confirmPasswordCheck" style="color:#dd0000"></div>
+                    </div>
   
                     <div class="pt-1 mb-4">
-                      <button data-mdb-button-init data-mdb-ripple-init class="btn btn-dark btn-lg btn-block" type="submit">Login</button>
-					<div id="response" style="color:#dd0000"></div>
+                      <button data-mdb-button-init data-mdb-ripple-init class="btn btn-dark btn-lg btn-block" type="submit">Register</button>
                     </div>
-                    <p class="mb-5 pb-lg-2" style="color: #000000;">Don't have an account?
-					<a href="/user/register" class="nav-link" style="color: #0000dd" data-link>register here!</a>
                   </form>
   
                 </div>
@@ -57,55 +59,19 @@ export default class extends AbstractView {
 			event.preventDefault();
 
 			const formData = new FormData(this)
-			const username = formData.get("username")
-			const password = formData.get("password")
-			const confirmPassword = formData.get("confirmPassword")
-			formData.delete("confirmPassword");
-
-			if (username.length === 0|| password.length === 0) {
-				document.getElementById('responseRegister')
-					.innerText = 'All fields must be provided';
-				return;
-			}
-
-			if (password !== confirmPassword) {
-				document.getElementById('responseRegister')
-					.innerText = 'Password must be equal';
-				return;
-			}
-
-			var url = "http://localhost:8000/register/"
-			fetch(url, {
-				method: 'POST',
-				body: formData,
-			})
-			.then(response => {
-				return response.json();
-			})
-			.then(data => {
-				document.getElementById('responseRegister')
-				.innerText = data.message;
-			})
-			.catch(error => {
-				console.error('Error:', error);
-				document.getElementById('responseRegister')
-				.innerText = 'An error occurred.';
-			});
-			document.getElementById('registerForm').reset()
-		});
-
-		document.getElementById('loginForm').addEventListener('submit', function(event) {
-			event.preventDefault();
-			document.getElementById('response').innerText = "";
-
-			const formData = new FormData(this)
 			const username = formData.get("username");
 			const password = formData.get("password");
+			const confirmPassword = formData.get("confirmPassword");
+			formData.delete("confirmPassword");
 			let inputCheck = false;
 
 			if (username === "") {
 				inputCheck = true;
 				document.getElementById('usernameCheck').innerText = "Please enter a username";
+			}
+			else if (!username.match(/^[A-Za-z0-9-_@+.]*$/)) {
+				inputCheck = true;
+				document.getElementById('usernameCheck').innerText = "Username can only contain alphanumeric characters and special characters - _ @ + .";
 			}
 			else {
 				document.getElementById('usernameCheck').innerText = "";
@@ -119,30 +85,35 @@ export default class extends AbstractView {
 				document.getElementById('passwordCheck').innerText = "";
 			}
 
-			if (inputCheck) {
+			if (password !== confirmPassword) {
+				inputCheck = true;
+				document.getElementById('confirmPasswordCheck').innerText = "Those passwords didn't match";
+			}
+			else {
+				document.getElementById('confirmPasswordCheck').innerText = "";
+			}
+
+			if (inputCheck === true) {
 				return;
 			}
 
-			var url = "https://localhost/api/users/login/"
+			var url = "https://localhost/api/users/register/"
 			fetch(url, {
 				method: 'POST',
 				body: formData,
 			})
 			.then(response => {
 				if (response.status >= 400) {
-					document.getElementById('response').innerText = "Invalid username or password";
+						document.getElementById('usernameCheck').innerText = "A user with that username already exists";
 				}
 				return response.json();
 			})
 			.then(data => {
-				if ("token" in data) {
-					console.log(data.token);
-				}
+				console.log(data.Message);
 			})
 			.catch(error => {
-				console.error(error);
+				console.error('Error');
 			});
-			document.getElementById('loginForm').reset()
 		});
 	}
 }

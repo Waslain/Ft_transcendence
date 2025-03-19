@@ -5,8 +5,6 @@ services:
       POSTGRES_DB: ${DATABASE_NAME}
       POSTGRES_USER: ${DATABASE_USERNAME}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-    ports:
-      - "5432:5432"
     networks:
       - transcendence
     volumes:
@@ -17,8 +15,6 @@ services:
   django:
     build: ./srcs/django
     container_name: django
-    ports:
-      - "8000:8000"
     networks:
       - transcendence
     depends_on:
@@ -43,7 +39,7 @@ services:
     build: ./srcs/nginx
     container_name: nginx
     ports:
-      - "8080:80"
+      - "443:443"
     volumes:
       - ./srcs/nginx/conf/nginx.conf:/etc/nginx/nginx.conf
       - ./srcs/nginx/content:/usr/share/nginx/html
