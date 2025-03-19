@@ -53,6 +53,47 @@ export default class extends AbstractView {
 	}
 
 	async getJavaScript() {
+		document.getElementById('registerForm').addEventListener('submit', function(event) {
+			event.preventDefault();
+
+			const formData = new FormData(this)
+			const username = formData.get("username")
+			const password = formData.get("password")
+			const confirmPassword = formData.get("confirmPassword")
+			formData.delete("confirmPassword");
+
+			if (username.length === 0|| password.length === 0) {
+				document.getElementById('responseRegister')
+					.innerText = 'All fields must be provided';
+				return;
+			}
+
+			if (password !== confirmPassword) {
+				document.getElementById('responseRegister')
+					.innerText = 'Password must be equal';
+				return;
+			}
+
+			var url = "http://localhost:8000/register/"
+			fetch(url, {
+				method: 'POST',
+				body: formData,
+			})
+			.then(response => {
+				return response.json();
+			})
+			.then(data => {
+				document.getElementById('responseRegister')
+				.innerText = data.message;
+			})
+			.catch(error => {
+				console.error('Error:', error);
+				document.getElementById('responseRegister')
+				.innerText = 'An error occurred.';
+			});
+			document.getElementById('registerForm').reset()
+		});
+
 		document.getElementById('loginForm').addEventListener('submit', function(event) {
 			event.preventDefault();
 			document.getElementById('response').innerText = "";
@@ -101,6 +142,7 @@ export default class extends AbstractView {
 			.catch(error => {
 				console.error(error);
 			});
+			document.getElementById('loginForm').reset()
 		});
 	}
 }

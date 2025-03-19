@@ -39,14 +39,12 @@ export default class extends AbstractView {
     };
 
     this.waitingRoomSocket.onmessage = (e) => {
-      console.log(e.data);
       const data = JSON.parse(e.data);
       if (data.count !== undefined) {
         document.getElementById("connectionCount").textContent =
           "Connections: " + data.count;
       }
       if (data.uuid !== undefined) {
-        console.log(data.uuid);
         navigateTo("/pong/" + data.uuid + "?name=" + encodeURIComponent(name));
       }
     };

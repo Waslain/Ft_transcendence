@@ -98,6 +98,7 @@ export default class extends AbstractView {
   }
 
   #pongRoomSocket;
+  #abortController;
 
   async #webSocket(name) {
     const roomName = "pongRoom";
@@ -120,13 +121,15 @@ export default class extends AbstractView {
   }
 
   async getJavaScript() {
+    this.#abortController = new AbortController();
     const searchParams = new URLSearchParams(window.location.search);
     await this.#webSocket(searchParams.get("name") || "Anonymous");
 
-    game(this.pongRoomSocket);
+    game(this.pongRoomSocket, this.#abortController.signal);
   }
 
   async cleanUp() {
     this.pongRoomSocket?.close();
+    this.#abortController.abort();
   }
 }
