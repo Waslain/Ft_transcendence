@@ -41,6 +41,12 @@ export default class extends AbstractView {
                     <p class="mb-5 pb-lg-2" style="color: #000000;">Don't have an account?
 					<a href="/user/register" class="nav-link" style="color: #0000dd" data-link>register here!</a>
                   </form>
+
+				  <div>
+				  	<button id=testBtn>Am I logged in ?</button>
+				  	<button id=logoutBtn>Logout</button>
+					<div id="test"></div>
+				  </div>
   
                 </div>
               </div>
@@ -94,8 +100,45 @@ export default class extends AbstractView {
 				return response.json();
 			})
 			.then(data => {
-				if ("token" in data) {
-					console.log(data.token);
+				console.log(data.message)
+			})
+			.catch(error => {
+				console.error(error);
+			});
+		});
+
+		document.getElementById('testBtn').addEventListener('click', function(event) {
+			var url = "https://localhost/api/users/session/"
+			fetch(url, {
+				method: 'GET',
+			})
+			.then(response => {
+				return response.json();
+			})
+			.then(data => {
+				if (data.IsAuthenticated === true) {
+					document.getElementById('test').innerText = 'User is logged in';
+				}
+				else {
+					document.getElementById('test').innerText = 'User is not logged in';
+				}
+			})
+			.catch(error => {
+				console.error(error);
+			});
+		});
+
+		document.getElementById('logoutBtn').addEventListener('click', function(event) {
+			var url = "https://localhost/api/users/logout/"
+			fetch(url, {
+				method: 'GET',
+			})
+			.then(response => {
+				if (response.status === 200) {
+					document.getElementById('test').innerText = 'Successfully logged out';
+				}
+				else {
+					document.getElementById('test').innerText = 'User is not logged in';
 				}
 			})
 			.catch(error => {
