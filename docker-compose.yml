@@ -43,8 +43,11 @@ services:
     volumes:
       - ./srcs/nginx/conf/nginx.conf:/etc/nginx/nginx.conf
       - ./srcs/nginx/content:/usr/share/nginx/html
+      - ./srcs/nginx/ssl:/etc/nginx/ssl
     networks:
       - transcendence
+    depends_on:
+      - django
 
 volumes:
   postgres_data:
