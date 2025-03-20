@@ -4,6 +4,7 @@ import Register from "./views/Register.js";
 import WaitingRoom from "./views/WaitingRoom.js";
 import Pong from "./views/Pong.js";
 import { loadAndSetFont } from "./views/pong/utils/font.js";
+import Test from "./views/Test.js";
 
 export const navigateTo = (url) => {
   history.pushState(null, null, url);
@@ -20,6 +21,7 @@ const router = async () => {
     { path: "/user/register", view: Register },
     { path: "/pong", view: WaitingRoom },
     { path: "/pong/:room_id", view: Pong },
+    { path: "/test", view: Test },
   ];
 
   const potentialMatches = routes.map((route) => {
@@ -48,6 +50,26 @@ const router = async () => {
   }
   const params = getParams(match);
   view = new match.route.view(params);
+
+  const redirection = view.redirect();
+  if (redirection.needed) {
+    var url = "https://localhost/api/users/session/"
+    const update = await fetch(url, {
+      method: 'GET',
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.IsAuthenticated === redirection.auth) {
+		  return true;
+      }
+      return false;
+    })
+	if (update) {
+	  history.replaceState(null, null, redirection.url);
+	  let obj = routes.find(route => route.path === redirection.url);
+	  view = new obj.view;
+	}
+  }
 
   document.querySelector("#style").innerHTML = await view.getStyle();
   document.querySelector("#app").innerHTML = await view.getHtml();
