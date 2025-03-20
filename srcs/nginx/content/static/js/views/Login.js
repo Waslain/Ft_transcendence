@@ -58,7 +58,11 @@ export default class extends AbstractView {
 		`;
 	}
 
+	#abortController;
+
 	async getJavaScript() {
+		this.#abortController = new AbortController();
+
 		document.getElementById('loginForm').addEventListener('submit', function(event) {
 			event.preventDefault();
 			document.getElementById('response').innerText = "";
@@ -105,6 +109,9 @@ export default class extends AbstractView {
 			.catch(error => {
 				console.error(error);
 			});
+		},
+		{
+			signal: this.#abortController.signal,
 		});
 
 		document.getElementById('testBtn').addEventListener('click', function(event) {
@@ -126,6 +133,9 @@ export default class extends AbstractView {
 			.catch(error => {
 				console.error(error);
 			});
+		},
+		{
+			signal: this.#abortController.signal,
 		});
 
 		document.getElementById('logoutBtn').addEventListener('click', function(event) {
@@ -144,6 +154,14 @@ export default class extends AbstractView {
 			.catch(error => {
 				console.error(error);
 			});
+		},
+		{
+			signal: this.#abortController.signal,
 		});
+		
+	}
+
+	async cleanUp() {
+		this.#abortController.abort();
 	}
 }
