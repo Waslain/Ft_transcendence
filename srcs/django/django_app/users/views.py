@@ -24,11 +24,24 @@ class RegisterView(generics.CreateAPIView):
 		serializer.is_valid(raise_exception=True)
 		self.perform_create(serializer)
 		headers = self.get_success_headers(serializer.data)
-		return Response({
+		user = authenticate(
+			username=request.data['username'],
+			password=request.data['password']
+		)
+		token, created = Token.objects.get_or_create(user=user)
+		response = Response({
 			'message':'User created successfully'},
 			status=status.HTTP_201_CREATED,
 			headers=headers
 		)
+		response.set_cookie(
+			key = 'auth_token',
+			value = token.key,
+			secure = True,
+			httponly = True,
+			samesite = 'Lax'
+		)
+		return response
 
 
 class LoginView(APIView):
