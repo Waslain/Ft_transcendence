@@ -54,7 +54,11 @@ export default class extends AbstractView {
 		`;
 	}
 
+	#abortController;
+
 	async getJavaScript() {
+		this.#abortController = new AbortController();
+
 		document.getElementById('registerForm').addEventListener('submit', function(event) {
 			event.preventDefault();
 
@@ -114,6 +118,13 @@ export default class extends AbstractView {
 			.catch(error => {
 				console.error('Error');
 			});
+		},
+		{
+			signal: this.#abortController.signal,
 		});
+	}
+
+	async cleanUp() {
+		this.#abortController.abort();
 	}
 }
