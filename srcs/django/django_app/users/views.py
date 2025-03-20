@@ -72,10 +72,12 @@ class LogoutView(APIView):
 
 
 class SessionView(APIView):
-	permission_classes = [permissions.IsAuthenticated]
-	
+	permission_classes = [permissions.AllowAny]
+
 	def get(self, request):
-		return Response({'IsAuthenticated': True})
+		if (request.user.is_authenticated):
+			return Response({'IsAuthenticated': True})
+		return Response({'IsAuthenticated': False}, status=401)
 
 
 @api_view(['GET'])

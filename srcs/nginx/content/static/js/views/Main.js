@@ -11,6 +11,7 @@ export default class extends AbstractView {
 			<h1>Hi, I am a sample page !</h1>
 			<a href="/user/login" class="nav__link" data-link>login</a><br>
 			<a href="/pong" class="nav__link" data-link>pong</a><br>
+			<a href="/test" class="nav__link" data-link>test page for redirections<a><br>
 		`;
   }
 }

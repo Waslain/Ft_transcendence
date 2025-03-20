@@ -4,6 +4,11 @@ export default class extends AbstractView {
 	constructor() {
 		super();
 		this.setTitle("Transcendence");
+		this.redirection = {
+			needed: false,
+			auth: true,
+			url: '/'
+		}
 	}
 
 	async getHtml() {
@@ -106,9 +111,6 @@ export default class extends AbstractView {
 			.then(data => {
 				console.log(data.message)
 			})
-			.catch(error => {
-				console.error(error);
-			});
 		},
 		{
 			signal: this.#abortController.signal,
@@ -130,9 +132,6 @@ export default class extends AbstractView {
 					document.getElementById('test').innerText = 'User is not logged in';
 				}
 			})
-			.catch(error => {
-				console.error(error);
-			});
 		},
 		{
 			signal: this.#abortController.signal,
@@ -151,9 +150,6 @@ export default class extends AbstractView {
 					document.getElementById('test').innerText = 'User is not logged in';
 				}
 			})
-			.catch(error => {
-				console.error(error);
-			});
 		},
 		{
 			signal: this.#abortController.signal,
