@@ -117,7 +117,7 @@ export default class extends AbstractView {
 		});
 
 		document.getElementById('testBtn').addEventListener('click', function(event) {
-			var url = "https://localhost/api/users/session/"
+			var url = "https://localhost/api/users/check-auth/"
 			fetch(url, {
 				method: 'GET',
 			})

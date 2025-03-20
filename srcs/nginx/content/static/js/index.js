@@ -53,7 +53,7 @@ const router = async () => {
 
   const redirection = view.redirect();
   if (redirection.needed) {
-    var url = "https://localhost/api/users/session/"
+    var url = "https://localhost/api/users/check-auth/"
     const update = await fetch(url, {
       method: 'GET',
     })
