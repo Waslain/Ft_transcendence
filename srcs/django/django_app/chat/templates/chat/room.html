@@ -1,44 +1,250 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Chat Room</title>
+    <title>Your Conversations</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            height: 100vh;
+        }
+        
+        .conversations-panel {
+            width: 30%;
+            border-right: 1px solid #ccc;
+            padding: 10px;
+            overflow-y: auto;
+        }
+        
+        .messages-panel {
+            width: 70%;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .conversation-item {
+            padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .conversation-item:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .active {
+            background-color: #e3f2fd;
+        }
+        
+        .messages-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .message-form {
+            display: flex;
+        }
+        
+        #message-input {
+            flex-grow: 1;
+            padding: 8px;
+            margin-right: 10px;
+        }
+        
+        .message {
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 5px;
+            max-width: 70%;
+        }
+        
+        .received {
+            background-color: #f0f0f0;
+            align-self: flex-start;
+        }
+        
+        .sent {
+            background-color: #e3f2fd;
+            align-self: flex-end;
+            text-align: right;
+        }
+        
+        .timestamp {
+            font-size: 0.8em;
+            color: #666;
+        }
+        
+        .no-conversation {
+            text-align: center;
+            color: #666;
+            margin-top: 50px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Chat Room: {{ room_name }}</h1>
-    <div id="chat-log"></div>
-    <input id="chat-message-input" type="text" size="100">
-    <input id="chat-message-submit" type="button" value="Send">
+    <div class="conversations-panel">
+        <h2>Conversations</h2>
+        <div id="conversations-list">
+            {% for partner in conversation_partners %}
+                <div class="conversation-item" data-user-id="{{ partner.id }}" onclick="loadConversation({{ partner.id }})">
+                    <strong>{{ partner.username }}</strong>
+                    {% if latest_messages|get_item:partner.id %}
+                        <p>{{ latest_messages|get_item:partner.id.content|truncatechars:30 }}</p>
+                        <small class="timestamp">{{ latest_messages|get_item:partner.id.timestamp }}</small>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <p>No conversations yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="messages-panel">
+        <h2 id="conversation-header">Select a conversation</h2>
+        <div id="messages-container" class="messages-container">
+            <p class="no-conversation">Select a conversation to view messages</p>
+        </div>
+        
+        <div class="message-form">
+            <input type="text" id="message-input" placeholder="Type your message..." disabled>
+            <button id="send-button" disabled>Send</button>
+        </div>
+    </div>
 
     <script>
-        const roomName = "{{ room_name }}";
-        const chatSocket = new WebSocket(
-            'ws://' + window.location.host + '/ws/chat/' + roomName + '/'
-        );
-
-        chatSocket.onmessage = function(e) {
-            const data = JSON.parse(e.data);
-            document.querySelector('#chat-log').innerHTML += (data.message + '<br>');
-        };
-
-        chatSocket.onclose = function(e) {
-            console.error('Chat socket closed unexpectedly');
-        };
-
-        document.querySelector('#chat-message-input').focus();
-        document.querySelector('#chat-message-input').onkeyup = function(e) {
-            if (e.keyCode === 13) {  // Enter key
-                document.querySelector('#chat-message-submit').click();
+        // Current user ID
+        const currentUserId = "{{ request.user.id }}";
+        let activeRecipientId = null;
+        let chatSocket = null;
+        
+        // Function to load conversation with a specific user
+        function loadConversation(userId) {
+            // Update active conversation
+            document.querySelectorAll('.conversation-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`.conversation-item[data-user-id="${userId}"]`).classList.add('active');
+            
+            // Enable message input
+            document.getElementById('message-input').disabled = false;
+            document.getElementById('send-button').disabled = false;
+            
+            // Set active recipient
+            activeRecipientId = userId;
+            
+            // Fetch conversation
+            fetch(`/chat/api/${userId}/with_user/`)
+                .then(response => response.json())
+                .then(data => {
+                    // Get recipient username
+                    const recipientUsername = document.querySelector(`.conversation-item[data-user-id="${userId}"] strong`).textContent;
+                    
+                    // Update conversation header
+                    document.getElementById('conversation-header').textContent = `Conversation with ${recipientUsername}`;
+                    
+                    // Clear messages container
+                    const messagesContainer = document.getElementById('messages-container');
+                    messagesContainer.innerHTML = '';
+                    
+                    // Add messages
+                    data.forEach(msg => {
+                        const isSent = msg.by == currentUserId;
+                        const messageDiv = document.createElement('div');
+                        messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+                        
+                        const contentP = document.createElement('p');
+                        contentP.textContent = msg.content;
+                        
+                        const timestampSmall = document.createElement('small');
+                        timestampSmall.className = 'timestamp';
+                        timestampSmall.textContent = new Date(msg.timestamp).toLocaleString();
+                        
+                        messageDiv.appendChild(contentP);
+                        messageDiv.appendChild(timestampSmall);
+                        messagesContainer.appendChild(messageDiv);
+                    });
+                    
+                    // Scroll to bottom
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    
+                    // Setup WebSocket if it hasn't been set up yet
+                    setupWebSocket();
+                })
+                .catch(error => console.error('Error loading conversation:', error));
+        }
+        
+        // Function to setup WebSocket connection
+        function setupWebSocket() {
+            // Close existing connection if it exists
+            if (chatSocket && chatSocket.readyState !== WebSocket.CLOSED) {
+                chatSocket.close();
             }
-        };
-
-        document.querySelector('#chat-message-submit').onclick = function(e) {
-            const messageInputDom = document.querySelector('#chat-message-input');
-            const message = messageInputDom.value;
-            chatSocket.send(JSON.stringify({
-                'message': message
-            }));
-            messageInputDom.value = '';
-        };
+            
+            // Create new WebSocket connection
+            chatSocket = new WebSocket(`ws://${window.location.host}/ws/chat/`);
+            
+            chatSocket.onmessage = function(e) {
+                const data = JSON.parse(e.data);
+                const message = data.message;
+                
+                // Only show messages if they're part of the active conversation
+                if (message.sender_id == activeRecipientId || message.recipient_id == activeRecipientId) {
+                    const isSent = message.sender_id == currentUserId;
+                    
+                    const messagesContainer = document.getElementById('messages-container');
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+                    
+                    const contentP = document.createElement('p');
+                    contentP.textContent = message.content;
+                    
+                    const timestampSmall = document.createElement('small');
+                    timestampSmall.className = 'timestamp';
+                    timestampSmall.textContent = new Date(message.timestamp).toLocaleString();
+                    
+                    messageDiv.appendChild(contentP);
+                    messageDiv.appendChild(timestampSmall);
+                    messagesContainer.appendChild(messageDiv);
+                    
+                    // Scroll to bottom
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                }
+            };
+            
+            chatSocket.onclose = function(e) {
+                console.log('Chat socket closed unexpectedly');
+                // You could implement reconnection logic here
+            };
+        }
+        
+        // Send message function
+        document.getElementById('send-button').addEventListener('click', sendMessage);
+        document.getElementById('message-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        function sendMessage() {
+            const messageInput = document.getElementById('message-input');
+            const message = messageInput.value.trim();
+            
+            if (message && activeRecipientId && chatSocket && chatSocket.readyState === WebSocket.OPEN) {
+                chatSocket.send(JSON.stringify({
+                    'recipient_id': activeRecipientId,
+                    'content': message
+                }));
+                
+                messageInput.value = '';
+            }
+        }
     </script>
 </body>
 </html>

@@ -30,6 +30,7 @@ services:
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       DATABASE_HOST: ${DATABASE_HOST}
       DATABASE_PORT: ${DATABASE_PORT}
+      DJANGO_SETTINGS_MODULE: django_app.settings
     volumes:
       - ./srcs/django/django_app:/app
     env_file:
