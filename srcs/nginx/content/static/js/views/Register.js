@@ -1,9 +1,15 @@
 import AbstractView from "./AbstractView.js";
+import { navigateTo} from "../index.js";
 
 export default class extends AbstractView {
 	constructor() {
 		super();
 		this.setTitle("Transcendence");
+		this.redirection = {
+			needed: true,
+			auth: true,
+			url: "/users/profile/" + localStorage.getItem("username")
+		}
 	}
 
 	async getHtml() {
@@ -40,7 +46,7 @@ export default class extends AbstractView {
                     </div>
   
                     <div class="pt-1 mb-4">
-                      <button data-mdb-button-init data-mdb-ripple-init class="btn btn-dark btn-lg btn-block" type="submit">Register</button>
+                      <button data-mdb-button-init data-mdb-ripple-init class="btn btn-dark btn-lg btn-block" type="submit" id="registerBtn">Register</button>
                     </div>
                   </form>
   
@@ -58,6 +64,7 @@ export default class extends AbstractView {
 
 	async getJavaScript() {
 		this.#abortController = new AbortController();
+		const registerBtn = document.getElementById('registerBtn');
 
 		document.getElementById('registerForm').addEventListener('submit', function(event) {
 			event.preventDefault();
@@ -101,20 +108,27 @@ export default class extends AbstractView {
 				return;
 			}
 
+			registerBtn.disabled = true;
 			var url = "https://localhost/api/users/register/"
 			fetch(url, {
 				method: 'POST',
 				body: formData,
 			})
-			.then(response => {
-				if (response.status >= 400) {
-						document.getElementById('usernameCheck').innerText = "A user with that username already exists";
+			.then(response => response.json().then(json => ({
+				data: json, status: response.status})))
+			.then(res => {
+				if (res.status >= 400) {
+					const msg = "A user with that username already exists";
+					console.log(msg);
+
+					document.getElementById('usernameCheck').innerText = msg;
 				}
-				return response.json();
-			})
-			.then(data => {
-				localStorage.setItem("username", data.username);
-				console.log(data.message);
+				else {
+					localStorage.setItem("username", res.data.username);
+					console.log(res.data.message);
+					navigateTo("/users/profile/" + res.data.username);
+				}
+				registerBtn.disabled = false;
 			})
 		},
 		{

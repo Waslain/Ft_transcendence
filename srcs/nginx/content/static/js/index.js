@@ -9,7 +9,9 @@ import Tournament from "./views/Tournament.js";
 import Test from "./views/Test.js";
 
 export const navigateTo = (url) => {
-  history.pushState(null, null, url);
+  if (url !== location.pathname) {
+  	history.pushState(null, null, url);
+  }
   router();
 };
 
@@ -52,7 +54,7 @@ const router = async () => {
     await loadAndSetFont("/static/js/views/pong/utils/typeFont/typeFont.json");
     fontLoad = true;
   }
-  const params = getParams(match);
+  let params = getParams(match);
   view = new match.route.view(params);
 
   const redirection = view.redirect();
@@ -69,9 +71,9 @@ const router = async () => {
       return false;
     })
 	if (update) {
-	  history.replaceState(null, null, redirection.url);
-	  let obj = routes.find(route => route.path === redirection.url);
-	  view = new obj.view;
+	  view = null;
+	  navigateTo(redirection.url);
+	  return;
 	}
   }
 
@@ -114,7 +116,7 @@ const checkMatch = (path) => {
 };
 
 document.getElementById('dropdownProfile').addEventListener('click', function(event) {
-	navigateTo("users/profile/" + localStorage.getItem("username"));
+	navigateTo("/users/profile/" + localStorage.getItem("username"));
 });
 
 document.getElementById('dropdownSignOut').addEventListener('click', function(event) {

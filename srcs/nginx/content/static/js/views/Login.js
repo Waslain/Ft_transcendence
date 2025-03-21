@@ -8,7 +8,7 @@ export default class extends AbstractView {
 		this.redirection = {
 			needed: true,
 			auth: true,
-			url: '/'
+			url: "/users/profile/" + localStorage.getItem("username")
 		}
 	}
 
