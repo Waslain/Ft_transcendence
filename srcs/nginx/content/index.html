@@ -51,7 +51,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="/user/login"class="nav-link px-0 align-middle" data-link>
+                            <a href="/users/login"class="nav-link px-0 align-middle" data-link>
                                 <i class="fs-4 bi-door-open"></i> <span class="ms-1 d-none d-sm-inline">Login</span></a>
                         </li>
                         <li>
@@ -67,12 +67,12 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
                             <li><a class="dropdown-item" href="#">Dashboard</a></li>
-                            <li><a class="dropdown-item" href="#">Settings</a></li>
-                            <li><a class="dropdown-item" href="#">Profile</a></li>
+                            <li><a class="dropdown-item" href="#" data-link>Settings</a></li>
+                            <li><a class="dropdown-item" id=dropdownProfile>Profile</a></li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item" href="#">Sign out</a></li>
+                            <li><a class="dropdown-item" id=dropdownSignOut>Sign out</a></li>
                         </ul>
                     </div>
                 </div>
@@ -87,7 +87,9 @@
     </div>
     <script type="module" src="/static/js/index.js"></script>
     <!-- Latest compiled JavaScript -->
+	<!--
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+	-->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
 </body>

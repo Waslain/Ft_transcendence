@@ -30,7 +30,8 @@ class RegisterView(generics.CreateAPIView):
 		)
 		token, created = Token.objects.get_or_create(user=user)
 		response = Response({
-			'message':'User created successfully'},
+			'message': 'User created successfully',
+			'username': user.username},
 			status=status.HTTP_201_CREATED,
 			headers=headers
 		)
@@ -57,7 +58,10 @@ class LoginView(APIView):
 		if user is None:
 			return Response({'message':'Invalid username or password'}, status=401)
 		token, created = Token.objects.get_or_create(user=user)
-		response = Response({'message': 'Successfully logged in'})
+		response = Response({
+			'message': 'Successfully logged in',
+			'username': user.username
+		})
 		response.set_cookie(
 			key = 'auth_token',
 			value = token.key,

@@ -1,11 +1,12 @@
 import AbstractView from "./AbstractView.js";
+import { navigateTo} from "../index.js";
 
 export default class extends AbstractView {
 	constructor() {
 		super();
 		this.setTitle("Transcendence");
 		this.redirection = {
-			needed: false,
+			needed: true,
 			auth: true,
 			url: '/'
 		}
@@ -44,15 +45,9 @@ export default class extends AbstractView {
 					<div id="response" style="color:#dd0000"></div>
                     </div>
                     <p class="mb-5 pb-lg-2" style="color: #000000;">Don't have an account?
-					<a href="/user/register" class="nav-link" style="color: #0000dd" data-link>register here!</a>
+					<a href="/users/register" class="nav-link" style="color: #0000dd" data-link>register here!</a>
                   </form>
 
-				  <div>
-				  	<button id=testBtn>Am I logged in ?</button>
-				  	<button id=logoutBtn>Logout</button>
-					<div id="test"></div>
-				  </div>
-  
                 </div>
               </div>
             </div>
@@ -102,59 +97,23 @@ export default class extends AbstractView {
 				method: 'POST',
 				body: formData,
 			})
-			.then(response => {
-				if (response.status >= 400) {
-					document.getElementById('response').innerText = "Invalid username or password";
-				}
-				return response.json();
-			})
-			.then(data => {
-				console.log(data.message)
-			})
-		},
-		{
-			signal: this.#abortController.signal,
-		});
-
-		document.getElementById('testBtn').addEventListener('click', function(event) {
-			var url = "https://localhost/api/users/check-auth/"
-			fetch(url, {
-				method: 'GET',
-			})
-			.then(response => {
-				return response.json();
-			})
-			.then(data => {
-				if (data.IsAuthenticated === true) {
-					document.getElementById('test').innerText = 'User is logged in';
+			.then(response => response.json().then(json => ({
+					data: json, status: response.status})))
+			.then(res => {
+				if (res.status >= 400) {
+					console.log(res.data.message);
+					document.getElementById('response').innerText = res.data.message;
 				}
 				else {
-					document.getElementById('test').innerText = 'User is not logged in';
+					localStorage.setItem("username", res.data.username);
+					console.log(res.data.message);
+					navigateTo("/users/profile/" + res.data.username);
 				}
 			})
 		},
 		{
 			signal: this.#abortController.signal,
 		});
-
-		document.getElementById('logoutBtn').addEventListener('click', function(event) {
-			var url = "https://localhost/api/users/logout/"
-			fetch(url, {
-				method: 'GET',
-			})
-			.then(response => {
-				if (response.status === 200) {
-					document.getElementById('test').innerText = 'Successfully logged out';
-				}
-				else {
-					document.getElementById('test').innerText = 'User is not logged in';
-				}
-			})
-		},
-		{
-			signal: this.#abortController.signal,
-		});
-		
 	}
 
 	async cleanUp() {
