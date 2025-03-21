@@ -113,11 +113,9 @@ export default class extends AbstractView {
 				return response.json();
 			})
 			.then(data => {
-				console.log(data.Message);
+				localStorage.setItem("username", data.username);
+				console.log(data.message);
 			})
-			.catch(error => {
-				console.error('Error');
-			});
 		},
 		{
 			signal: this.#abortController.signal,

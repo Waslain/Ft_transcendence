@@ -1,6 +1,7 @@
 import Main from "./views/Main.js";
 import Login from "./views/Login.js";
 import Register from "./views/Register.js";
+import Users from "./views/Users.js";
 import WaitingRoom from "./views/WaitingRoom.js";
 import Pong from "./views/Pong.js";
 import { loadAndSetFont } from "./views/pong/utils/font.js";
@@ -18,8 +19,9 @@ let fontLoad = false;
 const router = async () => {
   const routes = [
     { path: "/", view: Main },
-    { path: "/user/login", view: Login },
-    { path: "/user/register", view: Register },
+    { path: "/users/login", view: Login },
+    { path: "/users/register", view: Register },
+	{ path: "/users/profile/:username", view: Users },
     { path: "/pong", view: WaitingRoom },
     { path: "/pong/:room_id", view: Pong },
     { path: "/tournament", view: Tournament },
@@ -110,3 +112,23 @@ const checkMatch = (path) => {
   );
   return location.pathname.match(regex);
 };
+
+document.getElementById('dropdownProfile').addEventListener('click', function(event) {
+	navigateTo("users/profile/" + localStorage.getItem("username"));
+});
+
+document.getElementById('dropdownSignOut').addEventListener('click', function(event) {
+	var url = "https://localhost/api/users/logout/"
+	fetch(url, {
+		method: 'GET',
+	})
+	.then(response => response.json().then(json => ({
+			data: json, status: response.status})))
+	.then(res => {
+		if (res.status === 200) {
+			localStorage.removeItem("username");
+			console.log(res.data.message)
+			router();
+		}
+	})
+});
