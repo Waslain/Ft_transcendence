@@ -4,6 +4,7 @@ import Register from "./views/Register.js";
 import WaitingRoom from "./views/WaitingRoom.js";
 import Pong from "./views/Pong.js";
 import { loadAndSetFont } from "./views/pong/utils/font.js";
+import Tournament from "./views/Tournament.js";
 import Test from "./views/Test.js";
 
 export const navigateTo = (url) => {
@@ -21,6 +22,7 @@ const router = async () => {
     { path: "/user/register", view: Register },
     { path: "/pong", view: WaitingRoom },
     { path: "/pong/:room_id", view: Pong },
+    { path: "/tournament", view: Tournament },
     { path: "/test", view: Test },
   ];
 

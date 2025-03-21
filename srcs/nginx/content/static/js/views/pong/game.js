@@ -1,35 +1,31 @@
 import * as THREE from "three";
-import { OrbitControls } from "three/addons/controls/OrbitControls";
 
+import { createCamera } from "./utils/createCamera.js";
+import { createRenderer } from "./utils/createRenderer.js";
+import { createControls } from "./utils/createControls.js";
 import { Keys } from "./utils/Keys.js";
 import { createBackground } from "./utils/createBackground.js";
 import { createPlayground } from "./utils/createPlayground.js";
 import { createPlayer } from "./utils/createPlayer.js";
 import { createBall } from "./utils/createBall.js";
-import { createText } from "./utils/createText.js";
 import { soundBtn } from "./utils/sound.js";
+import { handleSocketMessage } from "./utils/handleSocketMessage.js";
+import { updateScore } from "./utils/updateScore.js";
+import { updateName } from "./utils/updateName.js";
 
 export const game = (socket, signal) => {
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(
-    75,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    1000
-  );
-
-  const renderer = new THREE.WebGLRenderer();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  const controls = new OrbitControls(camera, renderer.domElement);
-  controls.mouseButtons.RIGHT = 0;
-  camera.position.set(0, 15, 15);
-  controls.minDistance = 20;
-  controls.maxDistance = 30;
-  controls.maxPolarAngle = 1.5;
+  const camera = createCamera();
+  const renderer = createRenderer();
+  const controls = createControls(camera, renderer);
 
   const keys = new Keys(socket);
 
   const objectManager = {
+    scene: scene,
+    camera: camera,
+    renderer: renderer,
+    controls: controls,
     background: createBackground(),
     playground: createPlayground(),
     player1: createPlayer(1),
@@ -37,6 +33,7 @@ export const game = (socket, signal) => {
     ball: createBall(),
     wallhit: 1,
     playerhit: 1,
+    sound: null,
   };
 
   scene.add(
@@ -51,64 +48,34 @@ export const game = (socket, signal) => {
     objectManager.ball.object
   );
 
-  soundBtn(camera);
+  soundBtn(objectManager, signal);
 
-  socket.onmessage = (e) => {
-    const data = JSON.parse(e.data);
-    switch (data.action) {
-      case "names":
-        objectManager.player1.name = data.params.names[0];
-        updateName(objectManager.player1, 1, scene);
-        objectManager.player2.name = data.params.names[1];
-        updateName(objectManager.player2, 2, scene);
-        break;
-      case "scores":
-        if (data.params.scores[0] !== objectManager.player1.score) {
-          objectManager.player1.score = data.params.scores[0];
-          updateScore(objectManager.player1, 1, scene);
-        }
-        if (
-          data.params.scores.length >= 2 &&
-          data.params.scores[1] !== objectManager.player2.score
-        ) {
-          objectManager.player2.score = data.params.scores[1];
-          updateScore(objectManager.player2, 2, scene, 1);
-        }
-        break;
-      case "loop":
-        objectManager.ball.object.position.set(
-          data.params.data.ball.x,
-          0.3,
-          data.params.data.ball.z
-        );
-        objectManager.player1.object.position.set(
-          data.params.data.players[0].x,
-          0.3,
-          data.params.data.players[0].z
-        );
-        objectManager.player2.object.position.set(
-          data.params.data.players[1].x,
-          0.3,
-          data.params.data.players[1].z
-        );
-        break;
-      case "message":
-        displayMessage(
-          data.params.messages.first,
-          data.params.messages.second,
-          scene
-        );
-        break;
-    }
-  };
+  if (socket) handleSocketMessage(objectManager, socket);
+  else {
+    objectManager.player1.name = "Player 1";
+    updateName(objectManager.player1, 1, objectManager.scene);
+    objectManager.player2.name = "Player 2";
+    updateName(objectManager.player2, 2, objectManager.scene);
+    objectManager.player1.score = 0;
+    updateScore(objectManager.player1, 1, objectManager.scene);
+    objectManager.player2.score = 0;
+    updateScore(objectManager.player2, 2, objectManager.scene);
+  }
 
   const animate = () => {
-    controls.update();
-    renderer.render(scene, camera);
+    objectManager.controls.update();
+    if (!socket) {
+      keys.rotate(objectManager);
+      objectManager.player1.hitbox.setFromObject(objectManager.player1.object);
+      objectManager.player2.hitbox.setFromObject(objectManager.player2.object);
+      ballDirection(objectManager);
+      // checkScore(objectManager);
+    }
+    objectManager.renderer.render(scene, camera);
   };
 
-  renderer.setAnimationLoop(animate);
-  document.getElementById("app").appendChild(renderer.domElement);
+  objectManager.renderer.setAnimationLoop(animate);
+  document.getElementById("app").appendChild(objectManager.renderer.domElement);
 
   window.addEventListener("keyup", (e) => keys.keyManager(e), {
     signal: signal,
@@ -117,18 +84,22 @@ export const game = (socket, signal) => {
     signal: signal,
   });
 
-  window.addEventListener("resize", onWindowResize, {
-    signal: signal,
-  });
+  window.addEventListener(
+    "resize",
+    () => {
+      objectManager.camera.aspect = window.innerWidth / window.innerHeight;
+      objectManager.camera.updateProjectionMatrix();
+      objectManager.renderer.setSize(window.innerWidth, window.innerHeight);
+    },
+    {
+      signal: signal,
+    }
+  );
 
-  function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-  }
+  return objectManager;
 };
 
-const ballDirection = (objectManager, scene) => {
+const ballDirection = (objectManager) => {
   if (
     objectManager.ball.hitbox.intersectsBox(
       objectManager.playground.southWall.hitbox
@@ -151,7 +122,7 @@ const ballDirection = (objectManager, scene) => {
     )
   ) {
     objectManager.player1.score++;
-    updateScore(objectManager.player1, scene, -1);
+    updateScore(objectManager.player1, 1, objectManager.scene);
     objectManager.ball.object.position.set(0, 0.3, 0);
   } else if (
     objectManager.ball.hitbox.intersectsBox(
@@ -159,7 +130,7 @@ const ballDirection = (objectManager, scene) => {
     )
   ) {
     objectManager.player2.score++;
-    updateScore(objectManager.player2, scene, 1);
+    updateScore(objectManager.player2, 2, objectManager.scene);
     objectManager.ball.object.position.set(0, 0.3, 0);
   }
 
@@ -172,56 +143,7 @@ const ballDirection = (objectManager, scene) => {
   objectManager.ball.object.position.add(vector);
 };
 
-const updateName = (player, nb, scene) => {
-  scene.remove(player.name3D.object);
-  player.name3D.object.geometry.dispose();
-  player.name3D.object.material.dispose();
-
-  const newName3D = createText(player.name, 10, 1);
-  player.name3D = newName3D;
-
-  player.name3D.object.rotation.x = -0.5;
-  if (nb == 1) player.name3D.object.position.set(-14, 1.5, -10);
-  else if (nb == 2)
-    player.name3D.object.position.set(14 - player.name3D.size.x, 1.5, -10);
-
-  scene.add(player.name3D.object);
-};
-
-const updateScore = (player, nb, scene) => {
-  scene.remove(player.score3D.object);
-  player.score3D.object.geometry.dispose();
-  player.score3D.object.material.dispose();
-
-  const newScore3D = createText(
-    "" + player.score,
-    ("" + player.score).length,
-    6
-  );
-  player.score3D = newScore3D;
-
-  if (nb == 1) {
-    player.score3D.object.rotation.z = 0.5;
-    player.score3D.object.rotateY((Math.PI / 2) * -3);
-    player.score3D.object.position.set(
-      -15,
-      1.5,
-      2.5 * ("" + player.score).length
-    );
-  } else if (nb == 2) {
-    player.score3D.object.rotation.z = -0.5;
-    player.score3D.object.rotateY((Math.PI / 2) * 3);
-    player.score3D.object.position.set(
-      15,
-      1.5,
-      -2.5 * ("" + player.score).length
-    );
-  }
-
-  scene.add(player.score3D.object);
-};
-
-const checkScore = (objectManager, scene) => {
+const checkScore = (objectManager) => {
   const scoreMin = 2;
   if (
     (objectManager.player1.score >= scoreMin &&
@@ -229,25 +151,13 @@ const checkScore = (objectManager, scene) => {
     (objectManager.player2.score >= scoreMin &&
       objectManager.player2.score - 2 >= objectManager.player1.score)
   ) {
-    displayMessage(
-      objectManager.player1.score > objectManager.player2.score
-        ? objectManager.player1.name
-        : objectManager.player2.name,
-      scene
-    );
+    // displayMessage(
+    //   objectManager.player1.score > objectManager.player2.score
+    //     ? objectManager.player1.name
+    //     : objectManager.player2.name,
+    //   objectManager.scene
+    // );
     return false;
   }
   return true;
-};
-
-const displayMessage = (firstStr, SecondStr, scene) => {
-  const firstMsg = createText(firstStr, firstStr.length, 3);
-  firstMsg.object.position.set(-(firstMsg.size.x / 2), 7, -16);
-  firstMsg.object.rotation.x = -0.5;
-
-  const secondMsg = createText(SecondStr, SecondStr.length, 3);
-  secondMsg.object.position.set(-(secondMsg.size.x / 2), 3, -15);
-  secondMsg.object.rotation.x = -0.5;
-
-  scene.add(firstMsg.object, secondMsg.object);
 };

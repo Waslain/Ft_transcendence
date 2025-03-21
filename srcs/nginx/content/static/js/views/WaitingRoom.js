@@ -23,22 +23,23 @@ export default class extends AbstractView {
 
   async #webSocket(name) {
     const roomName = "waitingRoom";
-    const url = "wss://" +
-        window.location.hostname +
-        "/ws/pong/waitingRoom/?name=" +
-        encodeURIComponent(name);
+    const url =
+      "wss://" +
+      window.location.hostname +
+      "/ws/pong/waitingRoom/?name=" +
+      encodeURIComponent(name);
 
-    this.waitingRoomSocket = new WebSocket(url);
+    this.#waitingRoomSocket = new WebSocket(url);
 
-    this.waitingRoomSocket.onopen = (e) => {
+    this.#waitingRoomSocket.onopen = (e) => {
       console.log("Connected to the waiting room:", roomName);
     };
 
-    this.waitingRoomSocket.onclose = (e) => {
+    this.#waitingRoomSocket.onclose = (e) => {
       console.log("Waiting room socket closed");
     };
 
-    this.waitingRoomSocket.onmessage = (e) => {
+    this.#waitingRoomSocket.onmessage = (e) => {
       const data = JSON.parse(e.data);
       if (data.count !== undefined) {
         document.getElementById("connectionCount").textContent =
@@ -59,7 +60,7 @@ export default class extends AbstractView {
     playBtn.addEventListener(
       "click",
       async () => {
-        if (nameInput.value) {
+        if (nameInput.value.trim() !== "") {
           playBtn.disabled = true;
           cancelBtn.disabled = false;
           connectionNb.hidden = false;
@@ -78,7 +79,7 @@ export default class extends AbstractView {
         cancelBtn.disabled = true;
         connectionNb.hidden = true;
         nameInput.disabled = false;
-        this.waitingRoomSocket?.close();
+        this.#waitingRoomSocket?.close();
       },
       {
         signal: this.#abortController.signal,
@@ -87,7 +88,7 @@ export default class extends AbstractView {
   }
 
   async cleanUp() {
-    this.waitingRoomSocket?.close();
+    this.#waitingRoomSocket?.close();
     this.#abortController.abort();
   }
 }

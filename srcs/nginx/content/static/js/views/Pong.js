@@ -1,5 +1,6 @@
 import AbstractView from "./AbstractView.js";
 import { game } from "./pong/game.js";
+import { cleanScene } from "./pong/utils/cleanScene.js";
 
 export default class extends AbstractView {
   constructor(params) {
@@ -99,23 +100,25 @@ export default class extends AbstractView {
 
   #pongRoomSocket;
   #abortController;
+  #objectManager;
 
   async #webSocket(name) {
     const roomName = "pongRoom";
-	const url = "wss://" +
-        window.location.hostname +
-        "/ws/pong/pongRoom/?uuid=" +
-        encodeURIComponent(this.params.room_id) +
-        "&name=" +
-        name;
+    const url =
+      "wss://" +
+      window.location.hostname +
+      "/ws/pong/pongRoom/?uuid=" +
+      encodeURIComponent(this.params.room_id) +
+      "&name=" +
+      name;
 
-    this.pongRoomSocket = new WebSocket(url);
+    this.#pongRoomSocket = new WebSocket(url);
 
-    this.pongRoomSocket.onopen = (e) => {
+    this.#pongRoomSocket.onopen = (e) => {
       console.log("Connected to the pong room:", roomName);
     };
 
-    this.pongRoomSocket.onclose = (e) => {
+    this.#pongRoomSocket.onclose = (e) => {
       console.log("Pong room socket closed");
     };
   }
@@ -125,11 +128,15 @@ export default class extends AbstractView {
     const searchParams = new URLSearchParams(window.location.search);
     await this.#webSocket(searchParams.get("name") || "Anonymous");
 
-    game(this.pongRoomSocket, this.#abortController.signal);
+    this.#objectManager = game(
+      this.#pongRoomSocket,
+      this.#abortController.signal
+    );
   }
 
   async cleanUp() {
-    this.pongRoomSocket?.close();
+    cleanScene(this.#objectManager);
+    this.#pongRoomSocket?.close();
     this.#abortController.abort();
   }
 }
