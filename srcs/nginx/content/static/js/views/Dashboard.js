@@ -4,6 +4,11 @@ export default class extends AbstractView {
 	constructor() {
 		super();
 		this.setTitle("Transcendence");
+		this.redirection = {
+			needed: true,
+			auth: false,
+			url: "/users/login"
+		}
 	}
 
     async getStyle() {
