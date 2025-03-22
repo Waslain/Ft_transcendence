@@ -94,7 +94,7 @@ class SessionView(APIView):
 	def get(self, request):
 		if (request.user.is_authenticated):
 			return Response({'IsAuthenticated': True})
-		return Response({'IsAuthenticated': False}, status=401)
+		return Response({'IsAuthenticated': False})
 
 
 @api_view(['GET'])

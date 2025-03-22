@@ -3,7 +3,8 @@ export default class {
 	  this.redirection = {
 		  needed: false,
 		  auth: false,
-		  url: ''
+		  url: '',
+		  urlAfterLogin: ""
 	  }
   }
 
