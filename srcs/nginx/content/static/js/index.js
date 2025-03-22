@@ -6,7 +6,7 @@ import WaitingRoom from "./views/WaitingRoom.js";
 import Pong from "./views/Pong.js";
 import { loadAndSetFont } from "./views/pong/utils/font.js";
 import Tournament from "./views/Tournament.js";
-import Dashboard from "./views/Dashboard";
+import Dashboard from "./views/Dashboard.js";
 import Test from "./views/Test.js";
 
 export const navigateTo = (url) => {

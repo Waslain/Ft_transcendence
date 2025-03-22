@@ -17,4 +17,7 @@ clean: stop
 vclean: stop
 	@rm -rf /var/lib/docker/volumes/srcs_postgres_data
 
+migrate:
+	docker exec django python manage.py migrate
+
 re: clean all
