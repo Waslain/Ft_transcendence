@@ -186,29 +186,13 @@ document.addEventListener("authenticate", (e) => {
 		/*Update dropdown user menu*/
   		document.querySelector("#dropdownUserMenu").innerHTML = `
 		<div class="dropdown pb-4">
-			<a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-				<img src="/static/img/cat.png" alt="hugenerd" width="30" height="30" class="rounded-circle">
+			<div class="d-flex align-items-center text-white text-decoration-none">
+				<img src="/static/img/cat.png" alt="sample cat photo" width="30" height="30" class="rounded-circle">
 				<span class="d-none d-sm-inline mx-1" id="dropdownMenuUsername"></span>
-			</a>
-			<ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-				<li><a class="dropdown-item" href="#">Dashboard</a></li>
-				<li><a class="dropdown-item" href="#" data-link>Settings</a></li>
-				<li><a class="dropdown-item" id=dropdownProfile>Profile</a></li>
-				<li>
-					<hr class="dropdown-divider">
-				</li>
-				<li><a class="dropdown-item" id=dropdownSignOut>Sign out</a></li>
-			</ul>
+			</div>
 		</div>
 		`;
 		document.getElementById('dropdownMenuUsername').innerText = localStorage.getItem("username")
-
-		document.getElementById('dropdownProfile').addEventListener('click', (e) => {
-			navigateTo("/users/profile/" + localStorage.getItem("username"));
-		},
-		{
-			signal: authAbortController.signal,
-		});
 
 		document.getElementById('signOut').addEventListener('click', (e) => {
 			e.preventDefault();
