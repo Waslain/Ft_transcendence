@@ -136,3 +136,75 @@ document.getElementById('dropdownSignOut').addEventListener('click', function(ev
 		}
 	})
 });
+
+
+/*Chat Box*/
+document.getElementById('chatBox').addEventListener('click', function(event) {
+  let logStatus = 1;
+  if (!logStatus) {
+    alert('Please log in to access the chat.')
+  }
+  else {
+    event.preventDefault();
+
+    const chatWindow = document.getElementById('chatWindow');
+    if (chatWindow.style.display === 'none' || chatWindow.style.display === '') {
+        chatWindow.style.display = 'block';
+    } else {
+        chatWindow.style.display = 'none';
+    }
+  }
+});
+
+document.getElementById('closeChatBtn').addEventListener('click', function() {
+  document.getElementById('chatWindow').style.display = 'none';
+});
+
+document.getElementById('chatInput').addEventListener('keydown', function(event) {
+  if (event.key === 'Enter') {
+      const message = event.target.value;
+      if (message.trim()) {
+          const chatMessages = document.getElementById('chatMessages');
+          const newMessage = document.createElement('div');
+          newMessage.textContent = message;
+          chatMessages.appendChild(newMessage);
+          event.target.value = '';
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+  }
+});
+
+document.getElementById("sendButton").addEventListener("click", function() {
+  var message = document.getElementById("chatInput").value;
+  if (message.trim() !== "") {
+      var messageElement = document.createElement("div");
+      messageElement.textContent = message;
+      document.getElementById("chatMessages").appendChild(messageElement);
+      document.getElementById("chatInput").value = "";
+  }
+});
+
+const chatWindow = document.getElementById("chatWindow");
+const chatHeader = document.getElementById("chatHeader");
+
+let isDragging = false;
+let offsetX, offsetY;
+
+chatHeader.addEventListener("mousedown", function(e) {
+  isDragging = true;
+  offsetX = e.clientX - chatWindow.offsetLeft;
+  offsetY = e.clientY - chatWindow.offsetTop;
+  document.body.style.cursor = 'move';
+});
+
+document.addEventListener("mousemove", function(e) {
+  if (isDragging) {
+    chatWindow.style.left = (e.clientX - offsetX) + "px";
+    chatWindow.style.top = (e.clientY - offsetY) + "px";
+  }
+});
+
+document.addEventListener("mouseup", function() {
+  isDragging = false;
+  document.body.style.cursor = 'default';
+});
