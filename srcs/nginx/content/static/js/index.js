@@ -7,7 +7,6 @@ import Pong from "./views/Pong.js";
 import { loadAndSetFont } from "./views/pong/utils/font.js";
 import Tournament from "./views/Tournament.js";
 import Dashboard from "./views/Dashboard.js";
-import Test from "./views/Test.js";
 
 export const navigateTo = (url) => {
   if (url !== location.pathname) {
@@ -41,7 +40,6 @@ const router = async () => {
     { path: "/pong/:room_id", view: Pong },
     { path: "/tournament", view: Tournament },
     { path: "/dashboard", view: Dashboard },
-    { path: "/test", view: Test },
   ];
 
   const potentialMatches = routes.map((route) => {
