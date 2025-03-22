@@ -1,14 +1,16 @@
 import AbstractView from "./AbstractView.js";
-import { navigateTo} from "../index.js";
+import { navigateTo } from "../index.js";
+import { loginUser } from "../index.js";
 
 export default class extends AbstractView {
 	constructor() {
 		super();
 		this.setTitle("Transcendence");
+		this.urlAfterLogin = "";
 		this.redirection = {
 			needed: true,
 			auth: true,
-			url: "/users/profile/" + localStorage.getItem("username")
+			url: "/users/profile"
 		}
 	}
 
@@ -62,6 +64,7 @@ export default class extends AbstractView {
 
 	async getJavaScript() {
 		this.#abortController = new AbortController();
+		let nextUrl = this.urlAfterLogin;
 
 		document.getElementById('loginForm').addEventListener('submit', function(event) {
 			event.preventDefault();
@@ -107,8 +110,15 @@ export default class extends AbstractView {
 				else {
 					localStorage.setItem("username", res.data.username);
 					console.log(res.data.message);
-					navigateTo("/users/profile/" + res.data.username);
+					document.dispatchEvent(loginUser);
+					if (nextUrl === "") {
+						nextUrl = "/users/profile"
+					}
+					navigateTo(nextUrl);
 				}
+			})
+			.catch(error => {
+				console.error(error);
 			})
 		},
 		{

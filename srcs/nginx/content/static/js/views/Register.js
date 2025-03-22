@@ -1,5 +1,6 @@
 import AbstractView from "./AbstractView.js";
 import { navigateTo} from "../index.js";
+import { loginUser } from "../index.js";
 
 export default class extends AbstractView {
 	constructor() {
@@ -8,7 +9,7 @@ export default class extends AbstractView {
 		this.redirection = {
 			needed: true,
 			auth: true,
-			url: "/users/profile/" + localStorage.getItem("username")
+			url: "/users/profile"
 		}
 	}
 
@@ -126,9 +127,13 @@ export default class extends AbstractView {
 				else {
 					localStorage.setItem("username", res.data.username);
 					console.log(res.data.message);
-					navigateTo("/users/profile/" + res.data.username);
+					document.dispatchEvent(loginUser);
+					navigateTo("/users/profile");
 				}
 				registerBtn.disabled = false;
+			})
+			.catch(error => {
+				console.error(error);
 			})
 		},
 		{

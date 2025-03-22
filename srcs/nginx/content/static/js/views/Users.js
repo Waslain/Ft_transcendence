@@ -8,7 +8,8 @@ export default class extends AbstractView {
 		this.redirection = {
 			needed: true,
 			auth: false,
-			url: '/users/login'
+			url: '/users/login',
+			urlAfterLogin: '/users/profile/'
 		}
 	}
 
