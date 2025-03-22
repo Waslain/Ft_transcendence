@@ -155,9 +155,36 @@ export const logoutUser = new CustomEvent('authenticate', {
 
 let authAbortController = null;
 document.addEventListener("authenticate", (e) => {
+	/* Code executed on login*/
 	if (e.detail.authenticated) {
 		authAbortController = new AbortController();
 
+		/* Update sidebar*/
+  		document.querySelector("#sidebarItems").innerHTML = `
+		<li class="nav-item">
+			<a href="/dashboard" class="nav-link align-middle px-0" data-link>
+				<i class="fs-4 bi-grid"></i> <span class="ms-1 d-none d-sm-inline">Dashboard</span>
+			</a>
+		</li>
+		<li class="nav-item">
+			<a href="#" class="nav-link align-middle px-0" id="chatBox">
+				<i class="fs-4 bi-chat-left-heart"></i> <span class="ms-1 d-none d-sm-inline">Chat</span>
+			</a>
+		</li>
+		<li class="nav-item">
+			<a href="#" class="nav-link align-middle px-0">
+				<i class="fs-4 bi-gear"></i> <span class="ms-1 d-none d-sm-inline">Settings</span>
+			</a>
+		</li>
+		<li>
+			<a href="#" class="nav-link px-0 align-middle">
+				<i class="fs-4 bi-people"></i> <span class="ms-1 d-none d-sm-inline">Friends</span> </a>
+		</li>
+		<li>
+			<a href="" class="nav-link px-0 align-middle" id="signOut">
+				<i class="fs-4 bi-door-open"></i> <span class="ms-1 d-none d-sm-inline">Sign out</span></a>
+		</li>
+		`
 		/*Update dropdown user menu*/
   		document.querySelector("#dropdownUserMenu").innerHTML = `
 		<div class="dropdown pb-4">
@@ -185,7 +212,8 @@ document.addEventListener("authenticate", (e) => {
 			signal: authAbortController.signal,
 		});
 
-		document.getElementById('dropdownSignOut').addEventListener('click', (e) => {
+		document.getElementById('signOut').addEventListener('click', (e) => {
+			e.preventDefault();
 			var url = "https://localhost/api/users/logout/"
 			fetch(url, {
 				method: 'GET',
@@ -207,15 +235,110 @@ document.addEventListener("authenticate", (e) => {
 		{
 			signal: authAbortController.signal,
 		});
+
+		/*Chat Box*/
+		document.getElementById('chatBox').addEventListener('click', function(event) {
+		  let logStatus = 1;
+		  if (!logStatus) {
+			alert('Please log in to access the chat.')
+		  }
+		  else {
+			event.preventDefault();
+
+			const chatWindow = document.getElementById('chatWindow');
+			if (chatWindow.style.display === 'none' || chatWindow.style.display === '') {
+				chatWindow.style.display = 'block';
+			} else {
+				chatWindow.style.display = 'none';
+			}
+		  }
+		},
+		{
+			signal: authAbortController.signal,
+		});
+
+		document.getElementById('closeChatBtn').addEventListener('click', function() {
+		  document.getElementById('chatWindow').style.display = 'none';
+		},
+		{
+			signal: authAbortController.signal,
+		});
+
+		document.getElementById('chatInput').addEventListener('keydown', function(event) {
+		  if (event.key === 'Enter') {
+			  const message = event.target.value;
+			  if (message.trim()) {
+				  const chatMessages = document.getElementById('chatMessages');
+				  const newMessage = document.createElement('div');
+				  newMessage.textContent = message;
+				  chatMessages.appendChild(newMessage);
+				  event.target.value = '';
+				  chatMessages.scrollTop = chatMessages.scrollHeight;
+			  }
+		  }
+		},
+		{
+			signal: authAbortController.signal,
+		});
+
+		document.getElementById("sendButton").addEventListener("click", function() {
+		  var message = document.getElementById("chatInput").value;
+		  if (message.trim() !== "") {
+			  var messageElement = document.createElement("div");
+			  messageElement.textContent = message;
+			  document.getElementById("chatMessages").appendChild(messageElement);
+			  document.getElementById("chatInput").value = "";
+		  }
+		},
+		{
+			signal: authAbortController.signal,
+		});
+
+		const chatWindow = document.getElementById("chatWindow");
+		const chatHeader = document.getElementById("chatHeader");
+
+		let isDragging = false;
+		let offsetX, offsetY;
+
+		chatHeader.addEventListener("mousedown", function(e) {
+		  isDragging = true;
+		  offsetX = e.clientX - chatWindow.offsetLeft;
+		  offsetY = e.clientY - chatWindow.offsetTop;
+		  document.body.style.cursor = 'move';
+		},
+		{
+			signal: authAbortController.signal,
+		});
+
+		document.addEventListener("mousemove", function(e) {
+		  if (isDragging) {
+			chatWindow.style.left = (e.clientX - offsetX) + "px";
+			chatWindow.style.top = (e.clientY - offsetY) + "px";
+		  }
+		},
+		{
+			signal: authAbortController.signal,
+		});
+
+		document.addEventListener("mouseup", function() {
+		  isDragging = false;
+		  document.body.style.cursor = 'default';
+		},
+		{
+			signal: authAbortController.signal,
+		});
 	}
+	/* Code executed on logout*/
 	else {
-  		document.querySelector("#dropdownUserMenu").innerHTML = `
+  		document.querySelector("#sidebarItems").innerHTML = `
+		<li>
+			<a href="/users/login"class="nav-link px-0 align-middle" data-link>
+				<i class="fs-4 bi-door-open"></i> <span class="ms-1 d-none d-sm-inline">Login</span></a>
+		</li>
 		`
-		/*
-  		document.querySelector("#dropdownUserMenu").innerHTML = `
-		<a href="/users/login" class="nav-link px-0 align-middle" data-link>Login</a>
-		`
-		*/
+  		document.querySelector("#dropdownUserMenu").innerHTML = ``
+		const chatWindow = document.getElementById('chatWindow');
+		chatWindow.style.display = 'none';
 		if (authAbortController) {
 			authAbortController.abort();
 		}
@@ -239,75 +362,3 @@ await fetch(url, {
 .catch(error => {
   console.error(error);
 })
-
-
-/*Chat Box*/
-document.getElementById('chatBox').addEventListener('click', function(event) {
-  let logStatus = 1;
-  if (!logStatus) {
-    alert('Please log in to access the chat.')
-  }
-  else {
-    event.preventDefault();
-
-    const chatWindow = document.getElementById('chatWindow');
-    if (chatWindow.style.display === 'none' || chatWindow.style.display === '') {
-        chatWindow.style.display = 'block';
-    } else {
-        chatWindow.style.display = 'none';
-    }
-  }
-});
-
-document.getElementById('closeChatBtn').addEventListener('click', function() {
-  document.getElementById('chatWindow').style.display = 'none';
-});
-
-document.getElementById('chatInput').addEventListener('keydown', function(event) {
-  if (event.key === 'Enter') {
-      const message = event.target.value;
-      if (message.trim()) {
-          const chatMessages = document.getElementById('chatMessages');
-          const newMessage = document.createElement('div');
-          newMessage.textContent = message;
-          chatMessages.appendChild(newMessage);
-          event.target.value = '';
-          chatMessages.scrollTop = chatMessages.scrollHeight;
-      }
-  }
-});
-
-document.getElementById("sendButton").addEventListener("click", function() {
-  var message = document.getElementById("chatInput").value;
-  if (message.trim() !== "") {
-      var messageElement = document.createElement("div");
-      messageElement.textContent = message;
-      document.getElementById("chatMessages").appendChild(messageElement);
-      document.getElementById("chatInput").value = "";
-  }
-});
-
-const chatWindow = document.getElementById("chatWindow");
-const chatHeader = document.getElementById("chatHeader");
-
-let isDragging = false;
-let offsetX, offsetY;
-
-chatHeader.addEventListener("mousedown", function(e) {
-  isDragging = true;
-  offsetX = e.clientX - chatWindow.offsetLeft;
-  offsetY = e.clientY - chatWindow.offsetTop;
-  document.body.style.cursor = 'move';
-});
-
-document.addEventListener("mousemove", function(e) {
-  if (isDragging) {
-    chatWindow.style.left = (e.clientX - offsetX) + "px";
-    chatWindow.style.top = (e.clientY - offsetY) + "px";
-  }
-});
-
-document.addEventListener("mouseup", function() {
-  isDragging = false;
-  document.body.style.cursor = 'default';
-});
