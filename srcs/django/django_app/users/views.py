@@ -18,6 +18,7 @@ class UserViewSet(viewsets.ModelViewSet):
 class RegisterView(generics.CreateAPIView):
 	serializer_class = UserSerializer
 	permission_classes = [permissions.AllowAny]
+	authentication_classes = []
 
 	def create(self, request):
 		serializer = self.get_serializer(data=request.data)
@@ -47,6 +48,7 @@ class RegisterView(generics.CreateAPIView):
 
 class LoginView(APIView):
 	permission_classes = [permissions.AllowAny]
+	authentication_classes = []
 
 	def post(self, request):
 		if 'username' not in request.data or 'password' not in request.data:

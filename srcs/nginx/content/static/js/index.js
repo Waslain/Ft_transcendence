@@ -75,12 +75,16 @@ const router = async () => {
     const update = await fetch(endpoint, {
       method: 'GET',
     })
-    .then(response => response.json())
-    .then(data => {
-      if (data.IsAuthenticated === redirection.auth) {
+	.then(response => response.json().then(json => ({
+      data: json, status: response.status})))
+	.then(res => {
+	  let auth = res.data.IsAuthenticated;
+      if (res.status > 400) {
+		  auth = false;
+      }
+      if (auth === redirection.auth) {
 		  return true;
       }
-      return false;
     })
     .catch(error => {
       console.error(error);
