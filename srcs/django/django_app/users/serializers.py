@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from users.models import User
+from stats.models import Stats
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
 	password = serializers.CharField(write_only=True)
@@ -21,5 +22,6 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 	def create(self, validated_data):
 		user = User.objects.create_user(**validated_data)
 		user.set_password(validated_data['password'])
+		user.stats = Stats.objects.create(user=user);
 		user.save()
 		return user
