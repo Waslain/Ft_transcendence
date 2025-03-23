@@ -7,5 +7,5 @@ router.register(r'stats', views.StatsViewSet, basename='user')
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('<int:userid>/', views.get_stats, name='get_stats'),
+    path('<str:username>/', views.getStatsView.as_view()),
 ]

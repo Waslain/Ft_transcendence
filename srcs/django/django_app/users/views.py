@@ -14,7 +14,6 @@ class UserViewSet(viewsets.ModelViewSet):
 	serializer_class = UserSerializer
 	# permission_classes = [permissions.IsAuthenticated]
 
-
 class RegisterView(generics.CreateAPIView):
 	serializer_class = UserSerializer
 	permission_classes = [permissions.AllowAny]

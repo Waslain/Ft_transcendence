@@ -45,7 +45,7 @@ export default class extends AbstractView {
     <div class="container py-5 h-100">
         <div class="row-fluid d-flex justify-content-center align-items-center">
                 <img src="/static/img/cat.png" alt="user's image" width="50" height="50" class="rounded-circle">
-                <h2 class="d-sm-inline mx-3 mb-0">{USER NAME}</h2>
+                <h2 class="d-sm-inline mx-3 mb-0" id=usernameDisplay></h2>
         </div>
         <hr/>
         <section>
@@ -75,7 +75,7 @@ export default class extends AbstractView {
                     <p class="fs-1 fs-sm-2 fs-md-3 fs-lg-5 text-center" id="statWins">Wins</p>
                 </div>
                 <div class="col-12 col-md-3 col-sm-3">
-                    <p class="fs-1 fs-sm-2 fs-md-3 fs-lg-5 text-center" id="statLoses"></p>
+                    <p class="fs-1 fs-sm-2 fs-md-3 fs-lg-5 text-center" id="statLosses"></p>
                 </div>
                 <div class="col-12 col-md-3 col-sm-3">
                     <p class="fs-1 fs-sm-2 fs-md-3 fs-lg-5 text-center" id="statWinRate"></p>
@@ -90,15 +90,49 @@ export default class extends AbstractView {
     }
 
     async getJavaScript() {
-        
-        /*This part needs to replace with API to fetch data*/
-        let numbers_of_wins = 120;
-        let numbers_of_loses = 50;
-        let rate_of_wins = ((numbers_of_wins / (numbers_of_wins + numbers_of_loses)) * 100).toFixed(2);
-        let game_time = 20
 
-        document.getElementById('statWins').innerHTML = `Wins<br/><span style="color: #4169e1;">${numbers_of_wins}</span>`;
-        document.getElementById('statLoses').innerHTML = `Loses<br/><span style="color: #98afc7;">${numbers_of_loses}</span>`;
+		const username = localStorage.getItem('username');
+		document.getElementById('usernameDisplay').innerText = username;
+
+		var endpoint = "https://localhost/api/stats/" + username;
+		const data = await fetch(endpoint, {
+			method: 'GET',
+		})
+		.then(response => response.json().then(json => ({
+			data: json, status: response.status})))
+		.then(res => {
+			let auth = res.data.IsAuthenticated;
+			if (res.status > 400) {
+				console.error(res.data.message)
+				return null;
+			}
+			else {
+				return res.data
+			}
+		})
+		.catch(error => {
+			return null;
+		})
+
+		if (data === null) {
+			return;
+		}
+
+		const number_of_wins = data.wins;
+		const number_of_losses = data.losses;
+		const number_of_games = number_of_wins + number_of_losses
+		const game_time = data.play_time;
+		const goals_scored = data.goals_scored;
+		const goals_taken = data.goals_taken;
+
+		let rate_of_wins = 100;
+		if (number_of_games) {
+			rate_of_wins = ((number_of_wins / number_of_games) * 100).toFixed(2);
+		}
+
+        
+        document.getElementById('statWins').innerHTML = `Wins<br/><span style="color: #4169e1;">${number_of_wins}</span>`;
+        document.getElementById('statLosses').innerHTML = `Losses<br/><span style="color: #98afc7;">${number_of_losses}</span>`;
         document.getElementById('statWinRate').innerHTML = `Win Rate<br/><span style="color: orange;">${rate_of_wins}%</span>`;
         document.getElementById('statGameTime').innerHTML = `Game Time<br/><span style="color: black;">${game_time} min</span>`;
 		
@@ -108,10 +142,10 @@ export default class extends AbstractView {
         const winsLossesChart = new Chart(dctx, {
             type: 'doughnut',  // Doughnut chart type
             data: {
-                labels: ['Wins', 'Loses'],  // Labels for the segments
+                labels: ['Wins', 'Losses'],  // Labels for the segments
                 datasets: [{
-                    label: 'Wins vs Loses',
-                    data: [numbers_of_wins, numbers_of_loses],  // Data for wins and losses
+                    label: 'Wins vs Losses',
+                    data: [number_of_wins, number_of_losses],  // Data for wins and losses
                     backgroundColor: ['#4169e1', '#98afc7'],  // Colors for the segments
                     borderWidth: 1
                 }]
@@ -142,7 +176,7 @@ export default class extends AbstractView {
                 labels: ['Goals Scored', 'Goals Taken'],
                 datasets: [{
                     label: 'Goals',
-                    data: [25, 15], // Need to replace with data from API
+                    data: [goals_scored, goals_taken], // Need to replace with data from API
                     backgroundColor: ['#4CAF50', '#FF5733'],
                     borderColor: ['#4CAF50', '#FF5733'], // Border colors
                     borderWidth: 1

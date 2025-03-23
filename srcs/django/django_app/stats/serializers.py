@@ -4,4 +4,4 @@ from .models import Stats
 class StatsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Stats
-        fields = ['user','wins', 'losses', 'goals_scored', 'goals_taken', 'play_time']
+        fields = ['wins', 'losses', 'goals_scored', 'goals_taken', 'play_time']
