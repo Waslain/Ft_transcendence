@@ -147,20 +147,23 @@ class PlayerConsumer(AsyncWebsocketConsumer):
                 del PlayerConsumer.games[self.uuid]
 
     async def receive(self, text_data):
-        data = json.loads(text_data)
-        if data["action"] == "keys":
-            for player in PlayerConsumer.games[self.uuid].players:
-                if player.name is self.name:
-                    if data["params"]["key"] == "z" or data["params"]["key"] == "ArrowUp":
-                        if data["params"]["type"] == "keydown":
-                            player.keyUp = True
-                        else:
-                            player.keyUp = False
-                    if data["params"]["key"] == "s" or data["params"]["key"] == "ArrowDown":
-                        if data["params"]["type"] == "keydown":
-                            player.keyDown = True
-                        else:
-                            player.keyDown = False
+        try:
+            data = json.loads(text_data)
+            if not isinstance(data, dict) or "action" not in data or "params" not in data:
+                return
+            if data["action"] == "keys":
+                if not PlayerConsumer.games.get(self.uuid):
+                    return
+                for player in PlayerConsumer.games[self.uuid].players:
+                    if player.name == self.name:
+                        key = data["params"].get("key", "")
+                        key_type = data["params"].get("type", "")
+                        if key in ("z", "ArrowUp"):
+                            player.keyUp = key_type == "keydown"
+                        elif key in ("s", "ArrowDown"):
+                            player.keyDown = key_type == "keydown"
+        except json.JSONDecodeError:
+            print("Error : Invalid JSON")
 
     async def updateScore(self, player, ball):
         player.score += 1
