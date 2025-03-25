@@ -186,12 +186,13 @@ document.addEventListener("authenticate", (e) => {
 			<i class="fs-2 bi-door-open"></i><span>Sign out</span>
 		</a>
 		<hr>
-		<a href="/profile" class="nav-item d-flex align-items-center">
-			<img src="/static/img/cat.png" alt="sample cat photo" width="30" height="30" class="rounded-circle">
-			<span id="dropdownMenuUsername"></span>
+		<a href="/users/profile" class="nav-item d-flex align-items-center">
+			<img src="#" id="sidebarAvatar" alt="avatar" width="30" height="30" class="rounded-circle">
+			<span id="sidebarUsername"></span>
 		</a>
 		`
 		/*Update dropdown user menu*/
+		/*
   		document.querySelector("#dropdownUserMenu").innerHTML = `
 		<div class="dropdown pb-4">
 			<div class="d-flex align-items-center text-white text-decoration-none">
@@ -200,9 +201,10 @@ document.addEventListener("authenticate", (e) => {
 			</div>
 		</div>
 		`;
-		document.getElementById('dropdownMenuUsername').innerText = localStorage.getItem("username")
+		*/
+		document.getElementById('sidebarUsername').innerText = localStorage.getItem("username")
 
-		document.getElementById('dropdownMenuAvatar').src = localStorage.getItem("avatar")
+		document.getElementById('sidebarAvatar').src = localStorage.getItem("avatar")
 
 		document.getElementById('signOut').addEventListener('click', (e) => {
 			e.preventDefault();
@@ -327,7 +329,7 @@ document.addEventListener("authenticate", (e) => {
 				<i class="fs-2 bi-door-open"></i><span>Login</span>
 		</a>
 		`
-  		document.querySelector("#dropdownUserMenu").innerHTML = ``
+  		//document.querySelector("#dropdownUserMenu").innerHTML = ``
 		const chatWindow = document.getElementById('chatWindow');
 		chatWindow.style.display = 'none';
 		if (authAbortController) {

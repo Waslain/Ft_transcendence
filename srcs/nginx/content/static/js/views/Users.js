@@ -52,7 +52,7 @@ export default class extends AbstractView {
     <div class="container py-5 h-100">
         <div class="row-fluid d-flex justify-content-center align-items-center">
                 <img src="#" id="avatarDisplay" alt="user's image" width="50" height="50" class="rounded-circle">
-                <h2 class="d-sm-inline mx-3 mb-0" id=usernameDisplay></h2>
+                <h2 class="d-sm-inline mx-3 mb-0 text-white" id=usernameDisplay></h2>
         </div>
         <hr/>
         <section>
@@ -79,16 +79,16 @@ export default class extends AbstractView {
         <section>
             <div class="row">
                 <div class="col-12 col-md-3 col-sm-3">
-                    <p class="fs-1 fs-sm-2 fs-md-3 fs-lg-5 text-center" id="statWins">Wins</p>
+                    <p class="fs-1 fs-sm-2 fs-md-3 fs-lg-5 text-center text-white" id="statWins">Wins</p>
                 </div>
                 <div class="col-12 col-md-3 col-sm-3">
-                    <p class="fs-1 fs-sm-2 fs-md-3 fs-lg-5 text-center" id="statLosses"></p>
+                    <p class="fs-1 fs-sm-2 fs-md-3 fs-lg-5 text-center text-white" id="statLosses"></p>
                 </div>
                 <div class="col-12 col-md-3 col-sm-3">
-                    <p class="fs-1 fs-sm-2 fs-md-3 fs-lg-5 text-center" id="statWinRate"></p>
+                    <p class="fs-1 fs-sm-2 fs-md-3 fs-lg-5 text-center text-white" id="statWinRate"></p>
                 </div>
                 <div class="col-12 col-md-3 col-sm-3">
-                    <p class="fs-1 fs-sm-2 fs-md-3 fs-lg-5 text-center" id="statGameTime"></p>
+                    <p class="fs-1 fs-sm-2 fs-md-3 fs-lg-5 text-center text-white" id="statGameTime"></p>
                 </div>
             </div>
         </section>
@@ -181,7 +181,7 @@ export default class extends AbstractView {
         document.getElementById('statWins').innerHTML = `Wins<br/><span style="color: #4169e1;">${number_of_wins}</span>`;
         document.getElementById('statLosses').innerHTML = `Losses<br/><span style="color: #98afc7;">${number_of_losses}</span>`;
         document.getElementById('statWinRate').innerHTML = `Win Rate<br/><span style="color: orange;">${rate_of_wins}%</span>`;
-        document.getElementById('statGameTime').innerHTML = `Game Time<br/><span style="color: black;">${game_time} min</span>`;
+        document.getElementById('statGameTime').innerHTML = `Game Time<br/><span style="color: pink;">${game_time} min</span>`;
 		
         /*Doughnut chart */
         const dctx = document.getElementById('winsCountChart').getContext('2d');
