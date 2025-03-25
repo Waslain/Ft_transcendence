@@ -4,15 +4,45 @@ from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
-from users.serializers import UserSerializer
+from users.serializers import UserSerializer, ImageSerializer
 from users.models import User
 from rest_framework.decorators import api_view
 
+class ImageViewSet(viewsets.ModelViewSet):
+	queryset = User.objects.all()
+	serializer_class = ImageSerializer
+	permission_classes = [permissions.AllowAny]
 
 class UserViewSet(viewsets.ModelViewSet):
 	queryset = User.objects.all()
 	serializer_class = UserSerializer
 	# permission_classes = [permissions.IsAuthenticated]
+
+
+class GetUserView(generics.RetrieveAPIView):
+	serializer_class = UserSerializer
+	#permission_classes = [permissions.IsAuthenticated]
+
+	def get(self, request, username):
+		try:
+			user = User.objects.get(username=username)
+		except:
+			return Response({"message":"User doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
+		serializer = UserSerializer(user)
+		return Response(serializer.data)
+
+
+class UpdateAvatarView(generics.UpdateAPIView):
+	serializer_class = ImageSerializer
+	permission_classes = [permissions.IsAuthenticated]
+
+	def update(self, request, *args, **kwargs):
+		token_key = request.COOKIES['auth_token']
+		instance = Token.objects.get(key=token_key).user
+		serializer = self.get_serializer(instance, data=request.data)
+		serializer.is_valid(raise_exception=True)
+		self.perform_update(serializer)
+		return Response(serializer.data)
 
 class RegisterView(generics.CreateAPIView):
 	serializer_class = UserSerializer
@@ -30,11 +60,14 @@ class RegisterView(generics.CreateAPIView):
 		)
 		token, created = Token.objects.get_or_create(user=user)
 		response = Response({
-			'message': 'User created successfully',
-			'username': user.username},
+			'message': 'Successfully created user',
+			'username': user.username,
+		},
 			status=status.HTTP_201_CREATED,
 			headers=headers
 		)
+		if user.avatar:
+			response.data['avatar'] = user.avatar.url
 		response.set_cookie(
 			key = 'auth_token',
 			value = token.key,
@@ -61,8 +94,10 @@ class LoginView(APIView):
 		token, created = Token.objects.get_or_create(user=user)
 		response = Response({
 			'message': 'Successfully logged in',
-			'username': user.username
+			'username': user.username,
 		})
+		if user.avatar:
+			response.data['avatar'] = user.avatar.url
 		response.set_cookie(
 			key = 'auth_token',
 			value = token.key,

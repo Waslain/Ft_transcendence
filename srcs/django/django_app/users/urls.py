@@ -3,10 +3,13 @@ from rest_framework.routers import DefaultRouter
 from users import views
 
 router = DefaultRouter()
-router.register(r'', views.UserViewSet, basename='user')
+router.register('users', views.UserViewSet, basename='user')
+router.register('images', views.ImageViewSet, basename='image')
 
 urlpatterns = [
-	path('get/', include(router.urls)),
+	path('', include(router.urls)),
+	path('get/<str:username>/', views.GetUserView.as_view()),
+	path('addAvatar/', views.UpdateAvatarView.as_view()),
 	path('register/', views.RegisterView.as_view()),
 	path('login/', views.LoginView.as_view()),
 	path('logout/', views.LogoutView.as_view()),
