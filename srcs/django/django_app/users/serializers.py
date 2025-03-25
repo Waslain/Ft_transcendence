@@ -3,9 +3,18 @@ from users.models import User
 from stats.models import Stats
 
 class ImageSerializer(serializers.ModelSerializer):
+	avatar = serializers.ImageField(required=False, allow_null=True)
+
 	class Meta:
 		model = User
 		fields = ['id', 'avatar']
+
+		def update(self, instance, validated_data):
+			value = validated_data.get('avatar');
+			if (value):
+				setattr(instance, 'avatar', value)
+			else:
+				setattr(instance, 'avatar', None)
 		
 
 class UserSerializer(serializers.ModelSerializer):

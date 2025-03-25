@@ -47,6 +47,17 @@ export default class extends AbstractView {
 	`
 	}
 
+	error(msg) {
+  		document.querySelector("#mainView").innerHTML = `
+		<div class="container py-5 h-100">
+			<div class="row-fluid d-flex justify-content-center align-items-center">
+					<h2 class="d-sm-inline mx-3 mb-0 text-white" id=errorDisplay></h2>
+			</div>
+		}
+		`
+		document.getElementById('errorDisplay').innerText = msg;
+	}
+
 	async getProfileHtml() {
 	return `
     <div class="container py-5 h-100">
@@ -108,8 +119,7 @@ export default class extends AbstractView {
 			data: json, status: response.status})))
 		.then(res => {
 			if (res.status > 400) {
-				document.getElementById('mainView').innerText =
-					"Error " + res.status + ": " + res.data.message;
+					this.error("Error " + res.status + ": " + res.data.message);
 				console.log(res.data.message);
 				return null;
 			}
@@ -119,8 +129,7 @@ export default class extends AbstractView {
 		})
 		.catch(error => {
 			console.error(error);
-			document.getElementById('errorMsg').innerText =
-				"Error: " + error;
+			this.error("Error: " + error);
 			return null;
 		})
 
@@ -141,8 +150,7 @@ export default class extends AbstractView {
 			data: json, status: response.status})))
 		.then(res => {
 			if (res.status > 400) {
-				document.getElementById('mainView').innerText =
-					"Error " + res.status + ": " + res.data.message;
+				this.error("Error " + res.status + ": " + res.data.message);
 				console.log(res.data.message);
 				return null;
 			}
@@ -152,8 +160,7 @@ export default class extends AbstractView {
 		})
 		.catch(error => {
 			console.error(error);
-			document.getElementById('errorMsg').innerText =
-				"Error: " + error;
+			this.error("Error: " + error);
 			return null;
 		})
 

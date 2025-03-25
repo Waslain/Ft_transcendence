@@ -1,5 +1,5 @@
 import AbstractView from "./AbstractView.js";
-import { navigateTo} from "../index.js";
+import { navigateTo } from "../index.js";
 import { loginUser } from "../index.js";
 
 export default class extends AbstractView {
@@ -47,9 +47,12 @@ export default class extends AbstractView {
                     </div>
 					
                     <div data-mdb-input-init class="form-outline mb-4">
-					  <label>Avatar (optional)</label>
+					  <label>Avatar (optional):</label>
                       <input type="file" id="avatar" name="avatar" class="form-control form-control-lg" accept="image/*">
-					<img id="avatarPreview" src="#" width="100" height="100" class="rounded-circle" style="display:none">
+        			  <div class="row-fluid d-flex align-items-center" style="padding-top:15px; margin-left:20px display: none" id="preview">
+					    <img id="avatarPreview" src="#" width="100" height="100" class="rounded-circle" style="display:none">
+                      <button data-mdb-button-init data-mdb-ripple-init class="btn btn-dark btn-lg btn-block" type="button" id="removeBtn" style="display:none;margin-left:30px">remove</button>
+				      </div>
                     </div>
   
                     <div class="pt-1 mb-4">
@@ -74,18 +77,42 @@ export default class extends AbstractView {
 		const registerBtn = document.getElementById('registerBtn');
 		const avatar = document.getElementById('avatar');
 		const registerForm = document.getElementById('registerForm');
+		const preview = document.getElementById('preview');
+		const avatarPreview = document.getElementById('avatarPreview');
+		const removeBtn = document.getElementById('removeBtn');
 
-		// event listener for the avatar image input
+		const showPreview = () => {
+			avatarPreview.style.display = 'block';
+			removeBtn.style.display = 'block';
+			preview.style.display = 'block';
+		}
+
+		const hidePreview = () => {
+			avatarPreview.style.display = 'none';
+			removeBtn.style.display = 'none';
+			preview.style.display = 'none';
+		}
+
 		avatar.addEventListener('change', function(event) {
 			const [file] = avatar.files
 			if (file) {
-				document.getElementById('avatarPreview').style.display = 'block';
-				document.getElementById('avatarPreview').src = URL.createObjectURL(file);
+				showPreview();
+				avatarPreview.src = URL.createObjectURL(file);
 			}
 		},
 		{
 			signal: this.#abortController.signal,
 		});
+
+
+		removeBtn.addEventListener('click', function(event) {
+			hidePreview();
+			avatar.value = '';
+		},
+		{
+			signal: this.#abortController.signal,
+		});
+		
 
 		// event listener for the register form
 		registerForm.addEventListener('submit', function(event) {
