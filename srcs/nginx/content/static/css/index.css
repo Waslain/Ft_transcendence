@@ -58,12 +58,16 @@ body::before{
     width: 50px;
 }
 
-.nav-items {
+.nav-items .nav-item{
+    display: none;
+    pointer-events: none;
     opacity: 0;
     transform: translateY(-10px);
 }
 
-.sidebar.open .nav-items {
+.sidebar.open .nav-items .nav-item{
+    display: flex;
+    pointer-events: auto;
     opacity: 1;
     transform: translateY(0);
 }
@@ -91,5 +95,8 @@ body::before{
 }
 
 .nav-item:hover span{
+    background-color: #306598;
+    border-radius: 25px;
+    padding: 10px;
     opacity: 1;
 }
