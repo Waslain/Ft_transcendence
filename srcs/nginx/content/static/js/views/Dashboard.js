@@ -43,48 +43,52 @@ export default class extends AbstractView {
 	async getHtml() {
 	return `
     <div class="container py-5 h-100">
-        <div class="row-fluid d-flex justify-content-center align-items-center">
-                <img src="/static/img/cat.png" alt="user's image" width="50" height="50" class="rounded-circle">
-                <h2 class="d-sm-inline mx-3 mb-0" id=usernameDisplay></h2>
+        <div class="card d-flex justify-content-center align-items-center h-100 bg-dark" style="width: 100%; border-radius: 1rem; --bs-bg-opacity: .7;">
+            <div class="card-body p-4 p-lg-5">
+                <div class="row-fluid d-flex justify-content-center align-items-center">
+                        <img src="/static/img/cat.png" alt="user's image" width="50" height="50" class="rounded-circle">
+                        <h2 class="d-sm-inline mx-3 mb-0 text-white" id=usernameDisplay></h2>
+                </div>
+                <hr/>
+                <section>
+                    <div class="row justify-content-center chart-container">
+                        <div class="col-12 col-sm-10 col-md-7 col-lg-6 col-xl-5 col-xxl-4">
+                            <div class="card widget-card border-light shadow-sm chart-wrapper">
+                                <div class="card-body p-4">
+                                    <h5 class="card-title widget-card-title mb-1 text-center">Win Stats</h5>
+                                    <canvas id="winsCountChart" style="width: 100%; height: auto;"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-10 col-md-7 col-lg-6 col-xl-5 col-xxl-4">
+                            <div class="card widget-card border-light shadow-sm chart-wrapper">
+                                <div class="card-body p-4">
+                                    <h5 class="card-title widget-card-title mb-1 text-center">Goals Chart</h5>
+                                    <canvas id="goalsChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <hr/>
+                <section>
+                    <div class="row">
+                        <div class="col-12 col-md-3 col-sm-3">
+                            <p class="fs-1 fs-sm-2 fs-md-3 fs-lg-5 text-center text-white" id="statWins">Wins</p>
+                        </div>
+                        <div class="col-12 col-md-3 col-sm-3">
+                            <p class="fs-1 fs-sm-2 fs-md-3 fs-lg-5 text-center text-white" id="statLosses"></p>
+                        </div>
+                        <div class="col-12 col-md-3 col-sm-3">
+                            <p class="fs-1 fs-sm-2 fs-md-3 fs-lg-5 text-center text-white" id="statWinRate"></p>
+                        </div>
+                        <div class="col-12 col-md-3 col-sm-3">
+                            <p class="fs-1 fs-sm-2 fs-md-3 fs-lg-5 text-center text-white" id="statGameTime"></p>
+                        </div>
+                    </div>
+                </section>
+            </div>
         </div>
-        <hr/>
-        <section>
-            <div class="row justify-content-center chart-container">
-                <div class="col-12 col-sm-10 col-md-7 col-lg-6 col-xl-5 col-xxl-4">
-                    <div class="card widget-card border-light shadow-sm chart-wrapper">
-                        <div class="card-body p-4">
-                            <h5 class="card-title widget-card-title mb-1 text-center">Win Stats</h5>
-                            <canvas id="winsCountChart" style="width: 100%; height: auto;"></canvas>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-sm-10 col-md-7 col-lg-6 col-xl-5 col-xxl-4">
-                    <div class="card widget-card border-light shadow-sm chart-wrapper">
-                        <div class="card-body p-4">
-                            <h5 class="card-title widget-card-title mb-1 text-center">Goals Chart</h5>
-                            <canvas id="goalsChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <hr/>
-        <section>
-            <div class="row">
-                <div class="col-12 col-md-3 col-sm-3">
-                    <p class="fs-1 fs-sm-2 fs-md-3 fs-lg-5 text-center" id="statWins">Wins</p>
-                </div>
-                <div class="col-12 col-md-3 col-sm-3">
-                    <p class="fs-1 fs-sm-2 fs-md-3 fs-lg-5 text-center" id="statLosses"></p>
-                </div>
-                <div class="col-12 col-md-3 col-sm-3">
-                    <p class="fs-1 fs-sm-2 fs-md-3 fs-lg-5 text-center" id="statWinRate"></p>
-                </div>
-                <div class="col-12 col-md-3 col-sm-3">
-                    <p class="fs-1 fs-sm-2 fs-md-3 fs-lg-5 text-center" id="statGameTime"></p>
-                </div>
-            </div>
-        </section>
     </div>
     `;
     }

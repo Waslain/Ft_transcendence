@@ -155,6 +155,13 @@ export const logoutUser = new CustomEvent('authenticate', {
   },
 });
 
+const sidebar = document.getElementById('sidebar');
+const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+
+sidebarToggleBtn.addEventListener('click', () =>{
+	sidebar.classList.toggle('open');
+});
+
 let authAbortController = null;
 document.addEventListener("authenticate", (e) => {
 	/* Code executed on login*/
@@ -163,29 +170,26 @@ document.addEventListener("authenticate", (e) => {
 
 		/* Update sidebar*/
   		document.querySelector("#sidebarItems").innerHTML = `
-		<li class="nav-item">
-			<a href="/dashboard" class="nav-link align-middle px-0" data-link>
-				<i class="fs-4 bi-grid"></i> <span class="ms-1 d-none d-sm-inline">Dashboard</span>
-			</a>
-		</li>
-		<li class="nav-item">
-			<a href="#" class="nav-link align-middle px-0" id="chatBox">
-				<i class="fs-4 bi-chat-left-heart"></i> <span class="ms-1 d-none d-sm-inline">Chat</span>
-			</a>
-		</li>
-		<li class="nav-item">
-			<a href="#" class="nav-link align-middle px-0">
-				<i class="fs-4 bi-gear"></i> <span class="ms-1 d-none d-sm-inline">Settings</span>
-			</a>
-		</li>
-		<li>
-			<a href="#" class="nav-link px-0 align-middle">
-				<i class="fs-4 bi-people"></i> <span class="ms-1 d-none d-sm-inline">Friends</span> </a>
-		</li>
-		<li>
-			<a href="" class="nav-link px-0 align-middle" id="signOut">
-				<i class="fs-4 bi-door-open"></i> <span class="ms-1 d-none d-sm-inline">Sign out</span></a>
-		</li>
+		<a href="/dashboard" class="nav-item d-flex align-items-center" data-link>
+				<i class="fs-2 bi-grid"></i><span>Dashboard</span>
+		</a>
+		<a href="#" class="nav-item d-flex align-items-center" id="chatBox">
+				<i class="fs-2 bi-chat-left-heart"></i><span>Chat</span>
+		</a>
+		<a href="#" class="nav-item d-flex align-items-center">
+			<i class="fs-2 bi-gear"></i><span>Settings</span>
+		</a>
+		<a href="#" class="nav-item d-flex align-items-center">
+			<i class="fs-2 bi-people"></i><span>Friends</span>
+		</a>
+		<a href="" class="nav-item d-flex align-items-center" id="signOut">
+			<i class="fs-2 bi-door-open"></i><span>Sign out</span>
+		</a>
+		<hr>
+		<a href="/profile" class="nav-item d-flex align-items-center">
+			<img src="/static/img/cat.png" alt="sample cat photo" width="30" height="30" class="rounded-circle">
+			<span id="dropdownMenuUsername"></span>
+		</a>
 		`
 		/*Update dropdown user menu*/
   		document.querySelector("#dropdownUserMenu").innerHTML = `
@@ -319,10 +323,9 @@ document.addEventListener("authenticate", (e) => {
 	/* Code executed on logout*/
 	else {
   		document.querySelector("#sidebarItems").innerHTML = `
-		<li>
-			<a href="/users/login"class="nav-link px-0 align-middle" data-link>
-				<i class="fs-4 bi-door-open"></i> <span class="ms-1 d-none d-sm-inline">Login</span></a>
-		</li>
+		<a href="/users/login" class="nav-item d-flex align-items-center" data-link>
+				<i class="fs-2 bi-door-open"></i><span>Login</span>
+		</a>
 		`
   		document.querySelector("#dropdownUserMenu").innerHTML = ``
 		const chatWindow = document.getElementById('chatWindow');

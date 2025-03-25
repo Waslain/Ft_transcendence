@@ -1,0 +1,95 @@
+@keyframes bg-slide {
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(-50%); }
+}
+
+body{
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    position: fixed;
+    z-index: -1;
+}
+body::before{
+    content:"";
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: url('../js/views/pong/utils/textures/night.jpg') repeat-x center/cover;
+    background-size: cover;
+    width: 200%;
+    height: 100%;
+    filter: contrast(160%) brightness(92%) saturate(103%) grayscale(20%);
+    animation: bg-slide 100s linear infinite alternate;
+    z-index: -1;
+}
+
+.btn-sidebar {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1;
+}
+
+.btn-circle.btn-xl {
+    width: 70px;
+    height: 70px;
+    padding: 10px 16px;
+    border-radius: 35px;
+    font-size: 24px;
+    line-height: 1.33;
+}
+
+.sidebar {
+    background-color: #9cafc9;
+    position: fixed;
+    top: 10px;
+    left: 25px;
+    width: 0;
+    border-radius: 50px;
+    transition: height 0.3s ease-in-out;
+    z-index: 1;
+}
+
+.sidebar.open {
+    top: 90px;
+    left: 25px;
+    width: 50px;
+}
+
+.nav-items {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+.sidebar.open .nav-items {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    color: rgb(224, 224, 224);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.nav-item:hover {
+    background-color: #306598;
+    border-radius: 60px;
+}
+
+.nav-item span{
+    opacity: 0;
+    margin-left: 20px;
+    font-size: 25px;
+    white-space: nowrap;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.nav-item:hover span{
+    opacity: 1;
+}
