@@ -46,7 +46,7 @@ export default class extends AbstractView {
         <div class="card d-flex justify-content-center align-items-center h-100 bg-dark" style="width: 100%; border-radius: 1rem; --bs-bg-opacity: .7;">
             <div class="card-body p-4 p-lg-5">
                 <div class="row-fluid d-flex justify-content-center align-items-center">
-                        <img src="/static/img/cat.png" alt="user's image" width="50" height="50" class="rounded-circle">
+                <img src="#" id="avatarDisplay" alt="user's image" width="50" height="50" class="rounded-circle">
                         <h2 class="d-sm-inline mx-3 mb-0 text-white" id=usernameDisplay></h2>
                 </div>
                 <hr/>
@@ -96,7 +96,10 @@ export default class extends AbstractView {
     async getJavaScript() {
 
 		const username = localStorage.getItem('username');
+		const avatar = localStorage.getItem('avatar');
+
 		document.getElementById('usernameDisplay').innerText = username;
+		document.getElementById('avatarDisplay').src = avatar;
 
 		var endpoint = "https://localhost/api/stats/" + username;
 		const data = await fetch(endpoint, {
@@ -138,7 +141,7 @@ export default class extends AbstractView {
         document.getElementById('statWins').innerHTML = `Wins<br/><span style="color: #4169e1;">${number_of_wins}</span>`;
         document.getElementById('statLosses').innerHTML = `Losses<br/><span style="color: #98afc7;">${number_of_losses}</span>`;
         document.getElementById('statWinRate').innerHTML = `Win Rate<br/><span style="color: orange;">${rate_of_wins}%</span>`;
-        document.getElementById('statGameTime').innerHTML = `Game Time<br/><span style="color: black;">${game_time} min</span>`;
+        document.getElementById('statGameTime').innerHTML = `Game Time<br/><span style="color: pink;">${game_time} min</span>`;
 		
         /*Doughnut chart */
         const dctx = document.getElementById('winsCountChart').getContext('2d');
