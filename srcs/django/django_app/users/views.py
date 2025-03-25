@@ -42,7 +42,13 @@ class UpdateAvatarView(generics.UpdateAPIView):
 		serializer = self.get_serializer(instance, data=request.data)
 		serializer.is_valid(raise_exception=True)
 		self.perform_update(serializer)
-		return Response(serializer.data)
+		response = Response({
+			'message': 'Successfully updated user',
+			'username': instance.username,
+		})
+		if instance.avatar:
+			response.data['avatar'] = instance.avatar.url
+		return response
 
 class RegisterView(generics.CreateAPIView):
 	serializer_class = UserSerializer

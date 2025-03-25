@@ -9,7 +9,7 @@ router.register('images', views.ImageViewSet, basename='image')
 urlpatterns = [
 	path('', include(router.urls)),
 	path('get/<str:username>/', views.GetUserView.as_view()),
-	path('addAvatar/', views.UpdateAvatarView.as_view()),
+	path('updateUser/', views.UpdateAvatarView.as_view()),
 	path('register/', views.RegisterView.as_view()),
 	path('login/', views.LoginView.as_view()),
 	path('logout/', views.LogoutView.as_view()),

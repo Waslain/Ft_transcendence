@@ -2,11 +2,11 @@ import Main from "./views/Main.js";
 import Login from "./views/Login.js";
 import Register from "./views/Register.js";
 import Users from "./views/Users.js";
+import Settings from "./views/Settings.js";
 import WaitingRoom from "./views/WaitingRoom.js";
 import Pong from "./views/Pong.js";
 import { loadAndSetFont } from "./views/pong/utils/font.js";
 import Tournament from "./views/Tournament.js";
-import Dashboard from "./views/Dashboard.js";
 
 export const navigateTo = (url) => {
   if (url !== location.pathname) {
@@ -36,10 +36,10 @@ const router = async () => {
     { path: "/users/login", view: Login },
     { path: "/users/register", view: Register },
 	{ path: "/users/profile/:username", view: Users },
+	{ path: "/settings", view: Settings},
     { path: "/pong", view: WaitingRoom },
     { path: "/pong/:room_id", view: Pong },
     { path: "/tournament", view: Tournament },
-    { path: "/dashboard", view: Dashboard },
   ];
 
   const potentialMatches = routes.map((route) => {
@@ -155,6 +155,10 @@ export const logoutUser = new CustomEvent('authenticate', {
   },
 });
 
+export const updateAvatar = () => {
+	document.getElementById('sidebarAvatar').src = localStorage.getItem("avatar")
+}
+
 const sidebar = document.getElementById('sidebar');
 const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
 
@@ -170,41 +174,27 @@ document.addEventListener("authenticate", (e) => {
 
 		/* Update sidebar*/
   		document.querySelector("#sidebarItems").innerHTML = `
-		<a href="/dashboard" class="nav-item d-flex align-items-center" data-link>
-				<i class="fs-2 bi-grid"></i><span>Dashboard</span>
-		</a>
 		<a href="#" class="nav-item d-flex align-items-center" id="chatBox">
 				<i class="fs-2 bi-chat-left-heart"></i><span>Chat</span>
 		</a>
-		<a href="#" class="nav-item d-flex align-items-center">
+		<a href="/settings" class="nav-item d-flex align-items-center" data-link>
 			<i class="fs-2 bi-gear"></i><span>Settings</span>
 		</a>
-		<a href="#" class="nav-item d-flex align-items-center">
+		<a href="#" class="nav-item d-flex align-items-center" data-link>
 			<i class="fs-2 bi-people"></i><span>Friends</span>
 		</a>
 		<a href="" class="nav-item d-flex align-items-center" id="signOut">
 			<i class="fs-2 bi-door-open"></i><span>Sign out</span>
 		</a>
 		<hr>
-		<a href="/users/profile" class="nav-item d-flex align-items-center">
+		<a href="/users/profile" class="nav-item d-flex align-items-center" data-link>
 			<img src="#" id="sidebarAvatar" alt="avatar" width="30" height="30" class="rounded-circle">
 			<span id="sidebarUsername"></span>
 		</a>
 		`
-		/*Update dropdown user menu*/
-		/*
-  		document.querySelector("#dropdownUserMenu").innerHTML = `
-		<div class="dropdown pb-4">
-			<div class="d-flex align-items-center text-white text-decoration-none">
-				<img src="#" id="dropdownMenuAvatar" alt="sample cat photo" width="30" height="30" class="rounded-circle">
-				<span class="d-none d-sm-inline mx-1" id="dropdownMenuUsername"></span>
-			</div>
-		</div>
-		`;
-		*/
 		document.getElementById('sidebarUsername').innerText = localStorage.getItem("username")
 
-		document.getElementById('sidebarAvatar').src = localStorage.getItem("avatar")
+		updateAvatar();
 
 		document.getElementById('signOut').addEventListener('click', (e) => {
 			e.preventDefault();
@@ -329,7 +319,6 @@ document.addEventListener("authenticate", (e) => {
 				<i class="fs-2 bi-door-open"></i><span>Login</span>
 		</a>
 		`
-  		//document.querySelector("#dropdownUserMenu").innerHTML = ``
 		const chatWindow = document.getElementById('chatWindow');
 		chatWindow.style.display = 'none';
 		if (authAbortController) {
