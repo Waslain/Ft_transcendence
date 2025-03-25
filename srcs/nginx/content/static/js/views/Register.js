@@ -45,6 +45,12 @@ export default class extends AbstractView {
                       <input type="password" id="confirmPassword" name="confirmPassword" class="form-control form-control-lg" placeholder="Confirm password" maxlength="20">
 					  <div id="confirmPasswordCheck" style="color:#dd0000"></div>
                     </div>
+					
+                    <div data-mdb-input-init class="form-outline mb-4">
+					  <label>Avatar (optional)</label>
+                      <input type="file" id="avatar" name="avatar" class="form-control form-control-lg" accept="image/*">
+					<img id="avatarPreview" src="#" width="100" height="100" class="rounded-circle" style="display:none">
+                    </div>
   
                     <div class="pt-1 mb-4">
                       <button data-mdb-button-init data-mdb-ripple-init class="btn btn-dark btn-lg btn-block" type="submit" id="registerBtn">Register</button>
@@ -66,8 +72,23 @@ export default class extends AbstractView {
 	async getJavaScript() {
 		this.#abortController = new AbortController();
 		const registerBtn = document.getElementById('registerBtn');
+		const avatar = document.getElementById('avatar');
+		const registerForm = document.getElementById('registerForm');
 
-		document.getElementById('registerForm').addEventListener('submit', function(event) {
+		// event listener for the avatar image input
+		avatar.addEventListener('change', function(event) {
+			const [file] = avatar.files
+			if (file) {
+				document.getElementById('avatarPreview').style.display = 'block';
+				document.getElementById('avatarPreview').src = URL.createObjectURL(file);
+			}
+		},
+		{
+			signal: this.#abortController.signal,
+		});
+
+		// event listener for the register form
+		registerForm.addEventListener('submit', function(event) {
 			event.preventDefault();
 
 			const formData = new FormData(this)
@@ -75,6 +96,9 @@ export default class extends AbstractView {
 			const password = formData.get("password");
 			const confirmPassword = formData.get("confirmPassword");
 			formData.delete("confirmPassword");
+			if (!formData.get('avatar').name) {
+				formData.delete("avatar");
+			}
 			let inputCheck = false;
 
 			if (username === "") {
@@ -110,8 +134,8 @@ export default class extends AbstractView {
 			}
 
 			registerBtn.disabled = true;
-			var url = "https://localhost/api/users/register/"
-			fetch(url, {
+			var endpoint = "https://localhost/api/users/register/"
+			fetch(endpoint, {
 				method: 'POST',
 				body: formData,
 			})
@@ -126,6 +150,12 @@ export default class extends AbstractView {
 				}
 				else {
 					localStorage.setItem("username", res.data.username);
+					if (res.data.avatar) {
+						localStorage.setItem("avatar", "https://localhost" + res.data.avatar);
+					}
+					else {
+						localStorage.setItem("avatar", "/static/img/default.png");
+					}
 					console.log(res.data.message);
 					document.dispatchEvent(loginUser);
 					navigateTo("/users/profile");

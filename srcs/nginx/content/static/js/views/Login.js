@@ -109,6 +109,12 @@ export default class extends AbstractView {
 				}
 				else {
 					localStorage.setItem("username", res.data.username);
+					if (res.data.avatar) {
+						localStorage.setItem("avatar", "https://localhost" + res.data.avatar);
+					}
+					else {
+						localStorage.setItem("avatar", "/static/img/default.png");
+					}
 					console.log(res.data.message);
 					document.dispatchEvent(loginUser);
 					if (nextUrl === "") {

@@ -191,12 +191,14 @@ document.addEventListener("authenticate", (e) => {
   		document.querySelector("#dropdownUserMenu").innerHTML = `
 		<div class="dropdown pb-4">
 			<div class="d-flex align-items-center text-white text-decoration-none">
-				<img src="/static/img/cat.png" alt="sample cat photo" width="30" height="30" class="rounded-circle">
+				<img src="#" id="dropdownMenuAvatar" alt="sample cat photo" width="30" height="30" class="rounded-circle">
 				<span class="d-none d-sm-inline mx-1" id="dropdownMenuUsername"></span>
 			</div>
 		</div>
 		`;
 		document.getElementById('dropdownMenuUsername').innerText = localStorage.getItem("username")
+
+		document.getElementById('dropdownMenuAvatar').src = localStorage.getItem("avatar")
 
 		document.getElementById('signOut').addEventListener('click', (e) => {
 			e.preventDefault();
@@ -328,6 +330,8 @@ document.addEventListener("authenticate", (e) => {
 		if (authAbortController) {
 			authAbortController.abort();
 		}
+		localStorage.removeItem('username');
+		localStorage.removeItem('avatar');
 	}
 });
 

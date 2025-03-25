@@ -51,7 +51,7 @@ export default class extends AbstractView {
 	return `
     <div class="container py-5 h-100">
         <div class="row-fluid d-flex justify-content-center align-items-center">
-                <img src="/static/img/cat.png" alt="user's image" width="50" height="50" class="rounded-circle">
+                <img src="#" id="avatarDisplay" alt="user's image" width="50" height="50" class="rounded-circle">
                 <h2 class="d-sm-inline mx-3 mb-0" id=usernameDisplay></h2>
         </div>
         <hr/>
@@ -100,14 +100,46 @@ export default class extends AbstractView {
 
 		const username = this.params.username; 
 
-		var endpoint = "https://localhost/api/stats/" + username;
+		let endpoint = "https://localhost/api/users/get/" + username;
+		const dataUser = await fetch(endpoint, {
+			method: 'GET',
+		})
+		.then(response => response.json().then(json => ({
+			data: json, status: response.status})))
+		.then(res => {
+			if (res.status > 400) {
+				document.getElementById('mainView').innerText =
+					"Error " + res.status + ": " + res.data.message;
+				console.log(res.data.message);
+				return null;
+			}
+			else {
+				return res.data
+			}
+		})
+		.catch(error => {
+			console.error(error);
+			document.getElementById('errorMsg').innerText =
+				"Error: " + error;
+			return null;
+		})
+
+		if (dataUser === null) {
+			return;
+		}
+
+		let avatar = "/static/img/default.png"
+		if (dataUser.avatar) {
+			avatar = "https://localhost" + dataUser.avatar;
+		}
+
+		endpoint = "https://localhost/api/stats/" + username;
 		const data = await fetch(endpoint, {
 			method: 'GET',
 		})
 		.then(response => response.json().then(json => ({
 			data: json, status: response.status})))
 		.then(res => {
-			let auth = res.data.IsAuthenticated;
 			if (res.status > 400) {
 				document.getElementById('mainView').innerText =
 					"Error " + res.status + ": " + res.data.message;
@@ -131,6 +163,7 @@ export default class extends AbstractView {
 
   		document.querySelector("#mainView").innerHTML = await this.getProfileHtml();
 		document.getElementById('usernameDisplay').innerText = username;
+		document.getElementById('avatarDisplay').src = avatar;
 
 		const number_of_wins = data.wins;
 		const number_of_losses = data.losses;
