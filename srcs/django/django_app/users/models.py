@@ -16,6 +16,12 @@ class User(AbstractUser):
 		default=list,
 		help_text='List of user IDs representing friends'
 	)
+	blocked_users = ArrayField(
+		models.IntegerField(),
+		blank=True,
+		default=list,
+		help_text='List of user IDs representing blocked users'
+	)
 	avatar = models.ImageField(upload_to='images/', blank=True, null=True)
 	def update_online_status(self):
 		#Update user's online status in cache

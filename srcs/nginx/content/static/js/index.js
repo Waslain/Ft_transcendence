@@ -296,8 +296,10 @@ document.addEventListener("authenticate", (e) => {
 				console.log('Chat connection established');
 				// Fetch online users when connection is established
 				fetchOnlineUsers();
+				fetchBlockedUsers();
 				// Start a periodic refresh of the online users list
 				setInterval(fetchOnlineUsers, 30000); // Every 30 seconds
+				setInterval(fetchBlockedUsers, 60000); // Every 60 seconds
 			};
 		
 			chatSocket.onmessage = function(e) {
@@ -324,6 +326,22 @@ document.addEventListener("authenticate", (e) => {
 		function displayMessage(message) {
 			const chatMessages = document.getElementById('chatMessages');
 			
+			// Check if the message is from a blocked user
+			if (message.sender_id) {  // Make sure sender_id exists
+				const blockedUsers = JSON.parse(localStorage.getItem('blockedUsers') || '[]');
+				console.log("Checking if user is blocked:", message.sender_id, blockedUsers);
+				
+				// IMPORTANT: Convert both to numbers for comparison
+				const senderId = Number(message.sender_id);
+				console.log(`Message from user ID: ${senderId}`);
+				console.log(`Blocked users: ${blockedUsers}`);
+				// Check if this user ID is in the blocked list
+				if (blockedUsers.includes(senderId)) {
+					console.log(`Blocked message from user ID ${message.sender_id}`);
+					return; // Don't display messages from blocked users
+				}
+			}
+
 			// Create message element
 			const messageElement = document.createElement('div');
 			messageElement.className = message.is_own ? 'my-message' : 'their-message';
@@ -413,7 +431,7 @@ document.addEventListener("authenticate", (e) => {
 
 		// Add this function to fetch online users
 		function fetchOnlineUsers() {
-			fetch('/api/users/online/', {
+			fetch('https://localhost/api/users/online/', {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json'
@@ -436,7 +454,31 @@ document.addEventListener("authenticate", (e) => {
 				console.error('Error fetching online users:', error);
 			});
 		}
-		
+
+		function fetchBlockedUsers() {
+			fetch('https://localhost/api/users/blocked/', {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				credentials: 'include'
+			})
+			.then(response => {
+				if (!response.ok) {
+					throw new Error(`Network response was not ok: ${response.status}`);
+				}
+				return response.json();
+			})
+			.then(blockedUsers => {
+				console.log("Fetched blocked users:", blockedUsers);
+				// Store the blocked users in localStorage for quick access
+				localStorage.setItem('blockedUsers', JSON.stringify(blockedUsers));
+			})
+			.catch(error => {
+				console.error('Error fetching blocked users:', error);
+			});
+		}
+
 		// Function to update the users dropdown
 		function updateOnlineUsersList(users) {
 			const chatUserSelect = document.getElementById('chatUserSelect');
