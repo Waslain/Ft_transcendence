@@ -23,6 +23,9 @@ export default class extends AbstractView {
             background-color: #306598;
             color: #fff;
         }
+        .profile-btn:hover {
+            background-color: #9cafc9;
+        }
         .chart-container {
             display: flex;
             justify-content: space-around;
@@ -267,7 +270,7 @@ export default class extends AbstractView {
 
         /*profileBtns*/
         const currentUser = username;
-        const profileName = username;
+        const profileName = ("test");
 
         if (currentUser == profileName) {
             document.querySelector("#profileBtns").innerHTML = `
