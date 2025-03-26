@@ -269,8 +269,8 @@ export default class extends AbstractView {
         });
 
         /*profileBtns*/
-        const currentUser = username;
-        const profileName = ("test");
+        const currentUser = localStorage.getItem('username');
+        const profileName = username;
 
         if (currentUser == profileName) {
             document.querySelector("#profileBtns").innerHTML = `
