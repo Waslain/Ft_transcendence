@@ -16,4 +16,5 @@ urlpatterns = [
 	path('check-auth/', views.SessionView.as_view()),
 	path('friends/<int:user_id_1>/<int:user_id_2>/', views.mutual_friends, name='friends'),
 	path('add-friend/<int:user_id_1>/<int:user_id_2>/', views.add_friend, name='add-friend'),
+	path('online/', views.get_online_users, name='online_users'),
 ]

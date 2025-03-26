@@ -7,9 +7,57 @@
     <link rel="icon" type="image/png" href="/static/img/cat.png" />
     <!-- Latest compiled and minified CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="/static/css/index.css"/>
-    <style id="style"></style>
+	<style>
+		body {
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+		}
+		.chat-user {
+			cursor: pointer;
+			font-size: 0.9em;
+			white-space: nowrap;
+			transition: background-color 0.2s;
+		}
+		
+		.chat-user:hover {
+			background-color: #f0f0f0;
+		}
+		
+		.chat-user.selected {
+			background-color: #e0f0ff;
+			font-weight: bold;
+		}
+		
+		.my-message, .their-message {
+			margin-bottom: 8px;
+			padding: 6px 10px;
+			border-radius: 5px;
+			max-width: 85%;
+			word-break: break-word;
+		}
+		
+		.my-message {
+			background-color: #dcf8c6;
+			margin-left: auto;
+			text-align: right;
+		}
+		
+		.their-message {
+			background-color: #f1f1f1;
+		}
+		
+		.message-time {
+			font-size: 0.7em;
+			color: #999;
+			margin-top: 2px;
+		}
+		
+		.message-content em {
+			color: #666;
+			font-style: italic;
+		}
+	</style>
     <script type="importmap">
       {
         "imports": {
@@ -22,35 +70,53 @@
     </script>
 </head>
 <body>
-    <!-- Sidebar -->
-    <button class="btn btn-light btn-circle btn-xl btn-sidebar" id="sidebarToggleBtn">
-        <i class="bi bi-list"></i>
-    </button>
-    <div id="sidebar" class="sidebar">
-        <div class="nav-items">
-            <div id="sidebarItems"></div>
-        </div>
-    </div>
-    <!--Chat Box-->
-    <div id="chatWindow" class="position-fixed bottom-0 end-0 m-4 p-3 bg-white border rounded shadow-lg z-3" style="width: 300px; height: 400px; display: none;">
-        <div id="chatHeader" class="d-flex justify-content-between border-bottom">
-            <h5>Chat</h5>
-            <button id="closeChatBtn" class="btn-close"></button>
-        </div>
-        <div id="chatMessages" style="overflow-y: scroll; height: 300px; word-wrap: break-word; overflow-wrap: break-word;">
-        <!--shows text msg-->
-        </div>
-        <div id="chatInputBar" class="d-flex mt-2">
-            <input type="text" id="chatInput" class="form-control" placeholder="Type a message..." />
-            <button id="sendButton" class="btn btn-primary ms-2">
-                <i class="bi bi-send"></i>
-            </button>   
-        </div>
-    </div>
-    <!-- Main content -->
     <div class="container-fluid">
-        <div id="content-area">
-            <div id="app"></div>
+        <div class="row flex-nowrap">
+            <!-- Sidebar -->
+			<button class="btn btn-light btn-circle btn-xl btn-sidebar" id="sidebarToggleBtn">
+				<i class="bi bi-list"></i>
+			</button>
+			<div id="sidebar" class="sidebar">
+				<div class="nav-items">
+					<div id="sidebarItems"></div>
+				</div>
+			</div>
+            <!--Chat Box-->
+            <div id="chatWindow" class="position-fixed bottom-0 end-0 m-4 p-3 bg-white border rounded shadow-lg z-3" style="width: 300px; height: 400px; display: none;">
+				<div id="chatHeader" class="d-flex justify-content-between border-bottom pb-2 mb-2">
+					<h5 id="chatHeaderTitle">Chat</h5>
+					<button id="closeChatBtn" class="btn-close"></button>
+				</div>
+				
+				<div class="d-flex flex-column" style="height: calc(100% - 50px);">
+					<!-- User selection dropdown -->
+					<div class="mb-2">
+						<select id="chatUserSelect" class="form-select form-select-sm">
+							<option value="general" selected>General Chat</option>
+							<!-- Online users will be added here -->
+						</select>
+					</div>
+					
+					<!-- Messages container -->
+					<div id="chatMessages" data-context="general" style="flex-grow: 1; overflow-y: auto; height: 235px; word-wrap: break-word; overflow-wrap: break-word;">
+						<!-- Messages will appear here -->
+					</div>
+					
+					<!-- Input area -->
+					<div id="chatInputBar" class="d-flex mt-2">
+						<input type="text" id="chatInput" class="form-control" placeholder="Type a message..." />
+						<button id="sendButton" class="btn btn-primary ms-2">
+							<i class="bi bi-send"></i>
+						</button>   
+					</div>
+				</div>
+			</div>
+            <!-- Main content -->
+			<div class="container-fluid">
+				<div id="content-area">
+					<div id="app"></div>
+                </div>
+            </main>
         </div>
     </div>
     <script type="module" src="/static/js/index.js"></script>

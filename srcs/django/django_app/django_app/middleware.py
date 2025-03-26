@@ -26,3 +26,16 @@ class TokenAuthMiddleware:
 
 
 TokenAuthMiddlewareStack = lambda inner: TokenAuthMiddleware(AuthMiddlewareStack(inner))
+
+class UserActivityMiddleware:
+	def __init__(self, get_response):
+		self.get_response = get_response
+
+	def __call__(self, request):
+		response = self.get_response(request)
+		
+		# Update last_activity if user is authenticated
+		if request.user.is_authenticated:
+			request.user.update_online_status()
+			
+		return response

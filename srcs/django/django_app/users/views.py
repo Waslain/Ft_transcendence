@@ -7,6 +7,9 @@ from rest_framework.authentication import TokenAuthentication
 from users.serializers import UserSerializer, ImageSerializer
 from users.models import User
 from rest_framework.decorators import api_view
+from django.core.cache import cache
+import logging
+logger = logging.getLogger('users')
 
 class ImageViewSet(viewsets.ModelViewSet):
 	queryset = User.objects.all()
@@ -97,6 +100,8 @@ class LoginView(APIView):
 		)
 		if user is None:
 			return Response({'message':'Invalid username or password'}, status=401)
+		else:
+			user.update_online_status()
 		token, created = Token.objects.get_or_create(user=user)
 		response = Response({
 			'message': 'Successfully logged in',
@@ -118,6 +123,8 @@ class LogoutView(APIView):
 	permission_classes = [permissions.IsAuthenticated]
 
 	def get(self, request):
+		if request.user.is_authenticated:
+			cache.delete(f'user_{request.user.id}_last_activity')
 		response = Response({'message': 'Successfully logged out'})
 		response.set_cookie(
 			key = 'auth_token',
@@ -165,3 +172,22 @@ def add_friend(request, user_id_1, user_id_2):
 		return Response({'status': 'friend added'}, status=status.HTTP_200_OK)
 	else:
 		return Response({'status': 'friend already in list'}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_online_users(request):
+	logger.debug("Getting online users using cache-based tracking")
+	users = User.objects.exclude(id=request.user.id)
+	
+	online_users = []
+	for user in users:
+		# Check if user is online using the cache
+		if user.is_online:
+			online_users.append({
+				'id': user.id,
+				'username': user.username
+			})
+			logger.debug(f"Added online user {user.username} to list")
+		else:
+			logger.debug(f"User {user.username} is not online")
+	
+	return Response(online_users)
