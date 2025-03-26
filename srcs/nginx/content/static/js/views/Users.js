@@ -275,11 +275,8 @@ export default class extends AbstractView {
         if (currentUser == profileName) {
             document.querySelector("#profileBtns").innerHTML = `
             <div class="row text-center">
-                 <div class="col-12 col-md-6 col-sm-6 text-nowrap">
+                 <div class="col text-nowrap">
                     <button type="button" class="btn profile-btn"><i class="bi bi-box-arrow-up" style="padding-right: 5px;"></i>Update Photo</button>
-                </div>
-                <div class="col-12 col-md-6 col-sm-6 text-nowrap">
-                    <button type="button" class="btn profile-btn"><i class="bi bi-pencil-square" style="padding-right: 5px;"></i>Change Avatar Name</button>
                 </div>
             </div>
             `
