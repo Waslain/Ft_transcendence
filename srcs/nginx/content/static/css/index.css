@@ -100,3 +100,48 @@ body::before{
     padding: 10px;
     opacity: 1;
 }
+
+.chat-user {
+	cursor: pointer;
+	font-size: 0.9em;
+	white-space: nowrap;
+	transition: background-color 0.2s;
+}
+
+.chat-user:hover {
+	background-color: #f0f0f0;
+}
+
+.chat-user.selected {
+	background-color: #e0f0ff;
+	font-weight: bold;
+}
+
+.my-message, .their-message {
+	margin-bottom: 8px;
+	padding: 6px 10px;
+	border-radius: 5px;
+	max-width: 85%;
+	word-break: break-word;
+}
+
+.my-message {
+	background-color: #dcf8c6;
+	margin-left: auto;
+	text-align: right;
+}
+
+.their-message {
+	background-color: #f1f1f1;
+}
+
+.message-time {
+	font-size: 0.7em;
+	color: #999;
+	margin-top: 2px;
+}
+
+.message-content em {
+	color: #666;
+	font-style: italic;
+}
