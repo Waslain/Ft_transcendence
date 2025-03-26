@@ -15,6 +15,14 @@ export default class extends AbstractView {
 
     async getStyle() {
         return `
+        .profile-btn {
+            justify-content: space-evely;
+            padding: 5px;
+            margin: 10px;
+            border-radius: 50px;
+            background-color: #306598;
+            color: #fff;
+        }
         .chart-container {
             display: flex;
             justify-content: space-around;
@@ -65,6 +73,8 @@ export default class extends AbstractView {
                 <img src="#" id="avatarDisplay" alt="user's image" width="50" height="50" class="rounded-circle">
                 <h2 class="d-sm-inline mx-3 mb-0 text-white" id=usernameDisplay></h2>
         </div>
+        <br>
+        <div id="profileBtns"></div>
         <hr/>
         <section>
             <div class="row justify-content-center chart-container">
@@ -254,5 +264,39 @@ export default class extends AbstractView {
                 }
             }
         });
+
+        /*profileBtns*/
+        const currentUser = username;
+        const profileName = username;
+
+        if (currentUser == profileName) {
+            document.querySelector("#profileBtns").innerHTML = `
+            <div class="row text-center">
+                 <div class="col-12 col-md-6 col-sm-6 text-nowrap">
+                    <button type="button" class="btn profile-btn"><i class="bi bi-box-arrow-up" style="padding-right: 5px;"></i>Update Photo</button>
+                </div>
+                <div class="col-12 col-md-6 col-sm-6 text-nowrap">
+                    <button type="button" class="btn profile-btn"><i class="bi bi-pencil-square" style="padding-right: 5px;"></i>Change Avatar Name</button>
+                </div>
+            </div>
+            `
+        } else {
+            document.querySelector("#profileBtns").innerHTML = `
+            <div class="row text-center">
+                 <div class="col-12 col-md-3 col-sm-3 text-nowrap">
+                    <button type="button" class="btn profile-btn"><i class="bi bi-plus-circle" style="padding-right: 5px;"></i>Add Friend</button>
+                </div>
+                <div class="col-12 col-md-3 col-sm-3 text-nowrap">
+                    <button type="button" class="btn profile-btn"><i class="bi bi-joystick" style="padding-right: 5px;"></i>Match Invite</button>
+                </div>
+                <div class="col-12 col-md-3 col-sm-3 text-nowrap">
+                    <button type="button" class="btn profile-btn" ><i class="bi bi-send" style="padding-right: 5px;"></i>Message</button>
+                </div>
+                <div class="col-12 col-md-3 col-sm-3 text-nowrap">
+                    <button type="button" class="btn profile-btn"><i class="bi bi-ban" style="padding-right: 5px;"></i>Block</button>
+                </div>
+            </div>
+            `
+        }
 	}
 }
