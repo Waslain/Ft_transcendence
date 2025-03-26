@@ -132,6 +132,13 @@ window.addEventListener("popstate", router);
 // });
 
 document.addEventListener("DOMContentLoaded", function() {
+	document.body.addEventListener("click", (e) => {
+		const link = e.target.closest("a[data-link]");
+		if (link) {
+		  e.preventDefault();
+		  navigateTo(link.getAttribute("href"));
+		}
+	  });
     const chatUserSelect = document.getElementById('chatUserSelect');
     if (chatUserSelect) {
         chatUserSelect.addEventListener('change', function() {
