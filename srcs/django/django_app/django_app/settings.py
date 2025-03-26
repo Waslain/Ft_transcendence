@@ -62,6 +62,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+	'django_app.middleware.UserActivityMiddleware',
 ]
 
 ROOT_URLCONF = 'django_app.urls'
@@ -127,6 +128,36 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Logging configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',  # Change to DEBUG to see all messages
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'users': {  # This will capture logs from your users app
+            'handlers': ['console'],
+            'level': 'DEBUG',  # Important: set to DEBUG
+            'propagate': False,
+        },
+    },
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
