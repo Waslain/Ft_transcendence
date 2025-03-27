@@ -1,6 +1,6 @@
 import { updateName } from "./updateName.js";
 import { updateScore } from "./updateScore.js";
-import { displayMessage } from "./displayMessage.js";
+import { updateMessage } from "./updateMessage.js";
 
 export const handleSocketMessage = (objectManager, socket) => {
   socket.onmessage = (e) => {
@@ -43,7 +43,8 @@ export const handleSocketMessage = (objectManager, socket) => {
         );
         break;
       case "message":
-        displayMessage(
+        updateMessage(
+          objectManager,
           data.params.messages.first,
           data.params.messages.second,
           objectManager.scene
