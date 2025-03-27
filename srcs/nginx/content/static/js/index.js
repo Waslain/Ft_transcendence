@@ -341,7 +341,167 @@ document.addEventListener("authenticate", (e) => {
 					return; // Don't display messages from blocked users
 				}
 			}
-		
+
+			// Special handling for game invitations
+			if (message.is_invitation) {
+				// Create special invitation element
+				const messageElement = document.createElement('div');
+				messageElement.className = 'game-invitation-message';
+				
+				const invitationCard = document.createElement('div');
+				invitationCard.className = 'invitation-card';
+				
+				// Add sender info with clickable username
+				if (message.username && message.username !== "Anonymous") {
+					const senderInfo = document.createElement('div');
+					senderInfo.className = 'invitation-sender';
+					
+					// Clickable username
+					const usernameLink = document.createElement('a');
+					usernameLink.textContent = message.username;
+					usernameLink.href = `/users/profile/${message.username}`;
+					usernameLink.style.color = 'inherit';
+					usernameLink.style.textDecoration = 'underline';
+					usernameLink.style.fontWeight = 'bold';
+					usernameLink.addEventListener('click', function(e) {
+						e.preventDefault();
+						navigateTo(`/users/profile/${message.username}`);
+					});
+					
+					senderInfo.appendChild(usernameLink);
+					senderInfo.appendChild(document.createTextNode(' invited you to a game!'));
+					invitationCard.appendChild(senderInfo);
+					
+					// Add action buttons
+					const actionButtons = document.createElement('div');
+					actionButtons.className = 'invitation-actions';
+					
+					// Accept button
+					const acceptButton = document.createElement('button');
+					acceptButton.className = 'btn btn-sm btn-success invitation-btn';
+					acceptButton.textContent = 'Accept';
+					acceptButton.addEventListener('click', function() {
+						// Navigate to game page with invitation info
+						navigateTo(`/pong/${message.username}?name=${localStorage.getItem('username')}`);
+					});
+					
+					// Decline button
+					const declineButton = document.createElement('button');
+					declineButton.className = 'btn btn-sm btn-danger invitation-btn ms-2';
+					declineButton.textContent = 'Decline';
+					declineButton.addEventListener('click', function() {
+						// Remove the invitation card
+						messageElement.remove();
+						
+						// Send decline message
+						if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
+							chatSocket.send(JSON.stringify({
+								'type': 'private_message',
+								'recipient_id': message.sender_id,
+								'message': 'declined your game invitation'
+							}));
+						}
+					});
+					
+					actionButtons.appendChild(acceptButton);
+					actionButtons.appendChild(declineButton);
+					invitationCard.appendChild(actionButtons);
+				} else {
+					// Fallback for missing username
+					invitationCard.textContent = "You received a game invitation";
+				}
+				
+				// Add timestamp
+				const messageTime = document.createElement('div');
+				messageTime.className = 'message-time';
+				const date = new Date(message.timestamp || new Date());
+				messageTime.textContent = date.toLocaleTimeString();
+				
+				messageElement.appendChild(invitationCard);
+				messageElement.appendChild(messageTime);
+				
+				chatMessages.appendChild(messageElement);
+				chatMessages.scrollTop = chatMessages.scrollHeight;
+				
+				// Exit early since we've already handled this message
+				return;
+			}
+
+			// Special handling for invitation sender confirmation
+			if (message.is_lobby && message.is_system) {
+				// Create special confirmation element
+				const messageElement = document.createElement('div');
+				messageElement.className = 'system-message invitation-confirmation';
+				
+				const invitationCard = document.createElement('div');
+				invitationCard.className = 'invitation-card sender-card';
+				
+				// Add confirmation message
+				const confirmationInfo = document.createElement('div');
+				confirmationInfo.className = 'confirmation-info';
+				
+				// Create message with clickable recipient username
+				const systemText = document.createElement('span');
+				systemText.textContent = 'You have invited ';
+				confirmationInfo.appendChild(systemText);
+				
+				const postText = document.createElement('span');
+				postText.textContent = ' to play a game.';
+				confirmationInfo.appendChild(postText);
+				
+				invitationCard.appendChild(confirmationInfo);
+				
+				// Add action buttons
+				const actionButtons = document.createElement('div');
+				actionButtons.className = 'invitation-actions';
+				
+				// Join button
+				const joinButton = document.createElement('button');
+				joinButton.className = 'btn btn-sm btn-primary invitation-btn';
+				joinButton.textContent = 'Join Game';
+				joinButton.addEventListener('click', function() {
+					// Navigate to game page as the inviter
+					navigateTo(`/pong/${localStorage.getItem('username')}?name=${localStorage.getItem('username')}`);
+				});
+				
+				// Cancel button
+				const cancelButton = document.createElement('button');
+				cancelButton.className = 'btn btn-sm btn-outline-secondary invitation-btn ms-2';
+				cancelButton.textContent = 'Cancel';
+				cancelButton.addEventListener('click', function() {
+					// Remove the invitation card
+					messageElement.remove();
+					
+					// Send cancellation message
+					if (chatSocket && chatSocket.readyState === WebSocket.OPEN) {
+						chatSocket.send(JSON.stringify({
+							'type': 'private_message',
+							'recipient_id': message.recipient_id,
+							'message': 'cancelled the game invitation'
+						}));
+					}
+				});
+				
+				actionButtons.appendChild(joinButton);
+				actionButtons.appendChild(cancelButton);
+				invitationCard.appendChild(actionButtons);
+				
+				// Add timestamp
+				const messageTime = document.createElement('div');
+				messageTime.className = 'message-time';
+				const date = new Date(message.timestamp || new Date());
+				messageTime.textContent = date.toLocaleTimeString();
+				
+				messageElement.appendChild(invitationCard);
+				messageElement.appendChild(messageTime);
+				
+				chatMessages.appendChild(messageElement);
+				chatMessages.scrollTop = chatMessages.scrollHeight;
+				
+				// Exit early since we've already handled this message
+				return;
+			}
+					
 			// Create message element
 			const messageElement = document.createElement('div');
 			messageElement.className = message.is_own ? 'my-message' : 'their-message';
@@ -387,7 +547,7 @@ document.addEventListener("authenticate", (e) => {
 					messageContent.appendChild(prefix);
 					
 					// Add clickable sender username
-					if (message.username && message.username !== "Anonymous" && message.username !== "Me") {
+					if (message.username && message.username !== "Anonymous" && message.username !== "Me" && message.username !== "System") {
 						const usernameLink = document.createElement('a');
 						usernameLink.textContent = message.username;
 						usernameLink.href = `/users/profile/${message.username}`;

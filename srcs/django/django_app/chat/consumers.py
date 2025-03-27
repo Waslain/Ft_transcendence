@@ -62,7 +62,70 @@ class ChatConsumer(AsyncWebsocketConsumer):
 		else:
 			username = user.username
 			user_id = user.id
-		
+		# Check for command patterns
+		if message.startswith('/invite ') and not user.is_anonymous:
+			# Extract the username from the command
+			target_username = message[8:].strip()
+			
+			try:
+				# Find the user by username
+				target_user = await self.get_user_by_username(target_username)
+				
+				if target_user and target_user.id != user_id:
+					# Send a game invitation
+					await self.channel_layer.group_send(
+						f'user_{target_user.id}',
+						{
+							'type': 'game_invitation',
+							'message': "has invited you to play a game!",
+							'username': username,
+							'sender_id': user_id,
+							'recipient_id': target_user.id,
+							'timestamp': str(datetime.datetime.now())
+						}
+					)
+					
+					# Send confirmation to sender
+					await self.send(text_data=json.dumps({
+						'message': {
+							'message': f"You have invited {target_username} to play a game",
+							'username': 'System',
+							'is_private': True,
+							'is_lobby': True,
+							'is_own': False,
+							'is_system': True,
+							'timestamp': str(datetime.datetime.now())
+						}
+					}))
+					
+					return
+				elif target_user and target_user.id == user_id:
+					# Send error message - can't invite yourself
+					await self.send(text_data=json.dumps({
+						'message': {
+							'message': "You can't invite yourself to a game",
+							'username': 'System',
+							'is_private': True,
+							'is_own': False,
+							'is_system': True,
+							'timestamp': str(datetime.datetime.now())
+						}
+					}))
+					return
+			except User.DoesNotExist:
+				# Send error message that user doesn't exist
+				await self.send(text_data=json.dumps({
+					'message': {
+						'message': f"User {target_username} not found",
+						'username': 'System',
+						'is_private': True,
+						'is_own': False,
+						'is_system': True,
+						'timestamp': str(datetime.datetime.now())
+					}
+				}))
+				return
+			
 		# Handle private message
 		if message_type == 'private_message':
 			recipient_id = text_data_json.get('recipient_id')
@@ -143,6 +206,26 @@ class ChatConsumer(AsyncWebsocketConsumer):
 				'sender_id': user_id
 			}
 		}))
+
+	async def game_invitation(self, event):
+		# Extract invitation data
+		message = event['message']
+		username = event.get('username', 'Anonymous')
+		timestamp = event.get('timestamp', str(datetime.datetime.now()))
+		sender_id = event.get('sender_id')
+		
+		# Send game invitation to WebSocket
+		await self.send(text_data=json.dumps({
+			'message': {
+				'message': message,
+				'username': username,
+				'timestamp': timestamp,
+				'is_private': True,
+				'is_own': False,
+				'is_invitation': True,
+				'sender_id': sender_id
+			}
+		}))
 		
 	async def private_message(self, event):
 		# Extract message data
@@ -178,3 +261,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
 				return None
 		
 		return await get_user(user_id)
+		
+	async def get_user_by_username(self, username):
+		from django.contrib.auth import get_user_model
+		User = get_user_model()
+
+		# We need to run database queries in a thread
+		from channels.db import database_sync_to_async
+
+		@database_sync_to_async
+		def get_user(name):
+			try:
+				return User.objects.get(username=name)
+			except User.DoesNotExist:
+				return None
+
+		return await get_user(username)
