@@ -4,15 +4,54 @@ from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
-from users.serializers import UserSerializer
+from users.serializers import UserSerializer, ImageSerializer
 from users.models import User
 from rest_framework.decorators import api_view
+from django.core.cache import cache
+import logging
+logger = logging.getLogger('users')
 
+class ImageViewSet(viewsets.ModelViewSet):
+	queryset = User.objects.all()
+	serializer_class = ImageSerializer
+	permission_classes = [permissions.AllowAny]
 
 class UserViewSet(viewsets.ModelViewSet):
 	queryset = User.objects.all()
 	serializer_class = UserSerializer
 	# permission_classes = [permissions.IsAuthenticated]
+
+
+class GetUserView(generics.RetrieveAPIView):
+	serializer_class = UserSerializer
+	#permission_classes = [permissions.IsAuthenticated]
+
+	def get(self, request, username):
+		try:
+			user = User.objects.get(username=username)
+		except:
+			return Response({"message":"User doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
+		serializer = UserSerializer(user)
+		return Response(serializer.data)
+
+
+class UpdateAvatarView(generics.UpdateAPIView):
+	serializer_class = ImageSerializer
+	permission_classes = [permissions.IsAuthenticated]
+
+	def update(self, request, *args, **kwargs):
+		token_key = request.COOKIES['auth_token']
+		instance = Token.objects.get(key=token_key).user
+		serializer = self.get_serializer(instance, data=request.data)
+		serializer.is_valid(raise_exception=True)
+		self.perform_update(serializer)
+		response = Response({
+			'message': 'Successfully updated user',
+			'username': instance.username,
+		})
+		if instance.avatar:
+			response.data['avatar'] = instance.avatar.url
+		return response
 
 class RegisterView(generics.CreateAPIView):
 	serializer_class = UserSerializer
@@ -30,11 +69,14 @@ class RegisterView(generics.CreateAPIView):
 		)
 		token, created = Token.objects.get_or_create(user=user)
 		response = Response({
-			'message': 'User created successfully',
-			'username': user.username},
+			'message': 'Successfully created user',
+			'username': user.username,
+		},
 			status=status.HTTP_201_CREATED,
 			headers=headers
 		)
+		if user.avatar:
+			response.data['avatar'] = user.avatar.url
 		response.set_cookie(
 			key = 'auth_token',
 			value = token.key,
@@ -58,11 +100,15 @@ class LoginView(APIView):
 		)
 		if user is None:
 			return Response({'message':'Invalid username or password'}, status=401)
+		else:
+			user.update_online_status()
 		token, created = Token.objects.get_or_create(user=user)
 		response = Response({
 			'message': 'Successfully logged in',
-			'username': user.username
+			'username': user.username,
 		})
+		if user.avatar:
+			response.data['avatar'] = user.avatar.url
 		response.set_cookie(
 			key = 'auth_token',
 			value = token.key,
@@ -77,6 +123,8 @@ class LogoutView(APIView):
 	permission_classes = [permissions.IsAuthenticated]
 
 	def get(self, request):
+		if request.user.is_authenticated:
+			cache.delete(f'user_{request.user.id}_last_activity')
 		response = Response({'message': 'Successfully logged out'})
 		response.set_cookie(
 			key = 'auth_token',
@@ -124,3 +172,64 @@ def add_friend(request, user_id_1, user_id_2):
 		return Response({'status': 'friend added'}, status=status.HTTP_200_OK)
 	else:
 		return Response({'status': 'friend already in list'}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def block_user_by_id(request, user_id_1, user_id_2):
+	try:
+		user1 = User.objects.get(id=user_id_1)
+		user2 = User.objects.get(id=user_id_2)
+	except User.DoesNotExist:
+		return Response(status=status.HTTP_404_NOT_FOUND)
+
+	if user_id_2 not in user1.blocked_users:
+		user1.blocked_users.append(user_id_2)
+		user1.save()
+		return Response({'status': 'user blocked'}, status=status.HTTP_200_OK)
+	else:
+		return Response({'status': 'user already blocked'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def block_user(request, username):
+	user = request.user
+	try:
+		user_to_block = User.objects.get(username=username)
+	except User.DoesNotExist:
+		return Response({'message': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+	
+	if user_to_block.id not in user.blocked_users:
+		user.blocked_users.append(user_to_block.id)
+		user.save()
+		return Response({'message': f'{username} has been blocked'}, status=status.HTTP_200_OK)
+	else:
+		return Response({'message': f'{username} is already blocked'}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_blocked_users(request):
+	# Returns a list of user IDs that the current user has blocked
+	user = request.user
+	
+	if user.is_authenticated:
+		# Return just the list of blocked user IDs
+		return Response(user.blocked_users)
+	else:
+		return Response([], status=status.HTTP_401_UNAUTHORIZED)
+
+@api_view(['GET'])
+def get_online_users(request):
+	logger.debug("Getting online users using cache-based tracking")
+	users = User.objects.exclude(id=request.user.id)
+	
+	online_users = []
+	for user in users:
+		# Check if user is online using the cache
+		if user.is_online:
+			online_users.append({
+				'id': user.id,
+				'username': user.username
+			})
+			logger.debug(f"Added online user {user.username} to list")
+		else:
+			logger.debug(f"User {user.username} is not online")
+	
+	return Response(online_users)

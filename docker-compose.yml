@@ -32,6 +32,7 @@ services:
       DATABASE_PORT: ${DATABASE_PORT}
     volumes:
       - ./srcs/django/django_app:/app
+      - media_data:/media
     env_file:
       - .env
 
@@ -44,6 +45,7 @@ services:
       - ./srcs/nginx/conf/nginx.conf:/etc/nginx/nginx.conf
       - ./srcs/nginx/content:/usr/share/nginx/html
       - ./srcs/nginx/ssl:/etc/nginx/ssl
+      - media_data:/media
     networks:
       - transcendence
     depends_on:
@@ -51,6 +53,7 @@ services:
 
 volumes:
   postgres_data:
+  media_data:
 
 networks:
   transcendence:

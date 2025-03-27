@@ -2,12 +2,28 @@ from rest_framework import serializers
 from users.models import User
 from stats.models import Stats
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-	password = serializers.CharField(write_only=True)
+class ImageSerializer(serializers.ModelSerializer):
+	avatar = serializers.ImageField(required=False, allow_null=True)
 
 	class Meta:
 		model = User
-		fields = ['url', 'id', 'username', 'password', 'friends']
+		fields = ['id', 'avatar']
+
+		def update(self, instance, validated_data):
+			value = validated_data.get('avatar');
+			if (value):
+				setattr(instance, 'avatar', value)
+			else:
+				setattr(instance, 'avatar', None)
+		
+
+class UserSerializer(serializers.ModelSerializer):
+	password = serializers.CharField(write_only=True)
+	avatar = serializers.ImageField(required=False)
+
+	class Meta:
+		model = User
+		fields = ['id', 'username', 'password', 'avatar']
 
 	def validate_username(self, value):
 		if len(value) > 20:

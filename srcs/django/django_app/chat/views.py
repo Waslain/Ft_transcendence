@@ -5,10 +5,10 @@ from .serializers import MessageSerializer
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
-def room(request, room_name):
-    return render(request, 'chat/room.html', {
-        'room_name': room_name
-    })
+# def room(request, room_name):
+#     return render(request, 'chat/room.html', {
+#         'room_name': room_name
+#     })
 
 class MessageListCreate(generics.ListCreateAPIView):
     queryset = Message.objects.all()
@@ -24,3 +24,6 @@ class MessageListCreate(generics.ListCreateAPIView):
                 'message': message.content
             }
         )
+
+def index(request):
+    return JsonResponse({"message": "Chat API endpoint"})

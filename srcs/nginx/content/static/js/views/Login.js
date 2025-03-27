@@ -27,7 +27,7 @@ export default class extends AbstractView {
                   <form id="loginForm">
   
                     <div class="d-flex align-items-center mb-3 pb-1">
-                      <span class="h1 fw-bold mb-0">Login</span>
+                      <span class="h1 fw-bold mb-0">Log in</span>
                     </div>
   
                     <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Sign into your account</h5>
@@ -43,7 +43,7 @@ export default class extends AbstractView {
                     </div>
   
                     <div class="pt-1 mb-4">
-                      <button data-mdb-button-init data-mdb-ripple-init class="btn btn-dark btn-lg btn-block" type="submit">Login</button>
+                      <button data-mdb-button-init data-mdb-ripple-init class="btn btn-dark btn-lg btn-block" type="submit">Log in</button>
 					<div id="response" style="color:#dd0000"></div>
                     </div>
                     <p class="mb-5 pb-lg-2" style="color: #000000;">Don't have an account?
@@ -109,6 +109,12 @@ export default class extends AbstractView {
 				}
 				else {
 					localStorage.setItem("username", res.data.username);
+					if (res.data.avatar) {
+						localStorage.setItem("avatar", "https://localhost" + res.data.avatar);
+					}
+					else {
+						localStorage.setItem("avatar", "/static/img/default.png");
+					}
 					console.log(res.data.message);
 					document.dispatchEvent(loginUser);
 					if (nextUrl === "") {
