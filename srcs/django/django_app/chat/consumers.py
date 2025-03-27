@@ -139,7 +139,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 				'username': username,
 				'timestamp': timestamp,
 				'is_private': False,
-				'is_own': is_own
+				'is_own': is_own,
+				'sender_id': user_id
 			}
 		}))
 		

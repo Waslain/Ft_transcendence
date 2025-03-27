@@ -173,6 +173,48 @@ def add_friend(request, user_id_1, user_id_2):
 	else:
 		return Response({'status': 'friend already in list'}, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['POST'])
+def block_user_by_id(request, user_id_1, user_id_2):
+	try:
+		user1 = User.objects.get(id=user_id_1)
+		user2 = User.objects.get(id=user_id_2)
+	except User.DoesNotExist:
+		return Response(status=status.HTTP_404_NOT_FOUND)
+
+	if user_id_2 not in user1.blocked_users:
+		user1.blocked_users.append(user_id_2)
+		user1.save()
+		return Response({'status': 'user blocked'}, status=status.HTTP_200_OK)
+	else:
+		return Response({'status': 'user already blocked'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def block_user(request, username):
+	user = request.user
+	try:
+		user_to_block = User.objects.get(username=username)
+	except User.DoesNotExist:
+		return Response({'message': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+	
+	if user_to_block.id not in user.blocked_users:
+		user.blocked_users.append(user_to_block.id)
+		user.save()
+		return Response({'message': f'{username} has been blocked'}, status=status.HTTP_200_OK)
+	else:
+		return Response({'message': f'{username} is already blocked'}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_blocked_users(request):
+	# Returns a list of user IDs that the current user has blocked
+	user = request.user
+	
+	if user.is_authenticated:
+		# Return just the list of blocked user IDs
+		return Response(user.blocked_users)
+	else:
+		return Response([], status=status.HTTP_401_UNAUTHORIZED)
+
 @api_view(['GET'])
 def get_online_users(request):
 	logger.debug("Getting online users using cache-based tracking")
