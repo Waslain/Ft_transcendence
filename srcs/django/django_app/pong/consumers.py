@@ -175,7 +175,7 @@ class GamePlayerConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
         if not self.uuid in GamePlayerConsumer.games:
-            GamePlayerConsumer.games[self.uuid] = GameManager()
+            GamePlayerConsumer.games[self.uuid] = GameManager(None)
         GamePlayerConsumer.games[self.uuid].players.append(Player(self.name))
         await self.accept()
 
