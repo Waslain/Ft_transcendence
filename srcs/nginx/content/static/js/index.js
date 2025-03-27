@@ -207,8 +207,14 @@ sidebarToggleBtn.addEventListener('click', () =>{
 	sidebar.classList.toggle('open');
 });
 
+let chatSocket = null;
+
 let authAbortController = null;
 document.addEventListener("authenticate", (e) => {
+	if (sidebar.className === 'sidebar') {
+		sidebar.classList.toggle('open');
+	}
+
 	/* Code executed on login*/
 	if (e.detail.authenticated) {
 		authAbortController = new AbortController();
@@ -262,44 +268,47 @@ document.addEventListener("authenticate", (e) => {
 		});
 
 		/*Chat Box*/
-		let chatSocket = null;
 
 		document.getElementById('chatBox').addEventListener('click', function(event) {
-		// Vérifiez si l'utilisateur est connecté
-		const username = localStorage.getItem("username");
-		if (!username) {
-			alert('Please log in to access the chat.')
-			return;
-		}
-		
-		event.preventDefault();
-
-		const chatWindow = document.getElementById('chatWindow');
-		if (chatWindow.style.display === 'none' || chatWindow.style.display === '') {
-			chatWindow.style.display = 'block';
-			
-			// Connectez-vous au WebSocket si ce n'est pas déjà fait
-			if (!chatSocket || chatSocket.readyState !== WebSocket.OPEN) {
-			connectWebSocket();
+			// Vérifiez si l'utilisateur est connecté
+			const username = localStorage.getItem("username");
+			if (!username) {
+				alert('Please log in to access the chat.')
+				return;
 			}
-		} else {
-			chatWindow.style.display = 'none';
-		}
+			
+			event.preventDefault();
+
+			const chatWindow = document.getElementById('chatWindow');
+			if (chatWindow.style.display === 'none' || chatWindow.style.display === '') {
+				chatWindow.style.display = 'block';
+				
+			} else {
+				chatWindow.style.display = 'none';
+			}
+		},
+		{
+			signal: authAbortController.signal,
 		});
 
+		// Connectez-vous au WebSocket si ce n'est pas déjà fait
+		if (!chatSocket || chatSocket.readyState !== WebSocket.OPEN) {
+			connectWebSocket();
+		}
+
 		function connectWebSocket() {
-				// Use wss:// for a secure connection (SSL/TLS)
-				const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-				chatSocket = new WebSocket(protocol + window.location.host + '/ws/chat/');
-				
-				chatSocket.onopen = function(e) {
-				console.log('Chat connection established');
-				// Fetch online users when connection is established
-				fetchOnlineUsers();
-				fetchBlockedUsers();
-				// Start a periodic refresh of the online users list
-				setInterval(fetchOnlineUsers, 30000); // Every 30 seconds
-				setInterval(fetchBlockedUsers, 60000); // Every 60 seconds
+			// Use wss:// for a secure connection (SSL/TLS)
+			const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+			chatSocket = new WebSocket(protocol + window.location.host + '/ws/chat/');
+
+			chatSocket.onopen = function(e) {
+			console.log('Chat connection established');
+			// Fetch online users when connection is established
+			fetchOnlineUsers();
+			fetchBlockedUsers();
+			// Start a periodic refresh of the online users list
+			setInterval(fetchOnlineUsers, 30000); // Every 30 seconds
+			setInterval(fetchBlockedUsers, 60000); // Every 60 seconds
 			};
 		
 			chatSocket.onmessage = function(e) {
@@ -366,6 +375,9 @@ document.addEventListener("authenticate", (e) => {
 					usernameLink.addEventListener('click', function(e) {
 						e.preventDefault();
 						navigateTo(`/users/profile/${message.username}`);
+					},
+					{
+						signal: authAbortController.signal,
 					});
 					
 					senderInfo.appendChild(usernameLink);
@@ -383,6 +395,9 @@ document.addEventListener("authenticate", (e) => {
 					acceptButton.addEventListener('click', function() {
 						// Navigate to game page with invitation info
 						navigateTo(`/pong/${message.username}?name=${localStorage.getItem('username')}`);
+					},
+					{
+						signal: authAbortController.signal,
 					});
 					
 					// Decline button
@@ -401,6 +416,9 @@ document.addEventListener("authenticate", (e) => {
 								'message': 'declined your game invitation'
 							}));
 						}
+					},
+					{
+						signal: authAbortController.signal,
 					});
 					
 					actionButtons.appendChild(acceptButton);
@@ -462,6 +480,9 @@ document.addEventListener("authenticate", (e) => {
 				joinButton.addEventListener('click', function() {
 					// Navigate to game page as the inviter
 					navigateTo(`/pong/${localStorage.getItem('username')}?name=${localStorage.getItem('username')}`);
+				},
+				{
+					signal: authAbortController.signal,
 				});
 				
 				// Cancel button
@@ -480,6 +501,9 @@ document.addEventListener("authenticate", (e) => {
 							'message': 'cancelled the game invitation'
 						}));
 					}
+				},
+				{
+					signal: authAbortController.signal,
 				});
 				
 				actionButtons.appendChild(joinButton);
@@ -529,6 +553,9 @@ document.addEventListener("authenticate", (e) => {
 						usernameLink.addEventListener('click', function(e) {
 							e.preventDefault();
 							navigateTo(`/users/profile/${message.recipient_username}`);
+						},
+						{
+							signal: authAbortController.signal,
 						});
 						messageContent.appendChild(usernameLink);
 					} else {
@@ -557,6 +584,9 @@ document.addEventListener("authenticate", (e) => {
 						usernameLink.addEventListener('click', function(e) {
 							e.preventDefault();
 							navigateTo(`/users/profile/${message.username}`);
+						},
+						{
+							signal: authAbortController.signal,
 						});
 						messageContent.appendChild(usernameLink);
 					} else {
@@ -589,6 +619,9 @@ document.addEventListener("authenticate", (e) => {
 						usernameLink.addEventListener('click', function(e) {
 							e.preventDefault();
 							navigateTo(`/users/profile/${message.username}`);
+						},
+						{
+							signal: authAbortController.signal,
 						});
 						messageContent.appendChild(usernameLink);
 						
@@ -624,11 +657,17 @@ document.addEventListener("authenticate", (e) => {
 			if (event.key === 'Enter') {
 				sendChatMessage();
 			}
+		},
+		{
+			signal: authAbortController.signal,
 		});
 		
 
 		document.getElementById("sendButton").addEventListener("click", function() {
 			sendChatMessage();
+		},
+		{
+			signal: authAbortController.signal,
 		});
 
 		function sendChatMessage() {
@@ -679,7 +718,7 @@ document.addEventListener("authenticate", (e) => {
 				return response.json();
 			})
 			.then(users => {
-				console.log("Fetched users:", users);
+				//console.log("Fetched users:", users);
 				onlineUsers = users; // Save users to onlineUsers array
 				updateOnlineUsersList(users);
 			})
@@ -703,7 +742,7 @@ document.addEventListener("authenticate", (e) => {
 				return response.json();
 			})
 			.then(blockedUsers => {
-				console.log("Fetched blocked users:", blockedUsers);
+				//console.log("Fetched blocked users:", blockedUsers);
 				// Store the blocked users in localStorage for quick access
 				localStorage.setItem('blockedUsers', JSON.stringify(blockedUsers));
 			})
@@ -775,6 +814,9 @@ document.addEventListener("authenticate", (e) => {
 			// Update the header to show who you're chatting with
 			const chatHeader = document.getElementById('chatHeaderTitle');
 			chatHeader.textContent = userId === 'general' ? 'General Chat' : `Chat with ${this.textContent}`;
+			},
+			{
+				signal: authAbortController.signal,
 			});
 		});
 		}
@@ -812,14 +854,26 @@ document.addEventListener("authenticate", (e) => {
 		{
 			signal: authAbortController.signal,
 		});
+
+		document.getElementById('closeChatBtn').addEventListener('click', function(event) {
+			event.preventDefault();
+			const chatWindow = document.getElementById('chatWindow');
+			chatWindow.style.display = 'none';
+		},
+		{
+			signal: authAbortController.signal,
+		});
 	}
 	/* Code executed on logout*/
 	else {
   		document.querySelector("#sidebarItems").innerHTML = `
 		<a href="/users/login" class="nav-item d-flex align-items-center" data-link>
-				<i class="fs-2 bi-door-open"></i><span>Login</span>
+				<i class="fs-2 bi-door-open"></i><span>Log in</span>
 		</a>
 		`
+		if (chatSocket) {
+			chatSocket.close();
+		}
 		const chatWindow = document.getElementById('chatWindow');
 		chatWindow.style.display = 'none';
 		if (authAbortController) {
