@@ -341,7 +341,7 @@ document.addEventListener("authenticate", (e) => {
 					return; // Don't display messages from blocked users
 				}
 			}
-
+		
 			// Create message element
 			const messageElement = document.createElement('div');
 			messageElement.className = message.is_own ? 'my-message' : 'their-message';
@@ -351,23 +351,96 @@ document.addEventListener("authenticate", (e) => {
 			
 			// Handle different message formats
 			if (message.is_private) {
-			// Private message format
-			if (message.is_own) {
-				// Message sent by current user
-				const prefix = document.createElement('em');
-				prefix.textContent = `Me → ${message.recipient_username}: `;
-				messageContent.appendChild(prefix);
-			} else {
-				// Message received from another user
-				const prefix = document.createElement('em');
-				prefix.textContent = `${message.username} → Me: `;
-				messageContent.appendChild(prefix);
-			}
+				// Private message format
+				if (message.is_own) {
+					// Message sent by current user
+					const prefix = document.createElement('em');
+					prefix.textContent = `Me → `;
+					messageContent.appendChild(prefix);
+					
+					// Add clickable recipient username
+					if (message.recipient_username && message.recipient_username !== "Anonymous") {
+						const usernameLink = document.createElement('a');
+						usernameLink.textContent = message.recipient_username;
+						usernameLink.href = `/users/profile/${message.recipient_username}`;
+						usernameLink.style.color = 'inherit';
+						usernameLink.style.textDecoration = 'underline';
+						usernameLink.style.fontStyle = 'italic';
+						usernameLink.addEventListener('click', function(e) {
+							e.preventDefault();
+							navigateTo(`/users/profile/${message.recipient_username}`);
+						});
+						messageContent.appendChild(usernameLink);
+					} else {
+						const username = document.createElement('em');
+						username.textContent = message.recipient_username || "Anonymous";
+						messageContent.appendChild(username);
+					}
+					
+					const colon = document.createElement('em');
+					colon.textContent = ": ";
+					messageContent.appendChild(colon);
+				} else {
+					// Message received from another user
+					const prefix = document.createElement('em');
+					prefix.textContent = "";
+					messageContent.appendChild(prefix);
+					
+					// Add clickable sender username
+					if (message.username && message.username !== "Anonymous" && message.username !== "Me") {
+						const usernameLink = document.createElement('a');
+						usernameLink.textContent = message.username;
+						usernameLink.href = `/users/profile/${message.username}`;
+						usernameLink.style.color = 'inherit';
+						usernameLink.style.textDecoration = 'underline';
+						usernameLink.style.fontStyle = 'italic';
+						usernameLink.addEventListener('click', function(e) {
+							e.preventDefault();
+							navigateTo(`/users/profile/${message.username}`);
+						});
+						messageContent.appendChild(usernameLink);
+					} else {
+						const username = document.createElement('em');
+						username.textContent = message.username || "Anonymous";
+						messageContent.appendChild(username);
+					}
+					
+					const arrow = document.createElement('em');
+					arrow.textContent = " → Me: ";
+					messageContent.appendChild(arrow);
+				}
 			} else {
 				// General chat format
-				const sender = document.createElement('strong');
-				sender.textContent = message.is_own ? 'Me: ' : `${message.username}: `;
-				messageContent.appendChild(sender);
+				if (message.is_own) {
+					// Own message in general chat
+					const sender = document.createElement('strong');
+					sender.textContent = 'Me: ';
+					messageContent.appendChild(sender);
+				} else {
+					// Other user's message in general chat
+					if (message.username && message.username !== "Anonymous") {
+						// Create clickable username
+						const usernameLink = document.createElement('a');
+						usernameLink.textContent = message.username;
+						usernameLink.href = `/users/profile/${message.username}`;
+						usernameLink.style.fontWeight = 'bold';
+						usernameLink.style.color = 'inherit';
+						usernameLink.style.textDecoration = 'underline';
+						usernameLink.addEventListener('click', function(e) {
+							e.preventDefault();
+							navigateTo(`/users/profile/${message.username}`);
+						});
+						messageContent.appendChild(usernameLink);
+						
+						const colon = document.createElement('strong');
+						colon.textContent = ': ';
+						messageContent.appendChild(colon);
+					} else {
+						const sender = document.createElement('strong');
+						sender.textContent = `${message.username || 'Anonymous'}: `;
+						messageContent.appendChild(sender);
+					}
+				}
 			}
 			
 			// Add the message content
