@@ -10,18 +10,28 @@ export default class extends AbstractView {
   async getHtml() {
     return `
 			<a href="/" class="nav__link" data-link>Go back to main page</a>
-      <h1>Waiting Room ...</h1>
-      <input id="nameInput" value=""/>
-      <button id="playBtn">Play</button>
+      <div>
+        <h1>Insert name for play !</h1>
+        <input id="nameInput" value=""/>
+      </div>
+      <div>
+        <h1>Waiting Room for Game ...</h1>
+        <button id="playBtnGame">Play</button>
+        <div id="connectionCountGame" hidden>Connections: 0</div>
+      </div>
+      <div>
+        <h1>Waiting Room for Tournament ...</h1>
+        <button id="playBtnTournament">Play</button>
+        <div id="connectionCountTournament" hidden>Connections: 0</div>
+      </div>
       <button id="cancelBtn" disabled>Cancel</button>
-			<div id="connectionCount" hidden>Connections: 0</div>
 		`;
   }
 
   #waitingRoomSocket;
   #abortController;
 
-  async #webSocket(name) {
+  async #webSocketGame(name) {
     const roomName = "waitingRoom";
     const url =
       "wss://" +
@@ -42,7 +52,7 @@ export default class extends AbstractView {
     this.#waitingRoomSocket.onmessage = (e) => {
       const data = JSON.parse(e.data);
       if (data.count !== undefined) {
-        document.getElementById("connectionCount").textContent =
+        document.getElementById("connectionCountGame").textContent =
           "Connections: " + data.count;
       }
       if (data.uuid !== undefined) {
@@ -51,21 +61,79 @@ export default class extends AbstractView {
     };
   }
 
+  async #webSocketTournament(name) {
+    const roomName = "waitingRoom";
+    const url =
+      "wss://" +
+      window.location.hostname +
+      "/ws/tournament/waitingRoom/?name=" +
+      encodeURIComponent(name);
+
+    this.#waitingRoomSocket = new WebSocket(url);
+
+    this.#waitingRoomSocket.onopen = (e) => {
+      console.log("Connected to the waiting room:", roomName);
+    };
+
+    this.#waitingRoomSocket.onclose = (e) => {
+      console.log("Waiting room socket closed");
+    };
+
+    this.#waitingRoomSocket.onmessage = (e) => {
+      const data = JSON.parse(e.data);
+      if (data.count !== undefined) {
+        document.getElementById("connectionCountTournament").textContent =
+          "Connections: " + data.count;
+      }
+      if (data.uuid !== undefined) {
+        navigateTo(
+          "/tournament/" + data.uuid + "?name=" + encodeURIComponent(name)
+        );
+      }
+    };
+  }
+
   async getJavaScript() {
     this.#abortController = new AbortController();
-    const connectionNb = document.getElementById("connectionCount");
-    const playBtn = document.getElementById("playBtn");
-    const cancelBtn = document.getElementById("cancelBtn");
     const nameInput = document.getElementById("nameInput");
-    playBtn.addEventListener(
+    const playBtnGame = document.getElementById("playBtnGame");
+    const connectionCountGame = document.getElementById("connectionCountGame");
+    const playBtnTournament = document.getElementById("playBtnTournament");
+    const connectionCountTournament = document.getElementById(
+      "connectionCountTournament"
+    );
+    const cancelBtn = document.getElementById("cancelBtn");
+
+    playBtnGame.addEventListener(
       "click",
       async () => {
         if (nameInput.value.trim() !== "") {
-          playBtn.disabled = true;
-          cancelBtn.disabled = false;
-          connectionNb.hidden = false;
           nameInput.disabled = true;
-          await this.#webSocket(nameInput.value);
+          playBtnGame.disabled = true;
+          connectionCountGame.hidden = false;
+          playBtnTournament.disabled = true;
+          connectionCountTournament.hidden = true;
+          cancelBtn.disabled = false;
+
+          await this.#webSocketGame(nameInput.value);
+        }
+      },
+      {
+        signal: this.#abortController.signal,
+      }
+    );
+    playBtnTournament.addEventListener(
+      "click",
+      async () => {
+        if (nameInput.value.trim() !== "") {
+          nameInput.disabled = true;
+          playBtnGame.disabled = true;
+          connectionCountGame.hidden = true;
+          playBtnTournament.disabled = true;
+          connectionCountTournament.hidden = false;
+          cancelBtn.disabled = false;
+
+          await this.#webSocketTournament(nameInput.value);
         }
       },
       {
@@ -75,10 +143,13 @@ export default class extends AbstractView {
     cancelBtn.addEventListener(
       "click",
       () => {
-        playBtn.disabled = false;
-        cancelBtn.disabled = true;
-        connectionNb.hidden = true;
         nameInput.disabled = false;
+        playBtnGame.disabled = false;
+        connectionCountGame.hidden = true;
+        playBtnTournament.disabled = false;
+        connectionCountTournament.hidden = true;
+        cancelBtn.disabled = true;
+
         this.#waitingRoomSocket?.close();
       },
       {

@@ -3,9 +3,9 @@ import Login from "./views/Login.js";
 import Register from "./views/Register.js";
 import Users from "./views/Users.js";
 import WaitingRoom from "./views/WaitingRoom.js";
-import Pong from "./views/Pong.js";
+import OnlineGame from "./views/OnlineGame.js";
 import { loadAndSetFont } from "./views/pong/utils/font.js";
-import Tournament from "./views/Tournament.js";
+import OnlineTournament from "./views/OnlineTournament.js";
 import Dashboard from "./views/Dashboard.js";
 
 export const navigateTo = (url) => {
@@ -35,10 +35,10 @@ const router = async () => {
     { path: "/", view: Main },
     { path: "/users/login", view: Login },
     { path: "/users/register", view: Register },
-	{ path: "/users/profile/:username", view: Users },
+    { path: "/users/profile/:username", view: Users },
     { path: "/pong", view: WaitingRoom },
-    { path: "/pong/:room_id", view: Pong },
-    { path: "/tournament", view: Tournament },
+    { path: "/pong/:room_id", view: OnlineGame },
+    { path: "/tournament/:room_id", view: OnlineTournament },
     { path: "/dashboard", view: Dashboard },
   ];
 

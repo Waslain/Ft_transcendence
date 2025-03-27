@@ -10,7 +10,6 @@ export default class extends AbstractView {
     return `
 			<h1>Hi, I am a sample page !</h1>
 			<a href="/pong" class="nav__link" data-link>pong</a><br>
-      <a href="/tournament" class="nav__link" data-link>tournament</a><br>
 		`;
   }
 }
