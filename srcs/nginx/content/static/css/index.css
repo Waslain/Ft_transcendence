@@ -116,6 +116,12 @@
     opacity: 1;
 }
 
+.chat-window {
+    border-color: #fff;
+    background-color:rgba(197, 197, 197, 0.4);
+    backdrop-filter: blur(5px);
+}
+
 .chat-user {
 	cursor: pointer;
 	font-size: 0.9em;
