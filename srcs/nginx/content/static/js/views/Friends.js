@@ -1,5 +1,6 @@
 import AbstractView from "./AbstractView.js";
 import * as Utils from "../utils.js";
+import { navigateTo } from "../index.js";
 
 export default class extends AbstractView {
 	constructor(params) {
@@ -30,7 +31,7 @@ export default class extends AbstractView {
         .card-body {
             padding: 0.5rem;
             padding-left: 0;
-            margin-left: 0;
+            margin-left: 5px;
         }
         .card-header {
             background-color: #9cafc9;
@@ -38,6 +39,16 @@ export default class extends AbstractView {
         }
         .card-footer {
             background-color: #9cafc9;
+        }
+        .list-item-clickable {
+            transition: all 0.3s ease;
+        }
+        .list-item-clickable:hover {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transform: scale(1.02);
+            z-index: 10;
         }
         `;}
 
@@ -114,7 +125,7 @@ export default class extends AbstractView {
 			const flistContainer = document.getElementById('friend-list-container');
 
 			/*Pending List*/
-			if (data.friends.length === 0){
+			if (!data.friends || data.friends.length === 0){
 				flistContainer.style.height = '70px';
 				const NoFriendsMsg = document.createElement('li');
 				NoFriendsMsg.classList.add('list-group-item', 'text-center', 'text-secondary');
@@ -124,7 +135,13 @@ export default class extends AbstractView {
 				data.friends.forEach(friend => {
 					flistContainer.style.height = '350px';
 					const listItem = document.createElement('li');
-					listItem.classList.add('list-group-item', 'd-flex', 'align-items-center', 'p-2');
+					listItem.classList.add('list-group-item', 'd-flex', 'align-items-center', 'p-2', 'list-item-clickable');
+
+                    listItem.style.cursor = 'pointer';
+                    listItem.addEventListener('click', (event) => {
+                        if (event.target.classList.contains('btn-danger')) return;
+						navigateTo(`/users/profile/${friend.username}`);
+                    });
 					
 					const status = document.createElement('i');
 					if (friend.is_online === true) {
@@ -187,31 +204,37 @@ export default class extends AbstractView {
 			document.getElementById('blockList').innerHTML = '';
 			const blistContainer = document.getElementById('block-list-container');
 
-			if (data.blocked.length === 0){
+			if (!data.blocked ||data.blocked.length === 0){
 				blistContainer.style.height = '70px';
 				const NoBlockedMsg = document.createElement('li');
 				NoBlockedMsg.classList.add('list-group-item', 'text-center', 'text-secondary');
 				NoBlockedMsg.textContent = 'No blocked users';
 				document.getElementById('blockList').appendChild(NoBlockedMsg);
 			} else {
-				data.blocked.forEach(blocked => {
+				data.blocked.forEach(block => {
 					blistContainer.style.height = '350px';
 					const listItem = document.createElement('li');
-					listItem.classList.add('list-group-item', 'd-flex', 'align-items-center', 'p-2');
+					listItem.classList.add('list-group-item', 'd-flex', 'align-items-center', 'p-2', 'list-item-clickable');
+
+                    listItem.style.cursor = 'pointer';
+                    listItem.addEventListener('click', (event) => {
+                        if (event.target.classList.contains('btn-primary')) return;
+						navigateTo(`/users/profile/${block.username}`);
+                    });
 
 					const img = document.createElement('img');
-					img.src = blocked.avatar || '/static/img/default.png';
-					img.alt = blocked.username;
+					img.src = block.avatar || '/static/img/default.png';
+					img.alt = block.username;
 					img.classList.add('rounded-circle', 'me-2');
 					img.style.height = '30px';
 					img.style.width = '30px';
 
-					const name = document.createTextNode(blocked.username);
+					const name = document.createTextNode(block.username);
 
 					const actionBtn = document.createElement('button');
 					actionBtn.classList.add('btn', 'btn-primary', 'btn-sm', 'ms-auto');
 					actionBtn.textContent = 'Unblock';
-					actionBtn.onclick = () => unblockUser(blocked.username);
+					actionBtn.onclick = () => unblockUser(block.username);
 
 					listItem.appendChild(img);
 					listItem.appendChild(name);
