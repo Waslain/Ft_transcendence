@@ -152,11 +152,11 @@ def add_match(request):
 		userb_id = data.get('userb_id')
 		usera_score = data.get('usera_score', 0)
 		userb_score = data.get('userb_score', 0)
-		game_time = data.get('game_time', 0)
+		game_time_seconds = data.get('game_time', 0)
 
 		# Convert game_time to proper interval format
 		from datetime import timedelta
-		game_time = timedelta(seconds=game_time)
+		game_time = timedelta(seconds=game_time_seconds)
 		
 		# Validate data
 		if not usera_id or not userb_id:
@@ -177,10 +177,41 @@ def add_match(request):
 			score_b=userb_score,
 			game_time=game_time
 		)
+		# Update user statistics based on match result
+		from stats.models import Stats
 		
+		# Get or create stats objects for both users
+		stats_a, created_a = Stats.objects.get_or_create(user=usera)
+		stats_b, created_b = Stats.objects.get_or_create(user=userb)
+		
+		# Determine winner and loser
+		if usera_score > userb_score:
+			# User A won
+			stats_a.wins += 1
+			stats_b.losses += 1
+		elif userb_score > usera_score:
+			# User B won
+			stats_b.wins += 1
+			stats_a.losses += 1
+		# If it's a tie, no wins/losses are updated
+		
+		# Update goals
+		stats_a.goals_scored += usera_score
+		stats_a.goals_taken += userb_score
+		stats_b.goals_scored += userb_score
+		stats_b.goals_taken += usera_score
+		
+		# Update play time (in seconds)
+		stats_a.play_time += game_time_seconds
+		stats_b.play_time += game_time_seconds
+		
+		# Save the updated stats
+		stats_a.save()
+		stats_b.save()
 		return JsonResponse({'status': 'success', 'match_id': match.id}, status=201)
 		
 	except json.JSONDecodeError:
 		return JsonResponse({'status': 'error', 'message': 'Invalid JSON'}, status=400)
 	except Exception as e:
 		return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
