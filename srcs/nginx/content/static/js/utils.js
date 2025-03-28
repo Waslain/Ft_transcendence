@@ -46,6 +46,7 @@ export function fetchOnlineUsers(usersArray) {
         }
         
         // Update UI
+		console.log("Updating online users list:", users);
         updateOnlineUsersList(users);
         
         // Return users for chaining
@@ -58,7 +59,7 @@ export function fetchOnlineUsers(usersArray) {
 }
 
 // Function to update the users dropdown
-function updateOnlineUsersList(users) {
+export function updateOnlineUsersList(users) {
 	const chatUserSelect = document.getElementById('chatUserSelect');
 	if (!chatUserSelect) return;
 	

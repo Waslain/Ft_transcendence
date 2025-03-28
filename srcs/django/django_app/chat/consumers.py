@@ -47,6 +47,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
 				self.user_group,
 				self.channel_name
 			)
+			
+		@database_sync_to_async
+		def update_user_offline_status():
+			self.scope['user'].last_online = datetime.datetime.now()
+			self.scope['user'].remove_online_status()
+		
+		await update_user_offline_status()
 
 	async def receive(self, text_data):
 		text_data_json = json.loads(text_data)

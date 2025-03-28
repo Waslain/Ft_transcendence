@@ -26,6 +26,9 @@ class User(AbstractUser):
 	def update_online_status(self):
 		#Update user's online status in cache
 		cache.set(f'user_{self.id}_last_activity', timezone.now(), 300)  # Store for 5 minutes
+	def remove_online_status(self):
+		# Remove user's online status from cache
+		cache.delete(f'user_{self.id}_last_activity')
 	
 	@property
 	def is_online(self):
