@@ -51,3 +51,12 @@ class FriendsSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = User
 		fields = ['id', 'friends', 'username']
+
+
+class BlockSerializer(serializers.ModelSerializer):
+	username = serializers.CharField(write_only=True)
+	blocked = UserSerializer(read_only=True, many=True)
+
+	class Meta:
+		model = User
+		fields = ['id', 'blocked', 'username']

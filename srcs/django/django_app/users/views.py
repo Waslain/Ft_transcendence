@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
-from users.serializers import UserSerializer, ImageSerializer, FriendsSerializer
+from users.serializers import UserSerializer, ImageSerializer, FriendsSerializer, BlockSerializer
 from users.models import User
 from rest_framework.decorators import api_view
 from django.core.cache import cache
@@ -151,8 +151,11 @@ class AddFriendView(generics.UpdateAPIView):
 	permission_classes = [permissions.IsAuthenticated]
 
 	def update(self, request, *args, **kwargs):
-		token_key = request.COOKIES['auth_token']
-		user = Token.objects.get(key=token_key).user
+		try:
+			token_key = request.COOKIES['auth_token']
+			user = Token.objects.get(key=token_key).user
+		except:
+			return Response({"message":"User doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
 		
 		if 'username' not in request.data:
 			return Response({'message':'Must provide a username'}, status=400)
@@ -172,8 +175,11 @@ class RemoveFriendView(generics.UpdateAPIView):
 	permission_classes = [permissions.IsAuthenticated]
 
 	def update(self, request, *args, **kwargs):
-		token_key = request.COOKIES['auth_token']
-		user = Token.objects.get(key=token_key).user
+		try:
+			token_key = request.COOKIES['auth_token']
+			user = Token.objects.get(key=token_key).user
+		except:
+			return Response({"message":"User doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
 		
 		if 'username' not in request.data:
 			return Response({'message':'Must provide a username'}, status=400)
@@ -190,30 +196,102 @@ class RemoveFriendView(generics.UpdateAPIView):
 
 class FriendsListView(generics.RetrieveAPIView):
 	serializer_class = FriendsSerializer;
-	#permission_classes = [permissions.IsAuthenticated]
+	permission_classes = [permissions.IsAuthenticated]
 		
-	def get(self, request, username):
+	def get(self, request):
 		try:
-			user = User.objects.get(username=username)
+			token_key = request.COOKIES['auth_token']
+			user = Token.objects.get(key=token_key).user
 		except:
 			return Response({"message":"User doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
 		serializer = FriendsSerializer(user)
 		return Response(serializer.data)
 
 
-class CheckFriendView(APIView):
+class AddBlockView(generics.UpdateAPIView):
+	serializer_class = FriendsSerializer;
 	permission_classes = [permissions.IsAuthenticated]
 
-	def post(self, request):
-		token_key = request.COOKIES['auth_token']
-		user = Token.objects.get(key=token_key).user
+	def update(self, request, *args, **kwargs):
+		try:
+			token_key = request.COOKIES['auth_token']
+			user = Token.objects.get(key=token_key).user
+		except:
+			return Response({"message":"User doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
 		
 		if 'username' not in request.data:
 			return Response({'message':'Must provide a username'}, status=400)
 
+		block = User.objects.get(username=request.data['username']);
+		if block is None:
+			return Response({'message':'User does not exist'}, status=400)
+		user.blocked.add(block);
+		response = Response({
+			'message': 'User blocked',
+		})
+		return response
+
+
+class RemoveBlockView(generics.UpdateAPIView):
+	serializer_class = FriendsSerializer;
+	permission_classes = [permissions.IsAuthenticated]
+
+	def update(self, request, *args, **kwargs):
+		try:
+			token_key = request.COOKIES['auth_token']
+			user = Token.objects.get(key=token_key).user
+		except:
+			return Response({"message":"User doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
+		
+		if 'username' not in request.data:
+			return Response({'message':'Must provide a username'}, status=400)
+
+		block = User.objects.get(username=request.data['username']);
+		if block is None:
+			return Response({'message':'User does not exist'}, status=400)
+		user.blocked.remove(block);
+		response = Response({
+			'message': 'User unblocked',
+		})
+		return response
+
+
+class BlockListView(generics.RetrieveAPIView):
+	serializer_class = BlockSerializer;
+	permission_classes = [permissions.IsAuthenticated]
+		
+	def get(self, request):
+		try:
+			token_key = request.COOKIES['auth_token']
+			user = Token.objects.get(key=token_key).user
+		except:
+			return Response({"message":"User doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
+		serializer = BlockSerializer(user)
+		return Response(serializer.data)
+
+class CheckFriendView(APIView):
+	permission_classes = [permissions.IsAuthenticated]
+
+	def post(self, request):
+		try:
+			token_key = request.COOKIES['auth_token']
+			user = Token.objects.get(key=token_key).user
+		except:
+			return Response({"message":"User doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
+		
+		if 'username' not in request.data:
+			return Response({'message':'Must provide a username'}, status=400)
+		
+		response = Response({});
 		if user.friends.filter(username=request.data['username']).exists():
-			return Response({"is_friend": True})
-		return Response({"is_friend": False})
+			response.data["is_friend"] = True
+		else:
+			response.data["is_friend"] = False
+		if user.blocked.filter(username=request.data['username']).exists():
+			response.data["is_blocked"] = True
+		else:
+			response.data["is_blocked"] = False
+		return response
 
 '''
 @api_view(['GET'])
@@ -274,17 +352,6 @@ def block_user(request, username):
 		return Response({'message': f'{username} has been blocked'}, status=status.HTTP_200_OK)
 	else:
 		return Response({'message': f'{username} is already blocked'}, status=status.HTTP_400_BAD_REQUEST)
-
-@api_view(['GET'])
-def get_blocked_users(request):
-	# Returns a list of user IDs that the current user has blocked
-	user = request.user
-	
-	if user.is_authenticated:
-		# Return just the list of blocked user IDs
-		return Response(user.blocked_users)
-	else:
-		return Response([], status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['GET'])
 def get_online_users(request):
