@@ -4,6 +4,8 @@ import asyncio
 from typing import Dict, List
 from urllib import parse
 import math
+from datetime import datetime
+import aiohttp
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 
@@ -156,6 +158,7 @@ class GameManager:
         self.loop = None
         self.players : List[Player] = []
         self.winner = None
+        self.time = None
 
 class TournamentManager:
     def __init__(self, uuid):
@@ -163,6 +166,22 @@ class TournamentManager:
         self.secondGame = GameManager(f"secondGame_{uuid}")
         self.finalGame = GameManager(f"finalGame_{uuid}")
         self.players : List[Player] = []
+
+async def sendMatchResult(result):
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                'http://localhost:8000/api/matchhistory/add/',  # Use internal URL
+                json=result
+            ) as response:
+                data = await response.json()
+                if response.status != 201:
+                    print(f"Error saving match history: {data.get('message')}")
+                    return None
+                return data
+    except Exception as e:
+        print(f"Error saving match: {str(e)}")
+        return None
 
 class GamePlayerConsumer(AsyncWebsocketConsumer):
     games : Dict[str, GameManager] = {}
@@ -176,7 +195,7 @@ class GamePlayerConsumer(AsyncWebsocketConsumer):
 
         if not self.uuid in GamePlayerConsumer.games:
             GamePlayerConsumer.games[self.uuid] = GameManager(None)
-        GamePlayerConsumer.games[self.uuid].players.append(Player(self.name))
+        GamePlayerConsumer.games[self.uuid].players.append(Player(self.name, self.channel_name))
         await self.accept()
 
         if len(GamePlayerConsumer.games[self.uuid].players) == 2:
@@ -222,7 +241,7 @@ class GamePlayerConsumer(AsyncWebsocketConsumer):
     async def updateScore(self, player, ball):
         player.score += 1
         await self.groupSend("scores", [player.score for player in GamePlayerConsumer.games[self.uuid].players])
-        if player.score >= 10:
+        if player.score >= 3:
             await self.groupSend("messages", {"first": "Winner is", "second": player.name})
             return "win"
         ball.setDirection(ball.dx * -1, ball.dz)
@@ -239,6 +258,7 @@ class GamePlayerConsumer(AsyncWebsocketConsumer):
         return False
 
     async def sendLoopGame(self):
+        GamePlayerConsumer.games[self.uuid].time = datetime.now()
         await self.groupSend("names", [player.name for player in GamePlayerConsumer.games[self.uuid].players])
         await self.groupSend("scores", [player.score for player in GamePlayerConsumer.games[self.uuid].players])
         playground = GamePlayerConsumer.games[self.uuid].playground
@@ -279,6 +299,14 @@ class GamePlayerConsumer(AsyncWebsocketConsumer):
             if ball.z >= playgroundHeightLimit or ball.z <= -(playgroundHeightLimit):
                 ball.dz *= -1
             await asyncio.sleep(0.01)
+        
+        GamePlayerConsumer.games[self.uuid].time = datetime.now() - GamePlayerConsumer.games[self.uuid].time;
+        await sendMatchResult({"user_a": GamePlayerConsumer.games[self.uuid].players[0].name, 
+                "user_b": GamePlayerConsumer.games[self.uuid].players[1].name,
+                "score_a": GamePlayerConsumer.games[self.uuid].players[0].score,
+                "score_b": GamePlayerConsumer.games[self.uuid].players[1].score,
+                "game_time": GamePlayerConsumer.games[self.uuid].time
+                })
 
     async def groupSend(self, name, data):
         await self.channel_layer.group_send(
