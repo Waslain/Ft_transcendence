@@ -1,4 +1,5 @@
 import AbstractView from "./AbstractView.js";
+import * as Utils from "../utils.js";
 
 export default class extends AbstractView {
 	constructor(params) {
@@ -9,7 +10,7 @@ export default class extends AbstractView {
 			needed: true,
 			auth: false,
 			url: '/users/login',
-			urlAfterLogin: '/users/profile'
+			urlAfterLogin: '/friends'
 		}
 	}
 
@@ -41,23 +42,6 @@ export default class extends AbstractView {
         `;}
 
     async getHtml() {
-        return `
-        <div id="mainView"><div>
-        `
-    }
-
-    error(msg) {
-        document.querySelector("#mainView").innerHTML = `
-      <div class="container py-5 h-100">
-          <div class="row-fluid d-flex justify-content-center align-items-center">
-                  <h2 class="d-sm-inline mx-3 mb-0 text-white" id=errorDisplay></h2>
-          </div>
-      }
-      `
-      document.getElementById('errorDisplay').innerText = msg;
-    }
-    
-    async getProfileHtml() {
 	return `
     <div class="container py-5 h-100">
         <div class="row-fluid d-flex justify-content-center align-items-center">
@@ -96,48 +80,19 @@ export default class extends AbstractView {
 
     async getJavaScript() {
         const username = localStorage.getItem("username");
-		let endpoint = "https://localhost/api/users/get/" + username;
-		const dataUser = await fetch(endpoint, {
-			method: 'GET',
-		})
-		.then(response => response.json().then(json => ({
-			data: json, status: response.status})))
-		.then(res => {
-			if (res.status > 400) {
-					this.error("Error " + res.status + ": " + res.data.message);
-				console.log(res.data.message);
-				return null;
-			}
-			else {
-				return res.data
-			}
-		})
-		.catch(error => {
-			console.error(error);
-			this.error("Error: " + error);
-			return null;
-		})
+		const avatar = localStorage.getItem("avatar");
 
-		if (dataUser === null) {
-			return;
-		}
-
-		let avatar = "/static/img/default.png"
-		if (dataUser.avatar) {
-			avatar = "https://localhost" + dataUser.avatar;
-		}
-
-  		document.querySelector("#mainView").innerHTML = await this.getProfileHtml();
 		document.getElementById('usernameDisplay').innerText = username;
 		document.getElementById('avatarDisplay').src = avatar;
 
-        
-        const data = await fetch('/static/mockFriendList.json')
+		let endpoint = "https://localhost/api/users/friends/list/" + username + "/";
+        let data = await fetch(endpoint, {
+			method: 'GET',
+		})
         .then(response => response.json().then(json => ({
 			data: json, status: response.status})))
 		.then(res => {
 			if (res.status > 400) {
-					this.error("Error " + res.status + ": " + res.data.message);
 				console.log(res.data.message);
 				return null;
 			}
@@ -147,9 +102,9 @@ export default class extends AbstractView {
 		})
 		.catch(error => {
 			console.error(error);
-			this.error("Error: " + error);
 			return null;
 		})
+		//console.log(data);
 
 		if (data === null) {
 			return;
@@ -159,7 +114,7 @@ export default class extends AbstractView {
         document.getElementById('blockList').innerHTML = '';
         const flistContainer = document.getElementById('friend-list-container');
         const blistContainer = document.getElementById('block-list-container');
-        /*Penindg List*/
+        /*Pending List*/
         if (data.friends.length === 0){
             flistContainer.style.height = '70px';
             const NoFriendsMsg = document.createElement('li');
@@ -181,13 +136,13 @@ export default class extends AbstractView {
                 }
 
                 const img = document.createElement('img');
-                img.src = friend.image_url || '/static/img/default.png';
-                img.alt = friend.name;
+                img.src = friend.avatar || '/static/img/default.png';
+                img.alt = friend.username;
                 img.classList.add('rounded-circle', 'me-2');
                 img.style.height = '30px';
                 img.style.width = '30px';
 
-                const name = document.createTextNode(friend.name);
+                const name = document.createTextNode(friend.username);
 
                 const actionBtn = document.createElement('button');
                 actionBtn.classList.add('btn', 'btn-danger', 'btn-sm', 'ms-auto');
@@ -203,6 +158,8 @@ export default class extends AbstractView {
             });
         }
 
+		data = {blocked: {length: 0}};
+		console.log(data);
         /*Blocked List*/
         if (data.blocked.length === 0){
             blistContainer.style.height = '70px';
@@ -217,13 +174,13 @@ export default class extends AbstractView {
                 listItem.classList.add('list-group-item', 'd-flex', 'align-items-center', 'p-2');
 
                 const img = document.createElement('img');
-                img.src = blocked.image_url || '/static/img/default.png';
-                img.alt = blocked.name;
+                img.src = blocked.avatar || '/static/img/default.png';
+                img.alt = blocked.username;
                 img.classList.add('rounded-circle', 'me-2');
                 img.style.height = '30px';
                 img.style.width = '30px';
 
-                const name = document.createTextNode(blocked.name);
+                const name = document.createTextNode(blocked.username);
 
                 const actionBtn = document.createElement('button');
                 actionBtn.classList.add('btn', 'btn-primary', 'btn-sm', 'ms-auto');
@@ -237,6 +194,7 @@ export default class extends AbstractView {
                 document.getElementById('blockList').appendChild(listItem);
             });
         }
+        /*Blocked List*/
 
         function unfriendUser(friendId) {
             console.log('Unfriend user ID:', friendId);
