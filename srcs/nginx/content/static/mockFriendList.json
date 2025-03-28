@@ -3,64 +3,64 @@
     "friends": [
         {
             "id": 1,
-            "name": "Friend 1",
-            "image_url": "/static/img/default.png",
+            "username": "Friend 1",
+            "avatar": "/static/img/default.png",
             "is_online": true
         },
         {
             "id": 2,
-            "name": "Friend 2",
-            "image_url": "/static/img/default.png",
+            "username": "Friend 2",
+            "avatar": "/static/img/default.png",
             "is_online": false
         },
         {
             "id": 3,
-            "name": "Friend 3",
-            "image_url": "/static/img/default.png",
+            "username": "Friend 3",
+            "avatar": "/static/img/default.png",
             "is_online": true
         },
         {
             "id": 4,
-            "name": "Friend 4",
-            "image_url": "/static/img/default.png",
+            "username": "Friend 4",
+            "avatar": "/static/img/default.png",
             "is_online": false
         },
         {
             "id": 5,
-            "name": "Friend 5",
-            "image_url": "/static/img/default.png",
+            "username": "Friend 5",
+            "avatar": "/static/img/default.png",
             "is_online": false
         },
         {
             "id": 6,
-            "name": "Friend 6",
-            "image_url": "/static/img/default.png",
+            "username": "Friend 6",
+            "avatar": "/static/img/default.png",
             "is_online": true
         },
         {
             "id": 7,
-            "name": "Friend 7",
-            "image_url": "/static/img/default.png",
+            "username": "Friend 7",
+            "avatar": "/static/img/default.png",
             "is_online": true
         },
         {
             "id": 8,
-            "name": "Friend 8",
-            "image_url": "/static/img/default.png",
+            "username": "Friend 8",
+            "avatar": "/static/img/default.png",
             "is_online": true
         }
     ],
     "blocked": [
         {
             "id": 3,
-            "name": "User 1",
-            "image_url": "/static/img/default.png",
+            "username": "User 1",
+            "avatar": "/static/img/default.png",
             "is_online": true
         },
         {
             "id": 4,
-            "name": "User 2",
-            "image_url": "/static/img/default.png",
+            "username": "User 2",
+            "avatar": "/static/img/default.png",
             "is_online": false
         }
     ]

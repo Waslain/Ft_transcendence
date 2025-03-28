@@ -4,18 +4,8 @@ from django.contrib.postgres.fields import ArrayField
 from django.core.cache import cache
 from django.utils import timezone
 
-'''
-def upload_to(instance, filename):
-	return 'images/{filename}'.format(filename=filename)
-'''
-
 class User(AbstractUser):
-	friends = ArrayField(
-		models.IntegerField(),
-		blank=True,
-		default=list,
-		help_text='List of user IDs representing friends'
-	)
+	friends = models.ManyToManyField('self', blank=True, symmetrical=False);
 	blocked_users = ArrayField(
 		models.IntegerField(),
 		blank=True,
