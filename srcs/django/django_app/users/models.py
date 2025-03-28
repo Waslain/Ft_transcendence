@@ -5,13 +5,8 @@ from django.core.cache import cache
 from django.utils import timezone
 
 class User(AbstractUser):
-	friends = models.ManyToManyField('self', blank=True, symmetrical=False);
-	blocked_users = ArrayField(
-		models.IntegerField(),
-		blank=True,
-		default=list,
-		help_text='List of user IDs representing blocked users'
-	)
+	friends = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='is_friend');
+	blocked = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='is_blocked');
 	avatar = models.ImageField(upload_to='images/', blank=True, null=True)
 	def update_online_status(self):
 		#Update user's online status in cache

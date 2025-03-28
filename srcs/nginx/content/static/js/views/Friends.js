@@ -85,125 +85,195 @@ export default class extends AbstractView {
 		document.getElementById('usernameDisplay').innerText = username;
 		document.getElementById('avatarDisplay').src = avatar;
 
-		let endpoint = "https://localhost/api/users/friends/list/" + username + "/";
-        let data = await fetch(endpoint, {
-			method: 'GET',
-		})
-        .then(response => response.json().then(json => ({
-			data: json, status: response.status})))
-		.then(res => {
-			if (res.status > 400) {
-				console.log(res.data.message);
+		const updateFriendsList = async () => {
+			let endpoint = "https://localhost/api/users/friends/list/";
+			let data = await fetch(endpoint, {
+				method: 'GET',
+			})
+			.then(response => response.json().then(json => ({
+				data: json, status: response.status})))
+			.then(res => {
+				if (res.status > 400) {
+					console.log(res.data.message);
+					return null;
+				}
+				else {
+					return res.data
+				}
+			})
+			.catch(error => {
+				console.error(error);
 				return null;
-			}
-			else {
-				return res.data
-			}
-		})
-		.catch(error => {
-			console.error(error);
-			return null;
-		})
-		//console.log(data);
+			})
 
-		if (data === null) {
-			return;
+			if (data === null) {
+				return;
+			}
+
+			document.getElementById('friendList').innerHTML = '';
+			const flistContainer = document.getElementById('friend-list-container');
+
+			/*Pending List*/
+			if (data.friends.length === 0){
+				flistContainer.style.height = '70px';
+				const NoFriendsMsg = document.createElement('li');
+				NoFriendsMsg.classList.add('list-group-item', 'text-center', 'text-secondary');
+				NoFriendsMsg.textContent = 'No friends yet';
+				document.getElementById('friendList').appendChild(NoFriendsMsg);
+			} else {
+				data.friends.forEach(friend => {
+					flistContainer.style.height = '350px';
+					const listItem = document.createElement('li');
+					listItem.classList.add('list-group-item', 'd-flex', 'align-items-center', 'p-2');
+					
+					const status = document.createElement('i');
+					if (friend.is_online === true) {
+						status.classList.add('bi', 'bi-emoji-laughing-fill', 'me-3', 'text-warning');
+					}
+					else {
+						status.classList.add('bi', 'bi-emoji-dizzy-fill', 'me-3', 'text-body-tertiary');
+					}
+
+					const img = document.createElement('img');
+					img.src = friend.avatar || '/static/img/default.png';
+					img.alt = friend.username;
+					img.classList.add('rounded-circle', 'me-2');
+					img.style.height = '30px';
+					img.style.width = '30px';
+
+					const name = document.createTextNode(friend.username);
+
+					const actionBtn = document.createElement('button');
+					actionBtn.classList.add('btn', 'btn-danger', 'btn-sm', 'ms-auto');
+					actionBtn.textContent = 'Unfriend';
+					actionBtn.onclick = () => unfriendUser(friend.username);
+
+					listItem.appendChild(status);
+					listItem.appendChild(img);
+					listItem.appendChild(name);
+					listItem.appendChild(actionBtn);
+
+					 document.getElementById('friendList').appendChild(listItem);
+				});
+			}
 		}
 
-        document.getElementById('friendList').innerHTML = '';
-        document.getElementById('blockList').innerHTML = '';
-        const flistContainer = document.getElementById('friend-list-container');
-        const blistContainer = document.getElementById('block-list-container');
-        /*Pending List*/
-        if (data.friends.length === 0){
-            flistContainer.style.height = '70px';
-            const NoFriendsMsg = document.createElement('li');
-            NoFriendsMsg.classList.add('list-group-item', 'text-center', 'text-secondary');
-            NoFriendsMsg.textContent = 'No friends yet';
-            document.getElementById('friendList').appendChild(NoFriendsMsg);
-        } else {
-            data.friends.forEach(friend => {
-                flistContainer.style.height = '350px';
-                const listItem = document.createElement('li');
-                listItem.classList.add('list-group-item', 'd-flex', 'align-items-center', 'p-2');
-                
-                const status = document.createElement('i');
-                if (friend.is_online === true) {
-                    status.classList.add('bi', 'bi-emoji-laughing-fill', 'me-3', 'text-warning');
-                }
-                else {
-                    status.classList.add('bi', 'bi-emoji-dizzy-fill', 'me-3', 'text-body-tertiary');
-                }
+		const updateBlockList = async () => {
+			let endpoint = "https://localhost/api/users/block/list/";
+			let data = await fetch(endpoint, {
+				method: 'GET',
+			})
+			.then(response => response.json().then(json => ({
+				data: json, status: response.status})))
+			.then(res => {
+				if (res.status > 400) {
+					console.log(res.data.message);
+					return null;
+				}
+				else {
+					return res.data
+				}
+			})
+			.catch(error => {
+				console.error(error);
+				return null;
+			})
 
-                const img = document.createElement('img');
-                img.src = friend.avatar || '/static/img/default.png';
-                img.alt = friend.username;
-                img.classList.add('rounded-circle', 'me-2');
-                img.style.height = '30px';
-                img.style.width = '30px';
+			if (data === null) {
+				return;
+			}
 
-                const name = document.createTextNode(friend.username);
+			/*Blocked List*/
+			document.getElementById('blockList').innerHTML = '';
+			const blistContainer = document.getElementById('block-list-container');
 
-                const actionBtn = document.createElement('button');
-                actionBtn.classList.add('btn', 'btn-danger', 'btn-sm', 'ms-auto');
-                actionBtn.textContent = 'Unfriend';
-                actionBtn.onclick = () => unfriendUser(friend.id);
+			if (data.blocked.length === 0){
+				blistContainer.style.height = '70px';
+				const NoBlockedMsg = document.createElement('li');
+				NoBlockedMsg.classList.add('list-group-item', 'text-center', 'text-secondary');
+				NoBlockedMsg.textContent = 'No blocked users';
+				document.getElementById('blockList').appendChild(NoBlockedMsg);
+			} else {
+				data.blocked.forEach(blocked => {
+					blistContainer.style.height = '350px';
+					const listItem = document.createElement('li');
+					listItem.classList.add('list-group-item', 'd-flex', 'align-items-center', 'p-2');
 
-                listItem.appendChild(status);
-                listItem.appendChild(img);
-                listItem.appendChild(name);
-                listItem.appendChild(actionBtn);
+					const img = document.createElement('img');
+					img.src = blocked.avatar || '/static/img/default.png';
+					img.alt = blocked.username;
+					img.classList.add('rounded-circle', 'me-2');
+					img.style.height = '30px';
+					img.style.width = '30px';
 
-                 document.getElementById('friendList').appendChild(listItem);
-            });
+					const name = document.createTextNode(blocked.username);
+
+					const actionBtn = document.createElement('button');
+					actionBtn.classList.add('btn', 'btn-primary', 'btn-sm', 'ms-auto');
+					actionBtn.textContent = 'Unblock';
+					actionBtn.onclick = () => unblockUser(blocked.username);
+
+					listItem.appendChild(img);
+					listItem.appendChild(name);
+					listItem.appendChild(actionBtn);
+
+					document.getElementById('blockList').appendChild(listItem);
+				});
+			}
+			/*Blocked List*/
+		}
+
+		updateFriendsList();
+		updateBlockList();
+
+        function unfriendUser(username) {
+			let formData = new FormData();
+			formData.set('username', username);
+
+			const endpoint = "https://localhost/api/users/friends/remove/";
+			fetch(endpoint, {
+				method: 'PUT',
+				body: formData,
+			})
+			.then(response => response.json().then(json => ({
+				data: json, status: response.status})))
+			.then(res => {
+				if (res.status > 400) {
+					console.log(res.data.message);
+				}
+				else {
+					console.log(username + ": " + res.data.message);
+					updateFriendsList();
+				}
+			})
+			.catch(error => {
+				console.error(error);
+			})
         }
 
-		data = {blocked: {length: 0}};
-		console.log(data);
-        /*Blocked List*/
-        if (data.blocked.length === 0){
-            blistContainer.style.height = '70px';
-            const NoBlockedMsg = document.createElement('li');
-            NoBlockedMsg.classList.add('list-group-item', 'text-center', 'text-secondary');
-            NoBlockedMsg.textContent = 'No blocked users';
-            document.getElementById('blockList').appendChild(NoBlockedMsg);
-        } else {
-            data.blocked.forEach(blocked => {
-                blistContainer.style.height = '350px';
-                const listItem = document.createElement('li');
-                listItem.classList.add('list-group-item', 'd-flex', 'align-items-center', 'p-2');
+        function unblockUser(username) {
+			let formData = new FormData();
+			formData.set('username', username);
 
-                const img = document.createElement('img');
-                img.src = blocked.avatar || '/static/img/default.png';
-                img.alt = blocked.username;
-                img.classList.add('rounded-circle', 'me-2');
-                img.style.height = '30px';
-                img.style.width = '30px';
-
-                const name = document.createTextNode(blocked.username);
-
-                const actionBtn = document.createElement('button');
-                actionBtn.classList.add('btn', 'btn-primary', 'btn-sm', 'ms-auto');
-                actionBtn.textContent = 'Unblock';
-                actionBtn.onclick = () => unblockUser(blocked.id);
-
-                listItem.appendChild(img);
-                listItem.appendChild(name);
-                listItem.appendChild(actionBtn);
-
-                document.getElementById('blockList').appendChild(listItem);
-            });
-        }
-        /*Blocked List*/
-
-        function unfriendUser(friendId) {
-            console.log('Unfriend user ID:', friendId);
-            //API to unfriend request
-        }
-
-        function unblockUser(userId) {
-            console.log('Unblock user ID:', userId);
-            //API to unfriend request
+			const endpoint = "https://localhost/api/users/block/remove/";
+			fetch(endpoint, {
+				method: 'PUT',
+				body: formData,
+			})
+			.then(response => response.json().then(json => ({
+				data: json, status: response.status})))
+			.then(res => {
+				if (res.status > 400) {
+					console.log(res.data.message);
+				}
+				else {
+					console.log(username + ": " + res.data.message);
+					updateBlockList();
+				}
+			})
+			.catch(error => {
+				console.error(error);
+			})
         }
 	}
 }

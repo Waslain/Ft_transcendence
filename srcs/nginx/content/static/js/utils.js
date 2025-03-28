@@ -1,10 +1,6 @@
 export function fetchBlockedUsers() {
-	fetch('https://localhost/api/users/blocked/', {
+	fetch('https://localhost/api/users/block/list/', {
 		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json'
-		},
-		credentials: 'include'
 	})
 	.then(response => {
 		if (!response.ok) {
@@ -15,8 +11,12 @@ export function fetchBlockedUsers() {
 	.then(blockedUsers => {
 		//console.log("Fetched blocked users:", blockedUsers);
 		// Store the blocked users in localStorage for quick access
-		localStorage.setItem('blockedUsers', JSON.stringify(blockedUsers));
-	})
+		let data = [];
+		blockedUsers.blocked.forEach(blocked => {
+			data.push(blocked.id);
+		});
+		localStorage.setItem('blockedUsers', JSON.stringify(data));
+})
 	.catch(error => {
 		console.error('Error fetching blocked users:', error);
 	});

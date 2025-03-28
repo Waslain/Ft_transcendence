@@ -274,6 +274,7 @@ export default class extends AbstractView {
 		const currentUser = localStorage.getItem('username');
 		const profileName = username;
 		let friend;
+		let blocked;
 
 		if (currentUser == profileName) {
 			document.querySelector("#profileBtns").innerHTML = `
@@ -299,7 +300,7 @@ export default class extends AbstractView {
 				<button type="button" class="btn profile-btn"><i class="bi bi-send" style="padding-right: 5px;"></i>Message</button>
 			</div>
 			<div class="col-12 col-md-3 col-sm-3 text-nowrap">
-				<button type="button" class="btn profile-btn" id="blockBtn"><i class="bi bi-ban" style="padding-right: 5px;"></i>Block</button>
+				<button type="button" class="btn profile-btn" id="blockBtn"><i class="bi bi-ban" style="padding-right: 5px;"></i><span id="blockDisplay"></span></button>
 			</div>
 		</div>
 			`
@@ -329,6 +330,7 @@ export default class extends AbstractView {
 				return ;
 			}
 			friend = tmpData.is_friend;
+			blocked = tmpData.is_blocked;
 			updateDisplay();
 		}
 
@@ -340,8 +342,15 @@ export default class extends AbstractView {
 			else {
 				document.getElementById("friendDisplay").innerText = "Add Friend"
 			}
+			if (blocked) {
+				document.getElementById("blockDisplay").innerText = "Unblock"
+			}
+			else {
+				document.getElementById("blockDisplay").innerText = "Block"
+			}
 		}
 
+/*
 		// With this code:
 		const blockBtn = document.getElementById('blockBtn');
 		if (blockBtn) {
@@ -395,6 +404,7 @@ export default class extends AbstractView {
 				});
 			}
 		}
+		*/
 
 		const friendBtn = document.getElementById('friendBtn');
 		if (friendBtn) {
@@ -422,6 +432,45 @@ export default class extends AbstractView {
 					else {
 						console.log(username + ": " + res.data.message);
 						friend = !friend;
+						updateDisplay();
+					}
+				})
+				.catch(error => {
+					console.error(error);
+				})
+			},
+			{
+				signal: this.#abortController.signal,
+			});
+		}
+
+
+		const blockBtn = document.getElementById('blockBtn');
+		if (blockBtn) {
+			blockBtn.addEventListener('click', (e) => {
+				let formData = new FormData();
+				formData.set('username', username);
+
+				let endpoint;
+				if (blocked) {
+					endpoint = "https://localhost/api/users/block/remove/";
+				}
+				else {
+					endpoint = "https://localhost/api/users/block/add/";
+				}
+				fetch(endpoint, {
+					method: 'PUT',
+					body: formData,
+				})
+				.then(response => response.json().then(json => ({
+					data: json, status: response.status})))
+				.then(res => {
+					if (res.status > 400) {
+						console.log(res.data.message);
+					}
+					else {
+						console.log(username + ": " + res.data.message);
+						blocked = !blocked;
 						updateDisplay();
 					}
 				})
