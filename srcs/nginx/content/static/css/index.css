@@ -47,10 +47,17 @@
     border-radius: 35px;
     font-size: 24px;
     line-height: 1.33;
+    border: solid #ffffffcb;
+    background-color: #f0f0f053;
+    color: #fff;
+}
+
+.blur {
+    backdrop-filter: blur(5px);
 }
 
 .sidebar {
-    background-color: #9cafc9;
+    background-color: #9cafc94b;
     position: absolute;
     top: 10px;
     left: 25px;
