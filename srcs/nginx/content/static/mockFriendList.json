@@ -1,6 +1,6 @@
 {
     "test":[],
-    "friend": [
+    "friends": [
         {
             "id": 1,
             "username": "Friend1",
@@ -50,7 +50,7 @@
             "is_online": true
         }
     ],
-    "block": [
+    "blocked": [
         {
             "id": 3,
             "username": "User1",

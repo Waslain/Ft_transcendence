@@ -28,24 +28,26 @@ export default class extends AbstractView {
         .btn {
             border-radius: 25px;
         }
+        .box-wrapper {
+            background-color:rgba(197, 197, 197, 0.1);
+            backdrop-filter: blur(5px);
+        }
         .card-body {
             padding: 0.5rem;
             padding-left: 0;
             margin-left: 5px;
+            color: white;
         }
         .card-header {
-            background-color: #9cafc9;
             color: #fff;
         }
-        .card-footer {
-            background-color: #9cafc9;
-        }
         .list-item-clickable {
-            transition: all 0.3s ease;
+            border-radius: 25px;
         }
         .list-item-clickable:hover {
-            background-color: #f8f9fa;
-            border-radius: 8px;
+            background-color:rgba(248, 249, 250, 0.4);
+            border-radius: 25px;
+            color: black;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             transform: scale(1.02);
             z-index: 10;
@@ -67,21 +69,21 @@ export default class extends AbstractView {
         <section>
             <div class="row justify-content-center chart-container">
                 <div class="col-12 col-sm-10 col-md-6 col-lg-5 col-xl-5 col-xxl-5 mb-4">
-                    <div class="card widget-card border-light shadow-sm chart-wrapper">
-                        <div class="card-header text-center fw-medium align-items-cente fs-5">Friends List</div>
+                    <div class="card widget-card border-light shadow-sm box-wrapper">
+                        <div class="card-header text-center border-light fw-medium align-items-cente fs-5">Friends List</div>
                         <div class="card-body overflow-auto" id="friend-list-container">
                             <ul id="friendList"></ul>
                         </div>
-                        <div class="card-footer"></div>
+                        <div class="card-footer border-light"></div>
                     </div>
                 </div>
                 <div class="col-12 col-sm-10 col-md-6 col-lg-5 col-xl-5 col-xxl-5 mb-4">
-                    <div class="card widget-card border-light shadow-sm chart-wrapper">
-                        <div class="card-header text-center fw-medium align-items-cente fs-5">Block List</div>
+                    <div class="card widget-card border-light shadow-sm box-wrapper">
+                        <div class="card-header border-light text-center fw-medium align-items-cente fs-5">Block List</div>
                         <div class="card-body overflow-auto" id="block-list-container">
                             <ul id="blockList"></ul>
                         </div>
-                        <div class="card-footer"></div>
+                        <div class="card-footer border-light"></div>
                     </div>
                 </div>
             </div>
@@ -148,7 +150,7 @@ export default class extends AbstractView {
 						status.classList.add('bi', 'bi-emoji-laughing-fill', 'me-3', 'text-warning');
 					}
 					else {
-						status.classList.add('bi', 'bi-emoji-dizzy-fill', 'me-3', 'text-body-tertiary');
+						status.classList.add('bi', 'bi-emoji-dizzy-fill', 'me-3', 'text-secondary');
 					}
 
 					const img = document.createElement('img');
