@@ -120,9 +120,12 @@ export default class extends AbstractView {
 	`;
 	}
 
-	async getJavaScript() {
+	#abortController;
 
+	async getJavaScript() {
+		this.#abortController = new AbortController();
 		const username = this.params.username; 
+
 		let endpoint = "https://localhost/api/users/get/" + username;
 		const dataUser = await fetch(endpoint, {
 			method: 'GET',
@@ -270,6 +273,7 @@ export default class extends AbstractView {
 		/*profileBtns*/
 		const currentUser = localStorage.getItem('username');
 		const profileName = username;
+		let friend;
 
 		if (currentUser == profileName) {
 			document.querySelector("#profileBtns").innerHTML = `
@@ -286,7 +290,7 @@ export default class extends AbstractView {
 			document.querySelector("#profileBtns").innerHTML = `
 			<div class="row text-center">
 			<div class="col-12 col-md-3 col-sm-3 text-nowrap">
-				<button type="button" class="btn profile-btn"><i class="bi bi-plus-circle" style="padding-right: 5px;"></i>Add Friend</button>
+				<button type="button" class="btn profile-btn" id="friendBtn"><i class="bi bi-plus-circle" style="padding-right: 5px;"></i><span id="friendDisplay"></span></button>
 			</div>
 			<div class="col-12 col-md-3 col-sm-3 text-nowrap">
 				<button type="button" class="btn profile-btn"><i class="bi bi-joystick" style="padding-right: 5px;"></i>Match Invite</button>
@@ -299,6 +303,43 @@ export default class extends AbstractView {
 			</div>
 		</div>
 			`
+
+			let formData = new FormData();
+			formData.set('username', username);
+
+			const endpoint = "https://localhost/api/users/friends/check/";
+			const tmpData = await fetch(endpoint, {
+				method: 'POST',
+				body: formData,
+			})
+			.then(response => response.json().then(json => ({
+				data: json, status: response.status})))
+			.then(res => {
+				if (res.status > 400) {
+					console.log(res.data.message);
+				}
+				else {
+					return res.data;
+				}
+			})
+			.catch(error => {
+				console.error(error);
+			})
+			if (!tmpData) {
+				return ;
+			}
+			friend = tmpData.is_friend;
+			updateDisplay();
+		}
+
+		function updateDisplay()
+		{
+			if (friend) {
+				document.getElementById("friendDisplay").innerText = "Remove Friend"
+			}
+			else {
+				document.getElementById("friendDisplay").innerText = "Add Friend"
+			}
 		}
 
 		// With this code:
@@ -308,6 +349,9 @@ export default class extends AbstractView {
 				// Get user ID from the dataUser object
 				const userId = dataUser.id;
 				blockUser(userId, username);
+			},
+			{
+				signal: this.#abortController.signal,
 			});
 		} else {
 			console.log("Block button not found, skipping event listener");
@@ -351,5 +395,47 @@ export default class extends AbstractView {
 				});
 			}
 		}
+
+		const friendBtn = document.getElementById('friendBtn');
+		if (friendBtn) {
+			friendBtn.addEventListener('click', (e) => {
+				let formData = new FormData();
+				formData.set('username', username);
+
+				let endpoint;
+				if (friend) {
+					endpoint = "https://localhost/api/users/friends/remove/";
+				}
+				else {
+					endpoint = "https://localhost/api/users/friends/add/";
+				}
+				fetch(endpoint, {
+					method: 'PUT',
+					body: formData,
+				})
+				.then(response => response.json().then(json => ({
+					data: json, status: response.status})))
+				.then(res => {
+					if (res.status > 400) {
+						console.log(res.data.message);
+					}
+					else {
+						console.log(username + ": " + res.data.message);
+						friend = !friend;
+						updateDisplay();
+					}
+				})
+				.catch(error => {
+					console.error(error);
+				})
+			},
+			{
+				signal: this.#abortController.signal,
+			});
+		}
+	}
+
+	async cleanUp() {
+		this.#abortController.abort();
 	}
 }
