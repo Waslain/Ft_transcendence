@@ -5,9 +5,13 @@ from typing import Dict, List
 from urllib import parse
 import math
 from datetime import datetime
-import aiohttp
 
 from channels.generic.websocket import AsyncWebsocketConsumer
+
+from django.contrib.auth import get_user_model
+from matchhistory.models import MatchHistory
+from channels.db import database_sync_to_async
+User = get_user_model()
 
 class GameWaitingRoomConsumer(AsyncWebsocketConsumer):
     playersNb = 0
@@ -167,21 +171,40 @@ class TournamentManager:
         self.finalGame = GameManager(f"finalGame_{uuid}")
         self.players : List[Player] = []
 
-async def sendMatchResult(result):
+@database_sync_to_async
+def save_match_history(usera_id, userb_id, usera_score, userb_score, game_time):
     try:
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
-                'http://localhost:8000/api/matchhistory/add/',  # Use internal URL
-                json=result
-            ) as response:
-                data = await response.json()
-                if response.status != 201:
-                    print(f"Error saving match history: {data.get('message')}")
-                    return None
-                return data
-    except Exception as e:
-        print(f"Error saving match: {str(e)}")
+        # Get User objects
+        user_a = User.objects.get(id=uid)
+        user_b = User.objects.get(id=uid)
+        
+        # Create match history record
+        match = MatchHistory.objects.create(
+            user_a=user_a,
+            user_b=user_b,
+            score_a=usera_score,
+            score_b=userb_score,
+            game_time=game_time,
+            timestamp=datetime.datetime.now()
+        )
+        
+        # Return the created match
+        return {
+            'status': 'success',
+            'match_id': match.id,
+            'user_a': match.user_a.username,
+            'user_b': match.user_b.username,
+            'score_a': match.score_a,
+            'score_b': match.score_b,
+            'timestamp': str(match.timestamp)
+        }
+    except User.DoesNotExist:
+        print(f"Error saving match history: User with ID {usera_id} or {userb_id} not found")
         return None
+    except Exception as e:
+        print(f"Error saving match history: {str(e)}")
+        return None
+
 
 class GamePlayerConsumer(AsyncWebsocketConsumer):
     games : Dict[str, GameManager] = {}
@@ -301,12 +324,13 @@ class GamePlayerConsumer(AsyncWebsocketConsumer):
             await asyncio.sleep(0.01)
         
         GamePlayerConsumer.games[self.uuid].time = datetime.now() - GamePlayerConsumer.games[self.uuid].time;
-        await sendMatchResult({"user_a": GamePlayerConsumer.games[self.uuid].players[0].name, 
-                "user_b": GamePlayerConsumer.games[self.uuid].players[1].name,
-                "score_a": GamePlayerConsumer.games[self.uuid].players[0].score,
-                "score_b": GamePlayerConsumer.games[self.uuid].players[1].score,
-                "game_time": GamePlayerConsumer.games[self.uuid].time
-                })
+        await save_match_history(
+            GamePlayerConsumer.games[self.uuid].players[0].name,
+            GamePlayerConsumer.games[self.uuid].players[1].name,
+            GamePlayerConsumer.games[self.uuid].players[0].score,
+            GamePlayerConsumer.games[self.uuid].players[1].score,
+            GamePlayerConsumer.games[self.uuid].time
+        )
 
     async def groupSend(self, name, data):
         await self.channel_layer.group_send(
