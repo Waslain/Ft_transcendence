@@ -123,7 +123,6 @@ export default class extends AbstractView {
 	async getJavaScript() {
 
 		const username = this.params.username; 
-
 		let endpoint = "https://localhost/api/users/get/" + username;
 		const dataUser = await fetch(endpoint, {
 			method: 'GET',

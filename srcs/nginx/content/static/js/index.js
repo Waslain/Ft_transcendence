@@ -7,6 +7,7 @@ import WaitingRoom from "./views/WaitingRoom.js";
 import OnlineGame from "./views/OnlineGame.js";
 import { loadAndSetFont } from "./views/pong/utils/font.js";
 import OnlineTournament from "./views/OnlineTournament.js";
+import Friends from "./views/Friends.js";
 
 export const navigateTo = (url) => {
   if (url !== location.pathname) {
@@ -40,6 +41,7 @@ const router = async () => {
     { path: "/pong", view: WaitingRoom },
     { path: "/pong/:room_id", view: OnlineGame },
     { path: "/tournament/:room_id", view: OnlineTournament },
+	{ path: "/friends", view: Friends },
   ];
 
   const potentialMatches = routes.map((route) => {
@@ -227,7 +229,7 @@ document.addEventListener("authenticate", (e) => {
 		<a href="/settings" class="nav-item d-flex align-items-center" data-link>
 			<i class="fs-2 bi-gear"></i><span>Settings</span>
 		</a>
-		<a href="#" class="nav-item d-flex align-items-center" data-link>
+		<a href="/friends" class="nav-item d-flex align-items-center" data-link>
 			<i class="fs-2 bi-people"></i><span>Friends</span>
 		</a>
 		<a href="" class="nav-item d-flex align-items-center" id="signOut">
