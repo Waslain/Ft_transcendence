@@ -186,7 +186,6 @@ def save_match_history(usera_id, userb_id, usera_score, userb_score, game_time):
             score_a=usera_score,
             score_b=userb_score,
             game_time=game_time,
-            timestamp=datetime.datetime.now()
         )
         
         # Return the created match
@@ -197,7 +196,7 @@ def save_match_history(usera_id, userb_id, usera_score, userb_score, game_time):
             'user_b': match.user_b.username,
             'score_a': match.score_a,
             'score_b': match.score_b,
-            'timestamp': str(match.timestamp)
+            'game_time': game_time,
         }
     except User.DoesNotExist:
         print(f"Error saving match history: User with ID {usera_id} or {userb_id} not found")
