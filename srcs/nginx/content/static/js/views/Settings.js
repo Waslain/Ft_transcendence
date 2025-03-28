@@ -13,15 +13,29 @@ export default class extends AbstractView {
 		}
 	}
 
+	async getStyle() {
+		return `
+		.container-wrapper {
+			background-color:rgba(197, 197, 197, 0.1);
+            backdrop-filter: blur(5px);
+			border-radius: 1rem;
+		}
+		.btn-sumbit {
+			background-color: #306598;
+			color: #fff;
+			border-radius: 25px;
+		}
+		`;
+	}
 	async getHtml() {
 	return `
 	<div class="container py-5 h-100">
       <div class="row d-flex justify-content-center align-items-center h-100">
         <div class="col col-xl-10">
-          <div class="card" style="border-radius: 1rem;">
+          <div class="card container-wrapper border-light mt-5">
             <div class="row g-0">
               <div class="col-md-6 col-lg-7 d-flex align-items-center">
-                <div class="card-body p-4 p-lg-5 text-black">
+                <div class="card-body p-4 p-lg-5 text-white">
   
                   <form id="updateForm">
   
@@ -40,7 +54,7 @@ export default class extends AbstractView {
                     </div>
   
                     <div class="pt-1 mb-4">
-                      <button data-mdb-button-init data-mdb-ripple-init class="btn btn-dark btn-lg btn-block" type="submit" id="updateBtn">Update</button>
+                      <button data-mdb-button-init data-mdb-ripple-init class="btn btn-sumbit btn-lg btn-block" type="submit" id="updateBtn">Update</button>
                     </div>
                   </form>
 
