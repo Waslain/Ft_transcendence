@@ -40,7 +40,15 @@ export default class extends AbstractView {
 			height: 300px; /* Fixed height for charts */
 			position: relative;
 			padding: 10px;
+            background-color:rgba(197, 197, 197, 0.1);
+            backdrop-filter: blur(5px);
 		}
+        .no-data-text {
+            margin-top: 1rem;
+            color: #888;
+            justify-content: center;
+			align-items: center;
+        }
 		canvas {
 			width: 100% !important;
 			height: 100% !important;
@@ -73,18 +81,19 @@ export default class extends AbstractView {
 	return `
 	<div class="container py-5 h-100">
 		<div class="row-fluid d-flex justify-content-center align-items-center">
-				<img src="#" id="avatarDisplay" alt="user's image" width="50" height="50" class="rounded-circle">
+				<img src="#" id="avatarDisplay" alt="user's image" width="50" height="50" class="rounded-circle" style="border: solid #fff;">
 				<h2 class="d-sm-inline mx-3 mb-0 text-white" id=usernameDisplay></h2>
 		</div>
 		<br>
 		<div id="profileBtns"></div>
 		<hr/>
 		<section>
-			<div class="row justify-content-center chart-container">
+			<div class="row justify-content-center chart-container g-4">
 				<div class="col-12 col-sm-10 col-md-7 col-lg-6 col-xl-5 col-xxl-4">
 					<div class="card widget-card border-light shadow-sm chart-wrapper">
 						<div class="card-body p-4">
-							<h5 class="card-title widget-card-title mb-1 text-center">Win Stats</h5>
+							<h5 class="card-title widget-card-title mb-1 text-center text-white">Win Stats</h5>
+                            <div id="noDataText" class="no-data-text">No data available</div>
 							<canvas id="winsCountChart" style="width: 100%; height: auto;"></canvas>
 						</div>
 					</div>
@@ -92,7 +101,8 @@ export default class extends AbstractView {
 				<div class="col-12 col-sm-10 col-md-7 col-lg-6 col-xl-5 col-xxl-4">
 					<div class="card widget-card border-light shadow-sm chart-wrapper">
 						<div class="card-body p-4">
-							<h5 class="card-title widget-card-title mb-1 text-center">Goals Chart</h5>
+							<h5 class="card-title widget-card-title mb-1 text-center text-white">Goals Chart</h5>
+                            <div id="noDataTextBar" class="no-data-text">No data available</div>
 							<canvas id="goalsChart"></canvas>
 						</div>
 					</div>
@@ -205,70 +215,83 @@ export default class extends AbstractView {
 		document.getElementById('statWinRate').innerHTML = `Win Rate<br/><span style="color: orange;">${rate_of_wins}%</span>`;
 		document.getElementById('statGameTime').innerHTML = `Game Time<br/><span style="color: pink;">${game_time} min</span>`;
 		
+        const noDataText = document.getElementById('noDataText');
+        const noDataTextBar = document.getElementById('noDataTextBar');
 		/*Doughnut chart */
 		const dctx = document.getElementById('winsCountChart').getContext('2d');
-
-		const winsLossesChart = new Chart(dctx, {
-			type: 'doughnut',  // Doughnut chart type
-			data: {
-				labels: ['Wins', 'Losses'],  // Labels for the segments
-				datasets: [{
-					label: 'Wins vs Losses',
-					data: [number_of_wins, number_of_losses],  // Data for wins and losses
-					backgroundColor: ['#4169e1', '#98afc7'],  // Colors for the segments
-					borderWidth: 1
-				}]
-			},
-			options: {
-				responsive: true,
-				plugins: {
-					legend: {
-						position: 'top',
-					},
-					tooltip: {
-						callbacks: {
-							label: function(tooltipItem) {
-								return tooltipItem.label + ': ' + tooltipItem.raw; // Display value as number
-							}
-						}
-					}
-				},
-				cutout: '70%',
-			}
-		});
+        if (number_of_games === 0) {
+            noDataText.style.display = 'flex';
+            dctx.clearRect(0, 0, dctx.canvas.width, dctx.canvas.height);
+        } else {
+            noDataText.style.display = 'none';
+            const winsLossesChart = new Chart(dctx, {
+                type: 'doughnut',  // Doughnut chart type
+                data: {
+                    labels: ['Wins', 'Losses'],  // Labels for the segments
+                    datasets: [{
+                        label: 'Wins vs Losses',
+                        data: [number_of_wins, number_of_losses],  // Data for wins and losses
+                        backgroundColor: ['#4169e1', '#98afc7'],  // Colors for the segments
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    return tooltipItem.label + ': ' + tooltipItem.raw; // Display value as number
+                                }
+                            }
+                        }
+                    },
+                    cutout: '70%',
+                }
+            });
+        }
 
 		/*Bar chart */
 		var barctx = document.getElementById('goalsChart').getContext('2d');
-		var goalsChart = new Chart(barctx, {
-			type: 'bar',
-			data: {
-				labels: ['Goals Scored', 'Goals Taken'],
-				datasets: [{
-					label: 'Goals',
-					data: [goals_scored, goals_taken], // Need to replace with data from API
-					backgroundColor: ['#4CAF50', '#FF5733'],
-					borderColor: ['#4CAF50', '#FF5733'], // Border colors
-					borderWidth: 1
-				}]
-			},
-			options: {
-				responsive: true, // Make the chart responsive
-				scales: {
-					y: {
-						beginAtZero: true, // Start y-axis from 0
-						title: {
-							display: true,
-							text: 'Total Number of Goals'
-						}
-					}
-				},
-				plugins: {
-					legend: {
-						display: false
-					}
-				}
-			}
-		});
+        if (number_of_games === 0) {
+            noDataTextBar.style.display = 'flex';
+            barctx.clearRect(0, 0, barctx.canvas.width, barctx.canvas.height);
+        } else {
+            noDataTextBar.style.display = 'none';
+            var goalsChart = new Chart(barctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Goals Scored', 'Goals Taken'],
+                    datasets: [{
+                        label: 'Goals',
+                        data: [goals_scored, goals_taken], // Need to replace with data from API
+                        backgroundColor: ['#4CAF50', '#FF5733'],
+                        borderColor: ['#4CAF50', '#FF5733'], // Border colors
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true, // Make the chart responsive
+                    scales: {
+                        y: {
+                            beginAtZero: true, // Start y-axis from 0
+                            title: {
+                                display: true,
+                                text: 'Total Number of Goals'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
 
 		/*profileBtns*/
 		const currentUser = localStorage.getItem('username');
@@ -281,9 +304,6 @@ export default class extends AbstractView {
 			<div class="row text-center">
 				<div class="col text-nowrap">
 					<button type="button" class="btn profile-btn"><i class="bi bi-box-arrow-up" style="padding-right: 5px;"></i>Update Photo</button>
-				</div>
-				<div class="col-12 col-md-6 col-sm-6 text-nowrap">
-					<button type="button" class="btn profile-btn"><i class="bi bi-pencil-square" style="padding-right: 5px;"></i>Change Avatar Name</button>
 				</div>
 			</div>
 			`

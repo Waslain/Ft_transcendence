@@ -45,7 +45,7 @@ export default class extends AbstractView {
 	return `
     <div class="container py-5 h-100">
         <div class="row-fluid d-flex justify-content-center align-items-center">
-                <img src="#" id="avatarDisplay" alt="user's image" width="50" height="50" class="rounded-circle">
+                <img src="#" id="avatarDisplay" alt="user's image" width="50" height="50" class="rounded-circle" style="border: solid #fff;">
                 <h2 class="d-sm-inline mx-3 mb-0 text-white" id=usernameDisplay></h2>
         </div>
         <br>
