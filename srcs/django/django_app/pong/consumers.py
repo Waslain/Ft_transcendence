@@ -176,8 +176,8 @@ class TournamentManager:
 def save_match_history(usera_id, userb_id, usera_score, userb_score, game_time):
     try:
         # Get User objects
-        user_a = User.objects.get(id=uid)
-        user_b = User.objects.get(id=uid)
+        user_a = User.objects.get(id=usera_id)
+        user_b = User.objects.get(id=userb_id)
         
         # Create match history record
         match = MatchHistory.objects.create(

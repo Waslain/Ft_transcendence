@@ -4,10 +4,11 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 import json
 from .models import MatchHistory
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+User = get_user_model()
 from rest_framework import serializers, viewsets
 from rest_framework.response import Response
-from django.db.models import Count, Q, F, ExpressionWrapper, IntegerField
+from django.db.models import Count, Q, F, ExpressionWrapper, IntegerField, Sum
 from django.db.models.functions import Coalesce
 from collections import defaultdict
 
@@ -119,7 +120,8 @@ def match_list(request):
 		matches = MatchHistory.objects.filter(user_a=user) | MatchHistory.objects.filter(user_b=user)
 		
 		# Order by most recent
-		matches = matches.order_by('-timestamp')
+		# matches = matches.order_by('-timestamp')
+		matches = matches.order_by('id')
 		
 		# Prepare data for response
 		match_data = []
@@ -131,8 +133,8 @@ def match_list(request):
 				'score_a': match.score_a,
 				'score_b': match.score_b,
 				'game_time': match.game_time,
-				'timestamp': match.timestamp.isoformat(),
-				'winner': match.user_a.username if match.score_a > match.score_b else match.user_b.username
+				# 'timestamp': match.timestamp.isoformat(),
+				# 'winner': match.user_a.username if match.score_a > match.score_b else match.user_b.username
 			})
 		
 		return JsonResponse({'status': 'success', 'matches': match_data})
@@ -151,6 +153,10 @@ def add_match(request):
 		usera_score = data.get('usera_score', 0)
 		userb_score = data.get('userb_score', 0)
 		game_time = data.get('game_time', 0)
+
+		# Convert game_time to proper interval format
+		from datetime import timedelta
+		game_time = timedelta(seconds=game_time)
 		
 		# Validate data
 		if not usera_id or not userb_id:
