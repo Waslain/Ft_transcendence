@@ -24,6 +24,7 @@ urlpatterns = [
 	path('chat/', include('chat.urls')),
 	path('users/', include('users.urls')),
 	path('stats/', include('stats.urls')),
+	path('matchhistory/', include('matchhistory.urls')),
 ]
 
 urlpatterns = [path('api/', include(urlpatterns))]
