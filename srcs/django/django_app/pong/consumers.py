@@ -136,8 +136,9 @@ class Paddle(MovingEntity):
         self.speed = 0.1
 
 class Player:
-    def __init__(self, name, channelName):
+    def __init__(self, name, idUser, channelName):
         self.name = name
+        self.idUser = idUser
         self.gameName = None
         self.connected = True
         self.keyUp = False
@@ -213,12 +214,13 @@ class GamePlayerConsumer(AsyncWebsocketConsumer):
         queryString = parse.parse_qs(self.scope["query_string"].decode())
         self.uuid = queryString["uuid"][0]
         self.name = queryString["name"][0]
+        self.idUser = self.scope['user'].id
         self.room_group_name = f"pong_room_{self.uuid}"
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
         if not self.uuid in GamePlayerConsumer.games:
             GamePlayerConsumer.games[self.uuid] = GameManager(None)
-        GamePlayerConsumer.games[self.uuid].players.append(Player(self.name, self.channel_name))
+        GamePlayerConsumer.games[self.uuid].players.append(Player(self.name, self.idUser, self.channel_name))
         await self.accept()
 
         if len(GamePlayerConsumer.games[self.uuid].players) == 2:
@@ -325,8 +327,8 @@ class GamePlayerConsumer(AsyncWebsocketConsumer):
         
         GamePlayerConsumer.games[self.uuid].time = datetime.now() - GamePlayerConsumer.games[self.uuid].time;
         await save_match_history(
-            GamePlayerConsumer.games[self.uuid].players[0].name,
-            GamePlayerConsumer.games[self.uuid].players[1].name,
+            GamePlayerConsumer.games[self.uuid].players[0].idUser,
+            GamePlayerConsumer.games[self.uuid].players[1].idUser,
             GamePlayerConsumer.games[self.uuid].players[0].score,
             GamePlayerConsumer.games[self.uuid].players[1].score,
             GamePlayerConsumer.games[self.uuid].time
@@ -362,12 +364,13 @@ class TournamentPlayerConsumer(AsyncWebsocketConsumer):
         queryString = parse.parse_qs(self.scope["query_string"].decode())
         self.uuid = queryString["uuid"][0]
         self.name = queryString["name"][0]
+        self.idUser = self.scope['user'].id
         self.room_group_name = f"tournament_room_{self.uuid}"
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
         if not self.uuid in TournamentPlayerConsumer.games:
             TournamentPlayerConsumer.games[self.uuid] = TournamentManager(self.uuid)
-        TournamentPlayerConsumer.games[self.uuid].players.append(Player(self.name, self.channel_name))
+        TournamentPlayerConsumer.games[self.uuid].players.append(Player(self.name, self.idUser, self.channel_name))
         await self.accept()
 
         playersTotal = len(TournamentPlayerConsumer.games[self.uuid].players)
