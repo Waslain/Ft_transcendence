@@ -1,4 +1,5 @@
 import AbstractView from "./AbstractView.js";
+import { invitePlayer } from "../index.js"
 
 export default class extends AbstractView {
 	constructor(params) {
@@ -314,10 +315,10 @@ export default class extends AbstractView {
 				<button type="button" class="btn profile-btn" id="friendBtn"><span id="friendDisplay"></span></button>
 			</div>
 			<div class="col-12 col-md-3 col-sm-3 text-nowrap">
-				<button type="button" class="btn profile-btn"><i class="bi bi-joystick" style="padding-right: 5px;"></i>Match Invite</button>
+				<button type="button" class="btn profile-btn" id="inviteBtn"><i class="bi bi-joystick" style="padding-right: 5px;"></i>Match Invite</button>
 			</div>
 			<div class="col-12 col-md-3 col-sm-3 text-nowrap">
-				<button type="button" class="btn profile-btn"><i class="bi bi-send" style="padding-right: 5px;"></i>Message</button>
+			<button type="button" class="btn profile-btn" id="messageBtn"><i class="bi bi-send" style="padding-right: 5px;""></i>Message</button>
 			</div>
 			<div class="col-12 col-md-3 col-sm-3 text-nowrap">
 				<button type="button" class="btn profile-btn" id="blockBtn"><i class="bi bi-ban" style="padding-right: 5px;"></i><span id="blockDisplay"></span></button>
@@ -370,61 +371,17 @@ export default class extends AbstractView {
 			}
 		}
 
-/*
-		// With this code:
-		const blockBtn = document.getElementById('blockBtn');
-		if (blockBtn) {
-			blockBtn.addEventListener('click', () => {
-				// Get user ID from the dataUser object
-				const userId = dataUser.id;
-				blockUser(userId, username);
+
+		const inviteBtn = document.getElementById('inviteBtn');
+		if (inviteBtn) {
+			inviteBtn.addEventListener('click', (e) => {
+				invitePlayer(username);
 			},
 			{
 				signal: this.#abortController.signal,
 			});
-		} else {
-			console.log("Block button not found, skipping event listener");
 		}
-		
-		function blockUser(userId, username) {
-			if (confirm(`Are you sure you want to block ${username}?`)) {
-				// Your API expects the username in the URL, not in the request body
-				fetch(`https://localhost/api/users/block/${username}/`, {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json'
-					},
-					credentials: 'include'
-				})
-				.then(response => {
-					if (!response.ok) {
-						if (response.status === 400) {
-							// User is already blocked
-							return response.json().then(data => {
-								throw new Error(data.message || `User ${username} is already blocked`);
-							});
-						}
-						if (response.status === 404) {
-							// User not found
-							return response.json().then(data => {
-								throw new Error(data.message || `User ${username} not found`);
-							});
-						}
-						throw new Error(`Network error: ${response.status}`);
-					}
-					return response.json();
-				})
-				.then(data => {
-					console.log("User blocked:", data);
-					alert(data.message || `${username} has been blocked`);
-				})
-				.catch(error => {
-					console.error('Error blocking user:', error);
-					alert(error.message || `Error blocking ${username}`);
-				});
-			}
-		}
-		*/
+
 
 		const friendBtn = document.getElementById('friendBtn');
 		if (friendBtn) {
