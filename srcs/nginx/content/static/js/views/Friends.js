@@ -63,7 +63,7 @@ export default class extends AbstractView {
         </div>
         <br>
         <div class="row-fluid d-flex justify-content-center align-items-center">
-            <input type="text" class="search-btn form-control" placeholder="Search user">
+            <input type="text" class="search-btn form-control" placeholder="Search user" id="searchBar">
         </div>
         <hr/>
         <section>
@@ -92,12 +92,25 @@ export default class extends AbstractView {
 	`;
     }
 
+	#abortController;
+
     async getJavaScript() {
+		this.#abortController = new AbortController();
         const username = localStorage.getItem("username");
 		const avatar = localStorage.getItem("avatar");
 
 		document.getElementById('usernameDisplay').innerText = username;
 		document.getElementById('avatarDisplay').src = avatar;
+
+		const searchBar = document.getElementById('searchBar');
+		searchBar.addEventListener("keydown", function(event) {
+			if (event.keyCode === 13) {
+				navigateTo("https://localhost/users/profile/" + searchBar.value);
+			}
+		},
+		{
+			signal: this.#abortController.signal,
+		});
 
 		const updateFriendsList = async () => {
 			let endpoint = "https://localhost/api/users/friends/list/";
@@ -144,6 +157,9 @@ export default class extends AbstractView {
                     listItem.addEventListener('click', (event) => {
                         if (event.target.classList.contains('btn-danger')) return;
 						navigateTo(`/users/profile/${friend.username}`);
+					},
+					{
+						signal: this.#abortController.signal,
                     });
 					
 					const status = document.createElement('i');
@@ -223,6 +239,9 @@ export default class extends AbstractView {
                     listItem.addEventListener('click', (event) => {
                         if (event.target.classList.contains('btn-primary')) return;
 						navigateTo(`/users/profile/${block.username}`);
+					},
+					{
+			signal: this.#abortController.signal,
                     });
 
 					const img = document.createElement('img');
@@ -301,5 +320,10 @@ export default class extends AbstractView {
 				console.error(error);
 			})
         }
+
+	}
+
+	async cleanUp() {
+		this.#abortController.abort();
 	}
 }
