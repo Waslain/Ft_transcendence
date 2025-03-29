@@ -282,6 +282,7 @@ document.addEventListener("authenticate", (e) => {
 					localStorage.removeItem("username");
 					console.log(res.data.message)
 					document.dispatchEvent(logoutUser)
+					navigateTo('/');
 					router();
 				}
 			})

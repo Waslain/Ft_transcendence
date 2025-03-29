@@ -29,7 +29,7 @@ export default class extends AbstractView {
               <div class="welcome-text"></div>
             </div>
           <div class="card-footer border-light text-center">
-	              <a href="/pong" class="nav__link" style="font-size: 20px;" data-link>Start Pong</a>
+                <div id="enterLink"></div>
           </div>
           </div>
         </div>
@@ -80,5 +80,26 @@ export default class extends AbstractView {
       }
     }
     scrambleText();
+
+    var url = "https://localhost/api/users/check-auth/"
+    await fetch(url, {
+      method: 'GET',
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.IsAuthenticated) {
+        document.querySelector('#enterLink').innerHTML = `
+          <a href="/pong" class="nav__link text-white" style="font-size: 20px;" data-link>Let's Start!</a>
+        `
+      }
+      else {
+        document.querySelector('#enterLink').innerHTML = `
+          <a href="/users/login" class="nav__link text-white" style="font-size: 20px;" data-link>Login</a>
+        `
+      }
+    })
+    .catch(error => {
+      console.error(error);
+    })
   }
 }
