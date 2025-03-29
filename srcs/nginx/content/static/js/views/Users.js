@@ -311,7 +311,7 @@ export default class extends AbstractView {
 			document.querySelector("#profileBtns").innerHTML = `
 			<div class="row text-center">
 			<div class="col-12 col-md-3 col-sm-3 text-nowrap">
-				<button type="button" class="btn profile-btn" id="friendBtn"><i class="bi bi-plus-circle" style="padding-right: 5px;"></i><span id="friendDisplay"></span></button>
+				<button type="button" class="btn profile-btn" id="friendBtn"><span id="friendDisplay"></span></button>
 			</div>
 			<div class="col-12 col-md-3 col-sm-3 text-nowrap">
 				<button type="button" class="btn profile-btn"><i class="bi bi-joystick" style="padding-right: 5px;"></i>Match Invite</button>
@@ -357,10 +357,10 @@ export default class extends AbstractView {
 		function updateDisplay()
 		{
 			if (friend) {
-				document.getElementById("friendDisplay").innerText = "Remove Friend"
+				document.getElementById("friendDisplay").innerHTML = '<i class="bi bi-dash-circle" style="padding-right: 5px;"></i><span>Remove Friend</span>';
 			}
 			else {
-				document.getElementById("friendDisplay").innerText = "Add Friend"
+				document.getElementById("friendDisplay").innerHTML = '<i class="bi bi-plus-circle" style="padding-right: 5px;"></i><span>Add Friend</span>';
 			}
 			if (blocked) {
 				document.getElementById("blockDisplay").innerText = "Unblock"
