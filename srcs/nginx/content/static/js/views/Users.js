@@ -1,5 +1,5 @@
 import AbstractView from "./AbstractView.js";
-import { invitePlayer, navigateTo } from "../index.js"
+import { invitePlayer, privMsg, navigateTo } from "../index.js"
 
 export default class extends AbstractView {
 	constructor(params) {
@@ -382,6 +382,13 @@ export default class extends AbstractView {
 			});
 		}
 
+		const messageBtn = document.getElementById('messageBtn');
+		if (messageBtn) {
+			messageBtn.addEventListener('click', () => {
+				console.log("Here is the username: " + username);
+				privMsg(username);
+			});
+		}
 
 		const friendBtn = document.getElementById('friendBtn');
 		if (friendBtn) {

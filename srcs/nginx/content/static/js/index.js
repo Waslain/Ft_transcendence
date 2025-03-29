@@ -221,6 +221,18 @@ export const invitePlayer = (username) => {
 	document.dispatchEvent(inviteEvent);
 }
 
+export const privMsg = (userToChat) => {
+	const matchOption = Array.from(chatUserSelect.options).find(option => option.text === userToChat)
+	if (matchOption) {
+		chatWindow.style.display = 'block';
+		chatUserSelect.value = matchOption.value;
+		chatHeaderTitle.textContent = `Chat with ${matchOption.text}`;
+		chatMessages.dataset.context = matchOption.value;
+	} else {
+		alert(`Error: User "${userToChat}" is not online`);
+	}
+}
+
 let chatSocket = null;
 
 let authAbortController = null;
