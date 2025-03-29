@@ -156,6 +156,14 @@
 	background-color: #f1f1f1;
 }
 
+.system-message {
+    margin-bottom: 8px;
+	padding: 6px 10px;
+	border-radius: 5px;
+	max-width: 100%;
+	background-color: #d2e6ff;
+}
+
 .message-time {
 	font-size: 0.7em;
 	color: #999;

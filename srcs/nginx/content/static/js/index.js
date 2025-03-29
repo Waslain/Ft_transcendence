@@ -379,7 +379,7 @@ document.addEventListener("authenticate", (e) => {
 			if (message.is_invitation) {
 				// Create special invitation element
 				const messageElement = document.createElement('div');
-				messageElement.className = 'game-invitation-message';
+				messageElement.className = 'game-invitation-message system-message';
 				
 				const invitationCard = document.createElement('div');
 				invitationCard.className = 'invitation-card';
@@ -473,7 +473,7 @@ document.addEventListener("authenticate", (e) => {
 			if (message.is_lobby && message.is_system) {
 				// Create special confirmation element
 				const messageElement = document.createElement('div');
-				messageElement.className = 'system-message invitation-confirmation';
+				messageElement.className = 'system-message invitation-confirmation system-message';
 				
 				const invitationCard = document.createElement('div');
 				invitationCard.className = 'invitation-card sender-card';
