@@ -1,5 +1,5 @@
 import AbstractView from "./AbstractView.js";
-import { invitePlayer } from "../index.js"
+import { invitePlayer, navigateTo } from "../index.js"
 
 export default class extends AbstractView {
 	constructor(params) {
@@ -304,7 +304,7 @@ export default class extends AbstractView {
 			document.querySelector("#profileBtns").innerHTML = `
 			<div class="row text-center">
 				<div class="col text-nowrap">
-					<button type="button" class="btn profile-btn"><i class="bi bi-box-arrow-up" style="padding-right: 5px;"></i>Update Photo</button>
+					<button type="button" class="btn profile-btn" id="playGameBtn"><i class="bi bi-controller" style="padding-right: 5px;"></i>Start Play</button>
 				</div>
 			</div>
 			`
@@ -457,6 +457,13 @@ export default class extends AbstractView {
 			},
 			{
 				signal: this.#abortController.signal,
+			});
+		}
+
+		const playGameBtn = document.getElementById('playGameBtn');
+		if (playGameBtn) {
+			playGameBtn.addEventListener('click', () => {
+				navigateTo(`/pong`);
 			});
 		}
 	}

@@ -21,6 +21,9 @@ export default class extends AbstractView {
             padding: 0.5rem;
             margin: 0;
         }
+        input[placeholder] {
+            text-overflow: ellipsis;
+        }
         .search-btn{
             width: 200px;
             border-radius: 25px;
@@ -63,7 +66,7 @@ export default class extends AbstractView {
         </div>
         <br>
         <div class="row-fluid d-flex justify-content-center align-items-center">
-            <input type="text" class="search-btn form-control" placeholder="Search user" id="searchBar">
+            <input type="text" class="search-btn form-control" placeholder="Enter full name to user profile" id="searchBar">
         </div>
         <hr/>
         <section>
