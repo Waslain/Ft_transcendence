@@ -211,6 +211,16 @@ sidebarToggleBtn.addEventListener('click', () =>{
 	sidebar.classList.toggle('open');
 });
 
+export const invitePlayer = (username) => {
+	chatWindow.style.display = 'block';
+	const inviteEvent = new CustomEvent('invite', {
+		detail: {
+			username: username,
+		},
+	});
+	document.dispatchEvent(inviteEvent);
+}
+
 let chatSocket = null;
 
 let authAbortController = null;
@@ -295,6 +305,13 @@ document.addEventListener("authenticate", (e) => {
 			signal: authAbortController.signal,
 		});
 
+		document.addEventListener("invite", (e) => {
+			sendInviteMessage(e.detail.username);
+		},
+		{
+			signal: authAbortController.signal,
+		});
+
 		// Connectez-vous au WebSocket si ce n'est pas déjà fait
 		if (!chatSocket || chatSocket.readyState !== WebSocket.OPEN) {
 			connectWebSocket();
@@ -319,6 +336,9 @@ document.addEventListener("authenticate", (e) => {
 			try {
 				const data = JSON.parse(e.data);
 				if (data.message) {
+					if (data.message.is_invitation) {
+						chatWindow.style.display = 'block';
+					}
 					// Display the message
 					displayMessage(data.message);
 				}
@@ -674,11 +694,20 @@ document.addEventListener("authenticate", (e) => {
 			signal: authAbortController.signal,
 		});
 
+		function sendInviteMessage(username) {
+			chatSocket.send(JSON.stringify({
+				'type': 'general_chat',
+				'message': "/invite " + username,
+			}));
+		}
+
 		function sendChatMessage() {
 			const chatInput = document.getElementById('chatInput');
 			const message = chatInput.value.trim();
 			const chatMessages = document.getElementById('chatMessages');
 			const chatContext = chatMessages ? chatMessages.dataset.context : 'general';
+			console.log(chatMessages);
+			console.log(chatContext);
 			
 			if (message && chatSocket && chatSocket.readyState === WebSocket.OPEN) {
 				// Check if this is a private message
@@ -689,6 +718,7 @@ document.addEventListener("authenticate", (e) => {
 						'recipient_id': chatContext,
 						'message': message
 					}));
+
 				} else {
 					// Send general chat message
 					chatSocket.send(JSON.stringify({
