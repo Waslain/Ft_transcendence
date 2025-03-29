@@ -88,6 +88,7 @@ export default class extends AbstractView {
                 </div>
             </div>
         </section>
+    </div>
 	`;
     }
 
