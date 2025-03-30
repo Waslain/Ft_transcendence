@@ -239,6 +239,8 @@ export const privMsg = (userToChat) => {
 }
 
 let chatSocket = null;
+let onlineUsersIntervalId;
+let blockedUsersIntervalId;
 
 let authAbortController = null;
 document.addEventListener("authenticate", (e) => {
@@ -369,8 +371,8 @@ document.addEventListener("authenticate", (e) => {
 			Utils.fetchOnlineUsers();
 			Utils.fetchBlockedUsers();
 			// Start a periodic refresh of the online users list
-			setInterval(Utils.fetchOnlineUsers, 5000); // Every 5 seconds
-			setInterval(Utils.fetchBlockedUsers, 30000); // Every 30 seconds
+			onlineUsersIntervalId = setInterval(Utils.fetchOnlineUsers, 5000); // Every 5 seconds
+			blockedUsersIntervalId = setInterval(Utils.fetchBlockedUsers, 30000); // Every 30 seconds
 			};
 		
 			chatSocket.onmessage = function(e) {
@@ -406,15 +408,11 @@ document.addEventListener("authenticate", (e) => {
 			// Check if the message is from a blocked user
 			if (message.sender_id) {  // Make sure sender_id exists
 				const blockedUsers = JSON.parse(localStorage.getItem('blockedUsers') || '[]');
-				console.log("Checking if user is blocked:", message.sender_id, blockedUsers);
 				
 				// IMPORTANT: Convert both to numbers for comparison
 				const senderId = Number(message.sender_id);
-				console.log(`Message from user ID: ${senderId}`);
-				console.log(`Blocked users: ${blockedUsers}`);
 				// Check if this user ID is in the blocked list
 				if (blockedUsers.includes(senderId)) {
-					console.log(`Blocked message from user ID ${message.sender_id}`);
 					return; // Don't display messages from blocked users
 				}
 			}
@@ -752,8 +750,6 @@ document.addEventListener("authenticate", (e) => {
 			const message = chatInput.value.trim();
 			const chatMessages = document.getElementById('chatMessages');
 			const chatContext = chatMessages ? chatMessages.dataset.context : 'general';
-			console.log(chatMessages);
-			console.log(chatContext);
 			
 			if (message && chatSocket && chatSocket.readyState === WebSocket.OPEN) {
 				// Check if this is a private message
@@ -842,6 +838,8 @@ document.addEventListener("authenticate", (e) => {
 		}
 		localStorage.removeItem('username');
 		localStorage.removeItem('avatar');
+		clearInterval(onlineUsersIntervalId);
+		clearInterval(blockedUsersIntervalId);
 	}
 });
 

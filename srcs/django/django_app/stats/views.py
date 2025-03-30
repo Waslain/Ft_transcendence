@@ -9,10 +9,7 @@ from rest_framework import generics, permissions
 from .models import Stats
 from .serializers import StatsSerializer
 
-class StatsViewSet(viewsets.ModelViewSet):
-    queryset = Stats.objects.all()
-    serializer_class = StatsSerializer
-	
+'''
 @api_view(['GET'])
 def get_stats(request, userid):
 	try:
@@ -22,6 +19,7 @@ def get_stats(request, userid):
 	stats = Stats.objects.filter(user=user1)
 	stats_data = list(stats.values())
 	return JsonResponse(stats_data, safe=False)
+'''
 
 class getStatsView(generics.RetrieveAPIView):
 	serializer_class = StatsSerializer

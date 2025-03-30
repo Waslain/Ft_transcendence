@@ -11,20 +11,9 @@ from django.core.cache import cache
 import logging
 logger = logging.getLogger('users')
 
-class ImageViewSet(viewsets.ModelViewSet):
-	queryset = User.objects.all()
-	serializer_class = ImageSerializer
-	permission_classes = [permissions.AllowAny]
-
-class UserViewSet(viewsets.ModelViewSet):
-	queryset = User.objects.all()
-	serializer_class = UserSerializer
-	# permission_classes = [permissions.IsAuthenticated]
-
-
 class GetUserView(generics.RetrieveAPIView):
 	serializer_class = UserSerializer
-	#permission_classes = [permissions.IsAuthenticated]
+	permission_classes = [permissions.IsAuthenticated]
 
 	def get(self, request, username):
 		try:
@@ -52,6 +41,7 @@ class UpdateAvatarView(generics.UpdateAPIView):
 		if instance.avatar:
 			response.data['avatar'] = instance.avatar.url
 		return response
+
 
 class RegisterView(generics.CreateAPIView):
 	serializer_class = UserSerializer
@@ -293,65 +283,6 @@ class CheckFriendView(APIView):
 			response.data["is_blocked"] = False
 		return response
 
-'''
-@api_view(['GET'])
-def mutual_friends(request, user_id_1, user_id_2):
-	try:
-		user1 = User.objects.get(id=user_id_1)
-		user2 = User.objects.get(id=user_id_2)
-	except User.DoesNotExist:
-		return Response(status=status.HTTP_404_NOT_FOUND)
-
-	are_mutual_friends = user_id_2 in user1.friends and user_id_1 in user2.friends
-	return Response({'are_mutual_friends': are_mutual_friends}, status=status.HTTP_200_OK)
-
-
-@api_view(['POST'])
-def add_friend(request, user_id_1, user_id_2):
-	try:
-		user1 = User.objects.get(id=user_id_1)
-		user2 = User.objects.get(id=user_id_2)
-	except User.DoesNotExist:
-		return Response(status=status.HTTP_404_NOT_FOUND)
-
-	if user_id_2 not in user1.friends:
-		user1.friends.append(user_id_2)
-		user1.save()
-		return Response({'status': 'friend added'}, status=status.HTTP_200_OK)
-	else:
-		return Response({'status': 'friend already in list'}, status=status.HTTP_400_BAD_REQUEST)
-'''
-
-@api_view(['POST'])
-def block_user_by_id(request, user_id_1, user_id_2):
-	try:
-		user1 = User.objects.get(id=user_id_1)
-		user2 = User.objects.get(id=user_id_2)
-	except User.DoesNotExist:
-		return Response(status=status.HTTP_404_NOT_FOUND)
-
-	if user_id_2 not in user1.blocked_users:
-		user1.blocked_users.append(user_id_2)
-		user1.save()
-		return Response({'status': 'user blocked'}, status=status.HTTP_200_OK)
-	else:
-		return Response({'status': 'user already blocked'}, status=status.HTTP_400_BAD_REQUEST)
-
-
-@api_view(['POST'])
-def block_user(request, username):
-	user = request.user
-	try:
-		user_to_block = User.objects.get(username=username)
-	except User.DoesNotExist:
-		return Response({'message': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-	
-	if user_to_block.id not in user.blocked_users:
-		user.blocked_users.append(user_to_block.id)
-		user.save()
-		return Response({'message': f'{username} has been blocked'}, status=status.HTTP_200_OK)
-	else:
-		return Response({'message': f'{username} is already blocked'}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 def get_online_users(request):
