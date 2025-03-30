@@ -225,9 +225,9 @@ class GamePlayerConsumer(AsyncWebsocketConsumer):
                     if player.name == self.name:
                         key = data["params"].get("key", "")
                         key_type = data["params"].get("type", "")
-                        if key in ("w", "ArrowUp"):
+                        if key in ("ArrowUp"):
                             player.keyUp = key_type == "keydown"
-                        elif key in ("s", "ArrowDown"):
+                        elif key in ("ArrowDown"):
                             player.keyDown = key_type == "keydown"
         except json.JSONDecodeError:
             print("Error : Invalid JSON")
@@ -453,6 +453,7 @@ class TournamentPlayerConsumer(AsyncWebsocketConsumer):
                 finalGame.loop = asyncio.create_task(self.sendLoopGame(finalGame, None))
 
     async def sendLoopGame(self, gameManager, finalGame):
+        await self.groupSend(gameManager.gameName, "tournamentMatch", [{"name": player.name, "id": player.idUser} for player in gameManager.players])
         await self.groupSend(gameManager.gameName, "names", [player.name for player in gameManager.players])
         await self.groupSend(gameManager.gameName, "scores", [player.score for player in gameManager.players])
         await self.groupSend(gameManager.gameName, "messages", {"first": "Game Started in :", "second": "3"})
@@ -525,4 +526,7 @@ class TournamentPlayerConsumer(AsyncWebsocketConsumer):
             return
         if "messages" in event:
             await self.send(text_data=json.dumps({"action": "message", "params": {"messages": event["messages"]}}))
+            return
+        if "tournamentMatch" in event:
+            await self.send(text_data=json.dumps({"action": "tournamentMatch", "params": {"players": event["tournamentMatch"]}}))
             return

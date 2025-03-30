@@ -1,10 +1,13 @@
 import { updateName } from "./updateName.js";
 import { updateScore } from "./updateScore.js";
 import { updateMessage } from "./updateMessage.js";
+import { getChatSocket } from "./../../../index.js";
+import * as Utils from "./../../../utils.js";
 
 export const handleSocketMessage = (objectManager, socket) => {
-  socket.onmessage = (e) => {
+  socket.onmessage = async (e) => {
     const data = JSON.parse(e.data);
+    console.log(data.action, data.params);
     switch (data.action) {
       case "names":
         objectManager.player1.name = data.params.names[0];
@@ -49,6 +52,31 @@ export const handleSocketMessage = (objectManager, socket) => {
           data.params.messages.second,
           objectManager.scene
         );
+        break;
+      case "tournamentMatch":
+        const chatSocket = getChatSocket();
+        if (chatSocket) {
+          const dataUser = await fetch(
+            "https://localhost/api/users/get/" +
+              localStorage.getItem("username"),
+            {
+              method: "GET",
+            }
+          );
+          const response = await dataUser.json();
+          chatSocket.send(
+            JSON.stringify({
+              type: "private_message",
+              recipient_id: response.id,
+              message:
+                "Your next match will be : " +
+                data.params.players[0].name +
+                " VS " +
+                data.params.players[1].name +
+                " !",
+            })
+          );
+        }
         break;
     }
   };
