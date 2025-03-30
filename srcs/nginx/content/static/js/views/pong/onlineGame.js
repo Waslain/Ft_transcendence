@@ -31,7 +31,7 @@ export const onlineGame = (socket, signal) => {
     ball: createBall(),
     firstMessage: null,
     secondMessage: null,
-    sound: null
+    sound: null,
   };
 
   scene.add(
@@ -64,6 +64,46 @@ export const onlineGame = (socket, signal) => {
   window.addEventListener("keydown", (e) => keys.keyManager(e), {
     signal: signal,
   });
+
+  let interval = null;
+  let key = null;
+
+  document.getElementById("ArrowUp").addEventListener(
+    "mousedown",
+    () => {
+      interval = setInterval(() => {
+        key = "ArrowUp";
+        keys.keyManager({ type: "keydown", key: "ArrowUp" });
+      }, 100);
+    },
+    {
+      signal: signal,
+    }
+  );
+
+  document.getElementById("ArrowDown").addEventListener(
+    "mousedown",
+    () => {
+      interval = setInterval(() => {
+        key = "ArrowDown";
+        keys.keyManager({ type: "keydown", key: "ArrowDown" });
+      }, 100);
+    },
+    {
+      signal: signal,
+    }
+  );
+
+  document.addEventListener(
+    "mouseup",
+    () => {
+      clearInterval(interval);
+      keys.keyManager({ type: "keyup", key: key });
+    },
+    {
+      signal: signal,
+    }
+  );
 
   window.addEventListener(
     "resize",

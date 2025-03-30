@@ -8,11 +8,11 @@ export default class extends Pong {
     this.params = params;
     this.setTitle("Transcendence");
     this.redirection = {
-			needed: true,
-			auth: false,
-			url: '/users/login',
-			urlAfterLogin: '/pong/' + this.params.room_id
-		}
+      needed: true,
+      auth: false,
+      url: "/users/login",
+      urlAfterLogin: "/pong/" + this.params.room_id,
+    };
   }
 
   #pongRoomSocket;

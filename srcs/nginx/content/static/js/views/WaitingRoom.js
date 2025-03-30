@@ -5,18 +5,18 @@ import { text } from "../index.js";
 export default class extends AbstractView {
   constructor(params) {
     super();
-		this.setTitle("Transcendence");
-		this.params = params;
-		this.redirection = {
-			needed: true,
-			auth: false,
-			url: '/users/login',
-			urlAfterLogin: '/pong'
-		}
+    this.setTitle("Transcendence");
+    this.params = params;
+    this.redirection = {
+      needed: true,
+      auth: false,
+      url: "/users/login",
+      urlAfterLogin: "/pong",
+    };
   }
 
   async getStyle() {
-		return `
+    return `
 		.box-wrapper {
 			background-color:rgba(197, 197, 197, 0.1);
             backdrop-filter: blur(5px);
@@ -39,7 +39,7 @@ export default class extends AbstractView {
 			border-radius: 25px;
     }
 		`;
-	}
+  }
 
   async getHtml() {
     return `
@@ -84,10 +84,7 @@ export default class extends AbstractView {
 
   async #webSocketGame() {
     const roomName = "waitingRoom";
-    const url =
-      "wss://" +
-      window.location.hostname +
-      "/ws/pong/waitingRoom/"
+    const url = "wss://" + window.location.hostname + "/ws/pong/waitingRoom/";
 
     this.#waitingRoomSocket = new WebSocket(url);
 
@@ -114,9 +111,7 @@ export default class extends AbstractView {
   async #webSocketTournament() {
     const roomName = "waitingRoom";
     const url =
-      "wss://" +
-      window.location.hostname +
-      "/ws/tournament/waitingRoom/"
+      "wss://" + window.location.hostname + "/ws/tournament/waitingRoom/";
 
     this.#waitingRoomSocket = new WebSocket(url);
 
@@ -154,10 +149,10 @@ export default class extends AbstractView {
       "click",
       async () => {
         playBtnGame.disabled = true;
-        playBtnGame.style.color = '#fff';
+        playBtnGame.style.color = "#fff";
         connectionCountGame.hidden = false;
         playBtnTournament.disabled = true;
-        playBtnTournament.style.color = '#fff';
+        playBtnTournament.style.color = "#fff";
         connectionCountTournament.hidden = true;
         cancelBtn.disabled = false;
 
@@ -171,10 +166,10 @@ export default class extends AbstractView {
       "click",
       async () => {
         playBtnGame.disabled = true;
-        playBtnGame.style.color = '#fff';
+        playBtnGame.style.color = "#fff";
         connectionCountGame.hidden = true;
         playBtnTournament.disabled = true;
-        playBtnTournament.style.color = '#fff';
+        playBtnTournament.style.color = "#fff";
         connectionCountTournament.hidden = false;
         cancelBtn.disabled = false;
 

@@ -269,6 +269,8 @@ let chatSocket = null;
 let onlineUsersIntervalId;
 let blockedUsersIntervalId;
 
+export const getChatSocket = () => {return chatSocket;}
+
 let authAbortController = null;
 document.addEventListener("authenticate", (e) => {
 	if (sidebar.className === 'sidebar') {
