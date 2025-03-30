@@ -23,4 +23,7 @@ ENV PIP_ROOT_USER_ACTION=ignore
 COPY --from=builder /usr/local/lib/python3.12/site-packages/ /usr/local/lib/python3.12/site-packages/
 COPY --from=builder /usr/local/bin /usr/local/bin/
 
-CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "django_app.asgi:application"]
+COPY script/docker-entry.sh /docker-entry.sh
+RUN chmod +x /docker-entry.sh
+
+ENTRYPOINT [ "/docker-entry.sh" ]
