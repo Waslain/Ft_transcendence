@@ -59,6 +59,46 @@ export default class extends AbstractView {
 			width: 100%;
 			height: auto;
 		}
+		.table-wrapper {
+			background-color:rgba(197, 197, 197, 0.1);
+			backdrop-filter: blur(5px);
+			border-radius: 8px;
+		}
+		.table-loading {
+            text-align: center;
+            padding: 20px;
+        }
+        .table-error {
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+        .table-container {
+            overflow-x: auto;
+			max-height: 600px;
+			overflow-y: auto;
+        }
+		.table-fixed-header thead {
+			position: sticky;
+			top: 0;
+			z-index: 1;
+			background-color:rgb(35, 41, 41);
+		}
+		.table-transparent {
+			background-color: transparent !important;
+		}
+		.table-transparent thead th,
+		.table-transparent thead tr,
+		.table-transparent tbody td,
+		.table-transparent tbody tr {
+			background-color: transparent !important;
+			color: white;
+		}
+		@media (max-width: 576px) {
+			.table {
+				font-size: 11px;
+			}
+		}
 		`;}
 
 	async getHtml() {
@@ -110,7 +150,7 @@ export default class extends AbstractView {
 				</div>
 			</div>
 		</section>
-		<hr/>
+		<hr>
 		<section>
 			<div class="row">
 				<div class="col-12 col-md-3 col-sm-3">
@@ -124,6 +164,36 @@ export default class extends AbstractView {
 				</div>
 				<div class="col-12 col-md-3 col-sm-3">
 					<p class="fs-1 fs-sm-2 fs-md-3 fs-lg-5 text-center text-white" id="statGameTime"></p>
+				</div>
+			</div>
+		</section>
+		<hr>
+		<section>
+			<div class="row-fluid d-flex justify-content-center">
+				<div class="col-10">
+					<div class="card widget-card d-flex border-light table-wrapper">
+						<div class="card-header border-light text-center text-white">Match History</div>
+						<div class="card-body">
+							<div id="table-loading" class="table-loading text-white">Loading data...</div>
+							<div id="table-error" class="table-error text-white" style="display: none;"></div>
+							<div id="table-container" class="table-container" style="display: none;">
+								<table class="table border-light table-transparent table-fixed-header">
+									<thead>
+										<tr>
+											<th>ID</th>
+											<th>Player A</th>
+											<th>Player B</th>
+											<th>Score A</th>
+											<th>Score B</th>
+											<th>Game Duration</th>
+											<th>Winner</th>
+										</tr>
+									</thead>
+									<tbody id="table-body"></tbody>
+								</table>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</section>
@@ -210,11 +280,20 @@ export default class extends AbstractView {
 			rate_of_wins = ((number_of_wins / number_of_games) * 100).toFixed(2);
 		}
 
+		function formatGameTime(totalSeconds) {
+			if (isNaN(totalSeconds)) return "0:00";
+			totalSeconds = Number(totalSeconds);
+			const minutes = Math.floor(totalSeconds / 60);
+			const seconds = Math.floor(totalSeconds % 60);
+
+			const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
+			return `${minutes}m${formattedSeconds}s`;
+		}
 		
 		document.getElementById('statWins').innerHTML = `Wins<br/><span style="color: #4169e1;">${number_of_wins}</span>`;
 		document.getElementById('statLosses').innerHTML = `Losses<br/><span style="color: #98afc7;">${number_of_losses}</span>`;
 		document.getElementById('statWinRate').innerHTML = `Win Rate<br/><span style="color: orange;">${rate_of_wins}%</span>`;
-		document.getElementById('statGameTime').innerHTML = `Game Time<br/><span style="color: pink;">${game_time} sec</span>`;
+		document.getElementById('statGameTime').innerHTML = `Game Time<br/><span style="color: pink;">${formatGameTime(game_time)}</span>`;
 		
         const noDataText = document.getElementById('noDataText');
         const noDataTextBar = document.getElementById('noDataTextBar');
@@ -311,19 +390,19 @@ export default class extends AbstractView {
 		} else {
 			document.querySelector("#profileBtns").innerHTML = `
 			<div class="row text-center">
-			<div class="col-12 col-md-3 col-sm-6 text-nowrap">
-				<button type="button" class="btn profile-btn" id="friendBtn"><span id="friendDisplay"></span></button>
+				<div class="col-12 col-md-3 col-sm-6 text-nowrap">
+					<button type="button" class="btn profile-btn" id="friendBtn"><span id="friendDisplay"></span></button>
+				</div>
+				<div class="col-12 col-md-3 col-sm-6 text-nowrap">
+					<button type="button" class="btn profile-btn" id="inviteBtn"><i class="bi bi-joystick" style="padding-right: 5px;"></i>Match Invite</button>
+				</div>
+				<div class="col-12 col-md-3 col-sm-6 text-nowrap">
+				<button type="button" class="btn profile-btn" id="messageBtn"><i class="bi bi-send" style="padding-right: 5px;""></i>Message</button>
+				</div>
+				<div class="col-12 col-md-3 col-sm-6 text-nowrap">
+					<button type="button" class="btn profile-btn" id="blockBtn"><i class="bi bi-ban" style="padding-right: 5px;"></i><span id="blockDisplay"></span></button>
+				</div>
 			</div>
-			<div class="col-12 col-md-3 col-sm-6 text-nowrap">
-				<button type="button" class="btn profile-btn" id="inviteBtn"><i class="bi bi-joystick" style="padding-right: 5px;"></i>Match Invite</button>
-			</div>
-			<div class="col-12 col-md-3 col-sm-6 text-nowrap">
-			<button type="button" class="btn profile-btn" id="messageBtn"><i class="bi bi-send" style="padding-right: 5px;""></i>Message</button>
-			</div>
-			<div class="col-12 col-md-3 col-sm-6 text-nowrap">
-				<button type="button" class="btn profile-btn" id="blockBtn"><i class="bi bi-ban" style="padding-right: 5px;"></i><span id="blockDisplay"></span></button>
-			</div>
-		</div>
 			`
 
 			let formData = new FormData();
@@ -472,6 +551,103 @@ export default class extends AbstractView {
 			playGameBtn.addEventListener('click', () => {
 				navigateTo(`/pong`);
 			});
+		}
+
+		/*Match History Table*/
+		endpoint = "https://localhost/api/matchhistory/list/";
+		const tableData = await fetch(endpoint, {
+			method: 'GET',
+		})
+		.then(response => response.json().then(json => ({
+			data: json, status: response.status})))
+		.then(res => {
+			if (res.status > 400) {
+				this.error("Error " + res.status + ": " + res.data.message);
+				console.log(res.data.message);
+				return null;
+			}
+			else {
+				return res.data;
+			}
+		})
+		.catch(error => {
+			console.error(error);
+			this.error("Error: " + error);
+			return null;
+		})
+
+		if (tableData === null) {
+			return;
+		}
+		displayMatchData(tableData);
+
+		function displayMatchData(data) {
+			document.getElementById('table-loading').style.display = 'none';
+			if (!data || !data.matches || data.matches.length === 0) {
+				showError('No match data available');
+				return;
+			}
+			const tableBody = document.getElementById('table-body');
+			tableBody.innerHTML = '';
+
+			data.matches.forEach(match => {
+				const row = document.createElement('tr');
+				const duration = formatDuration(match.game_time);
+
+				let winner = 'Tie';
+				if (match.score_a > match.score_b) {
+					winner = match.user_a;
+				} else if (match.score_b > match.score_a) {
+					winner = match.user_b;
+				}
+
+				row.innerHTML = `
+					<td>${match.id}</td>
+					<td>${match.user_a}</td>
+					<td>${match.user_b}</td>
+					<td>${match.score_a}</td>
+					<td>${match.score_b}</td>
+					<td>${duration}</td>
+					<td>${winner}</td>
+				`;
+
+				tableBody.appendChild(row);
+			});
+			document.getElementById('table-container').style.display = 'block';
+		}
+
+		function formatDuration(isoDuration) {
+			try{
+				const regex = /P(\d+)DT(\d+)H(\d+)M([\d.]+)S/;
+				const match = isoDuration.match(regex);
+
+				if (!match) {
+					return isoDuration;
+				}
+
+				const days = parseInt(match[1]);
+				const hours = parseInt(match[2]);
+				const minutes = parseInt(match[3]);
+				const seconds = parseFloat(match[4]).toFixed(1);
+
+				let readableDuration = '';
+				if (days > 0) readableDuration += `${days}d `;
+				if (hours > 0) readableDuration += `${hours}h `;
+				if (minutes > 0) readableDuration += `${minutes}m `;
+				if (seconds > 0) readableDuration += `${seconds}s`;
+
+				return readableDuration.trim() || '0s';
+			} catch (e) {
+				console.error('Error parsing duration:', e);
+				return isoDuration;
+			}
+		}
+
+		function showError(message) {
+			const errorElement = document.getElementById('table-error');
+			errorElement.textContent = message;
+			errorElement.style.display = 'block';
+			document.getElementById('table-container').style.display = 'none';
 		}
 	}
 

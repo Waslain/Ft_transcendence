@@ -28,9 +28,9 @@ export default class extends AbstractView {
             <div class="card-body p-4 p-lg-5 d-flex justify-content-center align-items-center">
               <div class="welcome-text"></div>
             </div>
-          <div class="card-footer border-light text-center">
-                <div id="enterLink"></div>
-          </div>
+            <div class="card-footer border-light text-center">
+              <div id="enterLink"></div>
+            </div>
           </div>
         </div>
       </div>
