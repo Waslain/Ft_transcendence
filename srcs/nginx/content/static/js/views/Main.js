@@ -1,4 +1,5 @@
 import AbstractView from "./AbstractView.js";
+import { text } from "../index.js";
 
 export default class extends AbstractView {
   constructor() {
@@ -40,7 +41,10 @@ export default class extends AbstractView {
 
   async getJavaScript() {
     function scrambleText(){
-      const phrases = ['Hello!', 'Welcome to', 'Transendence', 'Have fun C:'];
+	  let phrases = [];
+	  for (var i in text.main.phrases) {
+		  phrases.push(text.main.phrases[i]);
+	  }
       const specialChars = '!@#$%^&*()+_[]{}~<>?|/__\\';
       const el = document.querySelector('.welcome-text');
   
@@ -89,12 +93,12 @@ export default class extends AbstractView {
     .then(data => {
       if (data.IsAuthenticated) {
         document.querySelector('#enterLink').innerHTML = `
-          <a href="/pong" class="nav__link text-white" style="font-size: 20px;" data-link>Let's Start!</a>
+          <a href="/pong" class="nav__link text-white" style="font-size: 20px;" data-link>`+text.main.start+`</a>
         `
       }
       else {
         document.querySelector('#enterLink').innerHTML = `
-          <a href="/users/login" class="nav__link text-white" style="font-size: 20px;" data-link>Login</a>
+          <a href="/users/login" class="nav__link text-white" style="font-size: 20px;" data-link>`+text.login.login+`</a>
         `
       }
     })

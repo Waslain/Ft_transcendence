@@ -1,6 +1,7 @@
 import AbstractView from "./AbstractView.js";
 import * as Utils from "../utils.js";
 import { navigateTo } from "../index.js";
+import { text } from "../index.js";
 
 export default class extends AbstractView {
 	constructor(params) {
@@ -66,14 +67,14 @@ export default class extends AbstractView {
         </div>
         <br>
         <div class="row-fluid d-flex justify-content-center align-items-center">
-            <input type="text" class="search-btn form-control" placeholder="Enter full name to user profile" id="searchBar">
+            <input type="text" class="search-btn form-control" placeholder="`+text.friends.searchbar+`" id="searchBar">
         </div>
         <hr/>
         <section>
             <div class="row justify-content-center chart-container">
                 <div class="col-12 col-sm-10 col-md-6 col-lg-5 col-xl-5 col-xxl-5 mb-4">
                     <div class="card widget-card border-light shadow-sm box-wrapper">
-                        <div class="card-header text-center border-light fw-medium align-items-cente fs-5">Friends List</div>
+                        <div class="card-header text-center border-light fw-medium align-items-cente fs-5">`+text.friends.friendList+`</div>
                         <div class="card-body overflow-auto" id="friend-list-container">
                             <ul id="friendList"></ul>
                         </div>
@@ -82,7 +83,7 @@ export default class extends AbstractView {
                 </div>
                 <div class="col-12 col-sm-10 col-md-6 col-lg-5 col-xl-5 col-xxl-5 mb-4">
                     <div class="card widget-card border-light shadow-sm box-wrapper">
-                        <div class="card-header border-light text-center fw-medium align-items-cente fs-5">Block List</div>
+                        <div class="card-header border-light text-center fw-medium align-items-cente fs-5">`+text.friends.blockList+`</div>
                         <div class="card-body overflow-auto" id="block-list-container">
                             <ul id="blockList"></ul>
                         </div>
@@ -148,7 +149,7 @@ export default class extends AbstractView {
 				flistContainer.style.height = '70px';
 				const NoFriendsMsg = document.createElement('li');
 				NoFriendsMsg.classList.add('list-group-item', 'text-center', 'text-secondary');
-				NoFriendsMsg.textContent = 'No friends yet';
+				NoFriendsMsg.textContent = text.friends.noFriends;
 				document.getElementById('friendList').appendChild(NoFriendsMsg);
 			} else {
 				data.friends.forEach(friend => {
@@ -184,7 +185,7 @@ export default class extends AbstractView {
 
 					const actionBtn = document.createElement('button');
 					actionBtn.classList.add('btn', 'btn-danger', 'btn-sm', 'ms-auto');
-					actionBtn.textContent = 'Unfriend';
+					actionBtn.textContent = text.friends.unfriend;
 					actionBtn.onclick = () => unfriendUser(friend.username);
 
 					listItem.appendChild(status);
@@ -230,7 +231,7 @@ export default class extends AbstractView {
 				blistContainer.style.height = '70px';
 				const NoBlockedMsg = document.createElement('li');
 				NoBlockedMsg.classList.add('list-group-item', 'text-center', 'text-secondary');
-				NoBlockedMsg.textContent = 'No blocked users';
+				NoBlockedMsg.textContent = text.friends.noBlock;
 				document.getElementById('blockList').appendChild(NoBlockedMsg);
 			} else {
 				data.blocked.forEach(block => {
@@ -258,7 +259,7 @@ export default class extends AbstractView {
 
 					const actionBtn = document.createElement('button');
 					actionBtn.classList.add('btn', 'btn-primary', 'btn-sm', 'ms-auto');
-					actionBtn.textContent = 'Unblock';
+					actionBtn.textContent = text.friends.unblock;
 					actionBtn.onclick = () => unblockUser(block.username);
 
 					listItem.appendChild(img);

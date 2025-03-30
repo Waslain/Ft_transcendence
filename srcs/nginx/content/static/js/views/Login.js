@@ -1,6 +1,7 @@
 import AbstractView from "./AbstractView.js";
 import { navigateTo } from "../index.js";
-import { loginUser } from "../index.js";
+import { refreshPage } from "../index.js";
+import { text } from "../index.js";
 
 export default class extends AbstractView {
 	constructor() {
@@ -42,27 +43,27 @@ export default class extends AbstractView {
                   <form id="loginForm">
   
                     <div class="d-flex align-items-center mb-3 pb-1">
-                      <span class="h1 fw-bold mb-0">Log in</span>
+                      <span class="h1 fw-bold mb-0">`+text.login.login+`</span>
                     </div>
   
-                    <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Sign into your account</h5>
+                    <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">`+text.login.description+`</h5>
   
                     <div data-mdb-input-init class="form-outline mb-4">
-                      <input type="text" id="username" name="username" class="form-control form-control-lg" placeholder="Username" maxlength="20">
+                      <input type="text" id="username" name="username" class="form-control form-control-lg" placeholder="`+text.login.username+`" maxlength="20">
 					  <div id="usernameCheck" style="color:#dd0000"></div>
                     </div>
   
                     <div data-mdb-input-init class="form-outline mb-4">
-                      <input type="password" id="password" name="password" class="form-control form-control-lg" placeholder="Password" maxlength="20">
+                      <input type="password" id="password" name="password" class="form-control form-control-lg" placeholder="`+text.login.password+`" maxlength="20">
 					  <div id="passwordCheck" style="color:#dd0000"></div>
                     </div>
   
                     <div class="pt-1 mb-4">
-                      <button data-mdb-button-init data-mdb-ripple-init class="btn btn-sumbit btn-lg btn-block" type="submit">Log in</button>
+                      <button data-mdb-button-init data-mdb-ripple-init class="btn btn-sumbit btn-lg btn-block" type="submit">`+text.login.login+`</button>
 					<div id="response" style="color:#dd0000"></div>
                     </div>
-                    <p class="mb-5 pb-lg-2" style="color: #fff;">Don't have an account?
-					<a href="/users/register" class="nav-link" style="color:rgb(92, 160, 255)" data-link>register here!</a>
+                    <p class="mb-5 pb-lg-2" style="color: #fff;">`+text.login.noAccount+`
+					<a href="/users/register" class="nav-link" style="color:rgb(92, 160, 255)" data-link>`+text.login.registerHere+`</a>
                   </form>
 
                 </div>
@@ -92,7 +93,7 @@ export default class extends AbstractView {
 
 			if (username === "") {
 				inputCheck = true;
-				document.getElementById('usernameCheck').innerText = "Please enter a username";
+				document.getElementById('usernameCheck').innerText = text.login.usernameCheck;
 			}
 			else {
 				document.getElementById('usernameCheck').innerText = "";
@@ -100,7 +101,7 @@ export default class extends AbstractView {
 
 			if (password === "") {
 				inputCheck = true;
-				document.getElementById('passwordCheck').innerText = "Please enter a password";
+				document.getElementById('passwordCheck').innerText = text.login.passwordCheck;
 			}
 			else {
 				document.getElementById('passwordCheck').innerText = "";
@@ -130,8 +131,9 @@ export default class extends AbstractView {
 					else {
 						localStorage.setItem("avatar", "/static/img/default.png");
 					}
+					localStorage.setItem("language", res.data.language);
 					console.log(res.data.message);
-					document.dispatchEvent(loginUser);
+					refreshPage();
 					if (nextUrl === "") {
 						nextUrl = "/users/profile"
 					}

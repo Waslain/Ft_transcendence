@@ -1,5 +1,6 @@
 import AbstractView from "./AbstractView.js";
 import { navigateTo } from "../index.js";
+import { text } from "../index.js";
 
 export default class extends AbstractView {
   constructor(params) {
@@ -44,19 +45,19 @@ export default class extends AbstractView {
     return `
     <div class="container py-5 h-100">
       <div class="row-fluid d-flex justify-content-center align-items-center">
-        <h1 class="text-white m-3">Pong Waiting Room</h1>
+        <h1 class="text-white m-3">`+text.waitingRoom.title+`</h1>
       </div>
       <div class="row-fluid d-flex justify-content-center align-items-center">
-        <button id="cancelBtn" class="btn-cancel" disabled>Cancel</button>
+        <button id="cancelBtn" class="btn-cancel" disabled>`+text.waitingRoom.cancel+`</button>
       </div>
       <br>
       <section>
         <div class="row justify-content-center">
           <div class="col-12 col-sm-10 col-md-6 col-lg-5 col-xl-5 col-xxl-5 mb-4">
             <div class="card widget-card border-light shadow-sm box-wrapper">
-              <div class="card-header text-center text-white border-light fw-medium align-items-cente fs-5">Waiting Room for Game ...</div>
+              <div class="card-header text-center text-white border-light fw-medium align-items-cente fs-5">`+text.waitingRoom.text1+`</div>
               <div class="card-body d-flex justify-content-center align-items-center">
-                  <button id="playBtnGame" class="btn btn-play m-3">Play</button>
+                  <button id="playBtnGame" class="btn btn-play m-3">`+text.waitingRoom.play+`</button>
                   <div id="connectionCountGame" class="text-white" hidden>Current connections: 0</div>
               </div>
               <div class="card-footer border-light"></div>
@@ -64,9 +65,9 @@ export default class extends AbstractView {
           </div>
           <div class="col-12 col-sm-10 col-md-6 col-lg-5 col-xl-5 col-xxl-5 mb-4">
             <div class="card widget-card border-light shadow-sm box-wrapper">
-              <div class="card-header text-center text-white border-light fw-medium align-items-cente fs-5">Waiting Room for Tournament ...</div>
+              <div class="card-header text-center text-white border-light fw-medium align-items-cente fs-5">`+text.waitingRoom.text2+`</div>
               <div class="card-body d-flex justify-content-center align-items-center">
-                <button id="playBtnTournament" class="btn btn-play m-3">Play</button>
+                <button id="playBtnTournament" class="btn btn-play m-3">`+text.waitingRoom.play+`</button>
                 <div id="connectionCountTournament" class="text-white" hidden>Current connections: 0</div>
               </div>
               <div class="card-footer border-light"></div>
@@ -74,7 +75,7 @@ export default class extends AbstractView {
           </div>
         </div>
       </section>
-			<a href="/" class="nav__link d-flex justify-content-center align-items-center" data-link>Go back to main page</a>
+			<a href="/" class="nav__link d-flex justify-content-center align-items-center" data-link>`+text.waitingRoom.back+`</a>
 		`;
   }
 
@@ -102,7 +103,7 @@ export default class extends AbstractView {
       const data = JSON.parse(e.data);
       if (data.count !== undefined) {
         document.getElementById("connectionCountGame").textContent =
-          "Current connections: " + data.count;
+          text.waitingRoom.connections + data.count;
       }
       if (data.uuid !== undefined) {
         navigateTo("/pong/" + data.uuid);

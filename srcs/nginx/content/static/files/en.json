@@ -1,0 +1,72 @@
+{
+	"sidebar":{
+		"signout":"Sign out"
+	},
+	"login":{
+		"login":"Log in",
+		"username":"Username",
+		"password":"Password",
+		"description":"Sign in to your account",
+		"noAccount":"Don't have an account?",
+		"registerHere":"register here!",
+		"usernameCheck":"Please enter a username",
+		"passwordCheck":"Please enter a password",
+		"invalidCredentials":"Invalid username or password"
+	},
+	"register":{
+		"register":"Register",
+		"description":"Create a new account",
+		"confirmPassword":"Confirm password",
+		"usernameValidation":"Username can only contain alphanumeric characters and special characters - _ @ + .",
+		"confirmPasswordCheck":"Those passwords didn't match",
+		"avatar":"Choose an avatar (optional):",
+		"remove":"Remove",
+		"userExists":"A user with that username already exists"
+	},
+	"settings":{
+		"settings":"Settings",
+		"update":"Update",
+		"updateAvatar":"Update avatar:",
+		"updateLanguage":"Change language:",
+		"english":"English",
+		"french":"French",
+		"response":"User updated",
+		"error":"An error occurred"
+	},
+	"friends":{
+		"friends":"Friends",
+		"searchbar":"Search user",
+		"friendList":"Friend List",
+		"blockList":"Block List",
+		"noFriends":"No friends yet",
+		"noBlock":"No block yet",
+		"unfriend":"Unfriend",
+		"unblock":"Unblock"
+	},
+	"main":{
+		"phrases":{ 
+			"1":"Hello!",
+			"2":"Welcome to",
+			"3":"Transcendence",
+			"4":"Have fun C:"
+		},
+		"start":"Let's Start!"
+	},
+	"waitingRoom":{
+		"title":"Pong Waiting Room",
+		"cancel":"Cancel",
+		"play":"Play",
+		"text1":"Wating Room for Game ...",
+		"text2":"Wating Room for Tournament ...",
+		"back":"Go back to main page",
+		"connections":"Current connections: "
+	},
+	"pong":{
+		"start":"Game Starts in: ",
+		"winner":"The Winner is",
+		"disconnect":"has been Disconnected"
+	},
+	"chat":{
+		"chat":"Chat"
+	}
+}

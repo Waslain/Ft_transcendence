@@ -11,6 +11,8 @@ import Friends from "./views/Friends.js";
 import * as Utils from "./utils.js";
 
 
+export let text;
+
 export const navigateTo = (url) => {
   if (url !== location.pathname) {
   	history.pushState(null, null, url);
@@ -123,19 +125,66 @@ const router = async () => {
 
 window.addEventListener("popstate", router);
 
-// document.addEventListener("DOMContentLoaded", () => {
-//   document.body.addEventListener("click", (e) => {
-//     const link = e.target.closest("a[data-link]");
-//     if (link) {
-//       e.preventDefault();
-//       navigateTo(link.getAttribute("href"));
-//     }
-//   });
 
-//   router();
-// });
+const updateLanguage = async () => {
+	const url = "https://localhost/files/" + localStorage.getItem("language") + ".json";
+	text = await fetch(url)
+	.then(response => response.json())
+	.catch(error => console.error(error))
+}
 
-document.addEventListener("DOMContentLoaded", function() {
+const updateChatSelector = (instance) => {
+	const selectedValue = instance.value;
+	const chatMessages = document.getElementById('chatMessages');
+	
+	if (chatMessages) {
+		chatMessages.dataset.context = selectedValue;
+		
+		// Update the header title
+		const chatHeaderTitle = document.getElementById('chatHeaderTitle');
+		if (chatHeaderTitle) {
+			if (selectedValue === 'general') {
+				chatHeaderTitle.textContent = 'General Chat';
+			} else {
+				const selectedOption = instance.options[instance.selectedIndex];
+				chatHeaderTitle.textContent = `Chat with ${selectedOption.text}`;
+			}
+		}
+	}
+}
+
+export const refreshPage = async () => {
+	/*Check if the user is authenticated*/
+	var url = "https://localhost/api/users/check-auth/"
+	const data = await fetch(url, {
+	  method: 'GET',
+	})
+	.then(response => response.json())
+	.catch(error => {
+	  console.error(error);
+	})
+
+	localStorage.setItem("language", data.language);
+	await updateLanguage();
+
+    const chatUserSelect = document.getElementById('chatUserSelect');
+    if (chatUserSelect) {
+        chatUserSelect.removeEventListener('change', updateChatSelector(chatUserSelect));
+        chatUserSelect.addEventListener('change', updateChatSelector(chatUserSelect));
+    }
+
+	if (data.IsAuthenticated) {
+		document.dispatchEvent(loginUser);
+	}
+	else {
+		document.dispatchEvent(logoutUser);
+	}
+
+	router();
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+
 	document.body.addEventListener("click", (e) => {
 		const link = e.target.closest("a[data-link]");
 		if (link) {
@@ -143,29 +192,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		  navigateTo(link.getAttribute("href"));
 		}
 	  });
-    const chatUserSelect = document.getElementById('chatUserSelect');
-    if (chatUserSelect) {
-        chatUserSelect.addEventListener('change', function() {
-            const selectedValue = this.value;
-            const chatMessages = document.getElementById('chatMessages');
-            
-            if (chatMessages) {
-                chatMessages.dataset.context = selectedValue;
-                
-                // Update the header title
-                const chatHeaderTitle = document.getElementById('chatHeaderTitle');
-                if (chatHeaderTitle) {
-                    if (selectedValue === 'general') {
-                        chatHeaderTitle.textContent = 'General Chat';
-                    } else {
-                        const selectedOption = this.options[this.selectedIndex];
-                        chatHeaderTitle.textContent = `Chat with ${selectedOption.text}`;
-                    }
-                }
-            }
-        });
-    }
-	router();
+	await refreshPage();
 });
 
 const getParams = (match) => {
@@ -255,16 +282,16 @@ document.addEventListener("authenticate", (e) => {
 		/* Update sidebar*/
   		document.querySelector("#sidebarItems").innerHTML = `
 		<a href="#" class="nav-item d-flex align-items-center" id="chatBox">
-				<i class="fs-2 bi-chat-left-heart"></i><div id="msg-hint" class="msg-hint"><i class=" bi bi-circle-fill red-dot"></i></div><span>Chat</span>
+				<i class="fs-2 bi-chat-left-heart"></i><div id="msg-hint" class="msg-hint"><i class=" bi bi-circle-fill red-dot"></i></div><span>`+text.chat.chat+`</span>
 		</a>
 		<a href="/settings" class="nav-item d-flex align-items-center" data-link>
-			<i class="fs-2 bi-gear"></i><span>Settings</span>
+			<i class="fs-2 bi-gear"></i><span>`+text.settings.settings+`</span>
 		</a>
 		<a href="/friends" class="nav-item d-flex align-items-center" data-link>
-			<i class="fs-2 bi-people"></i><span>Friends</span>
+			<i class="fs-2 bi-people"></i><span>`+text.friends.friends+`</span>
 		</a>
 		<a href="" class="nav-item d-flex align-items-center" id="signOut">
-			<i class="fs-2 bi-door-open"></i><span>Sign out</span>
+			<i class="fs-2 bi-door-open"></i><span>`+text.sidebar.signout+`</span>
 		</a>
 		<hr>
 		<a href="/users/profile" class="nav-item d-flex align-items-center" data-link>
@@ -825,7 +852,7 @@ document.addEventListener("authenticate", (e) => {
 	else {
   		document.querySelector("#sidebarItems").innerHTML = `
 		<a href="/users/login" class="nav-item d-flex align-items-center" data-link>
-				<i class="fs-2 bi-door-open"></i><span>Log in</span>
+				<i class="fs-2 bi-door-open"></i><span>`+text.login.login+`</span>
 		</a>
 		`
 		if (chatSocket) {
@@ -842,21 +869,3 @@ document.addEventListener("authenticate", (e) => {
 		clearInterval(blockedUsersIntervalId);
 	}
 });
-
-/*Check if the user is authenticated when loading the page*/
-var url = "https://localhost/api/users/check-auth/"
-await fetch(url, {
-  method: 'GET',
-})
-.then(response => response.json())
-.then(data => {
-	if (data.IsAuthenticated) {
-		document.dispatchEvent(loginUser);
-	}
-	else {
-		document.dispatchEvent(logoutUser);
-	}
-})
-.catch(error => {
-  console.error(error);
-})

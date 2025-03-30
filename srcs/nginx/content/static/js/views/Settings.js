@@ -1,5 +1,6 @@
 import AbstractView from "./AbstractView.js";
-import { updateAvatar } from "../index.js";
+import { refreshPage } from "../index.js";
+import { text } from "../index.js";
 
 export default class extends AbstractView {
 	constructor() {
@@ -43,18 +44,26 @@ export default class extends AbstractView {
                       <span class="h1 fw-bold mb-0">Settings</span>
                     </div>
   
-                    <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Update avatar:</h5>
   
                     <div data-mdb-input-init class="form-outline mb-4">
+				      <label for="avatar">`+text.settings.updateAvatar+`</label>
                       <input type="file" id="avatar" name="avatar" class="form-control form-control-lg" accept="image/*">
         			  <div class="row-fluid d-flex align-items-center" style="padding-top:15px; margin-left:20px display: none" id="preview">
 					    <img id="avatarPreview" src="#" width="100" height="100" class="rounded-circle" style="display:none">
-                      <button data-mdb-button-init data-mdb-ripple-init class="btn btn-dark btn-lg btn-block" type="button" id="removeBtn" style="display:none;margin-left:30px">remove</button>
+                      <button data-mdb-button-init data-mdb-ripple-init class="btn btn-dark btn-lg btn-block" type="button" id="removeBtn" style="display:none;margin-left:30px">`+text.register.remove+`</button>
 				      </div>
                     </div>
   
+                    <div data-mdb-input-init class="form-outline mb-4">
+				      <label for="language">`+text.settings.updateLanguage+`</label>
+				      <select id="language" name="language" class="form-control form-control-lg">
+				        <option value="en">`+text.settings.english+`</option>
+				        <option value="fr">`+text.settings.french+`</option>
+				      </select>
+                    </div>
+  
                     <div class="pt-1 mb-4">
-                      <button data-mdb-button-init data-mdb-ripple-init class="btn btn-sumbit btn-lg btn-block" type="submit" id="updateBtn">Update</button>
+                      <button data-mdb-button-init data-mdb-ripple-init class="btn btn-sumbit btn-lg btn-block" type="submit" id="updateBtn">`+text.settings.update+`</button>
                     </div>
                   </form>
 
@@ -76,11 +85,14 @@ export default class extends AbstractView {
 		this.#abortController = new AbortController();
 		const updateBtn = document.getElementById('updateBtn');
 		const avatar = document.getElementById('avatar');
+		const language = document.getElementById('language');
 		const updateForm = document.getElementById('updateForm');
 		const preview = document.getElementById('preview');
 		const avatarPreview = document.getElementById('avatarPreview');
 		const removeBtn = document.getElementById('removeBtn');
 		const result = document.getElementById('result');
+
+		language.value = localStorage.getItem("language");
 
 		const showPreview = () => {
 			avatarPreview.style.display = 'block';
@@ -137,19 +149,22 @@ export default class extends AbstractView {
 			.then(res => {
 				if (res.status == 200) {
 					console.log(res.data.message);
+					result.innerText = text.settings.response;
 					if (res.data.avatar) {
 						localStorage.setItem("avatar", "https://localhost" + res.data.avatar);
 					}
 					else {
 						localStorage.setItem("avatar", "/static/img/default.png");
 					}
+					localStorage.setItem("language", res.data.language);
 					hidePreview();
 					updateForm.reset();
-					updateAvatar();
+					language.value = localStorage.getItem("language");
+					refreshPage();
 				}
 				else {
 					result.style.color = '#dd0000';
-					result.innerText = "An error occurred"
+					result.innerText = text.settings.error;
 				}
 				updateBtn.disabled = false;
 			})

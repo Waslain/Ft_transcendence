@@ -236,7 +236,7 @@ class GamePlayerConsumer(AsyncWebsocketConsumer):
         player.score += 1
         await self.groupSend(gameManager.gameName, "scores", [player.score for player in GamePlayerConsumer.games[self.uuid].players])
         if player.score >= 10:
-            await self.groupSend(gameManager.gameName, "messages", {"first": "Winner is", "second": player.name})
+            await self.groupSend(gameManager.gameName, "messages", {"first": "Winner is", "second": player.name, "type":"winner"})
             return "win"
         ball.setDirection(ball.dx * -1, ball.dz)
         ball.setPos(0, ball.z)
@@ -247,24 +247,24 @@ class GamePlayerConsumer(AsyncWebsocketConsumer):
             players[0].score = 0
             players[1].score = 10
             await self.groupSend(gameManager.gameName, "scores", [player.score for player in players])
-            await self.groupSend(gameManager.gameName, "messages", {"first": players[0].name + " is Disconnected", "second": "Winner is " + players[1].name})
+            await self.groupSend(gameManager.gameName, "messages", {"first": players[0].name, "second": players[1].name, "type":"disconnect"})
             return True
         elif not players[1].connected:
             players[0].score = 10
             players[1].score = 0
             await self.groupSend(gameManager.gameName, "scores", [player.score for player in players])
-            await self.groupSend(gameManager.gameName, "messages", {"first": players[1].name + " is Disconnected", "second": "Winner is " + players[0].name})
+            await self.groupSend(gameManager.gameName, "messages", {"first": players[1].name, "second": players[0].name, "type":"disconnect"})
             return True
         return False
 
     async def sendLoopGame(self, gameManager):
         await self.groupSend(gameManager.gameName, "names", [player.name for player in gameManager.players])
         await self.groupSend(gameManager.gameName, "scores", [player.score for player in gameManager.players])
-        await self.groupSend(gameManager.gameName, "messages", {"first": "Game Started in :", "second": "3"})
+        await self.groupSend(gameManager.gameName, "messages", {"first": "Game Starts in :", "second": "3", "type": "timer"})
         await asyncio.sleep(1)
-        await self.groupSend(gameManager.gameName, "messages", {"first": "Game Started in :", "second": "2"})
+        await self.groupSend(gameManager.gameName, "messages", {"first": "Game Starts in :", "second": "2", "type": "timer"})
         await asyncio.sleep(1)
-        await self.groupSend(gameManager.gameName, "messages", {"first": "Game Started in :", "second": "1"})
+        await self.groupSend(gameManager.gameName, "messages", {"first": "Game Starts in :", "second": "1", "type": "timer"})
         await asyncio.sleep(1)
         await self.groupSend(gameManager.gameName, "messages", {"first": "", "second": ""})
         gameManager.time = datetime.now()
@@ -419,7 +419,7 @@ class TournamentPlayerConsumer(AsyncWebsocketConsumer):
         player.score += 1
         await self.groupSend(gameManager.gameName, "scores", [player.score for player in gameManager.players])
         if player.score >= 10:
-            await self.groupSend(gameManager.gameName, "messages", {"first": "Winner is", "second": player.name})
+            await self.groupSend(gameManager.gameName, "messages", {"first": "Winner is", "second": player.name, "type":"winner"})
             gameManager.winner = player
             return "win"
         ball.setDirection(ball.dx * -1, ball.dz)
@@ -431,14 +431,14 @@ class TournamentPlayerConsumer(AsyncWebsocketConsumer):
             players[0].score = 0
             players[1].score = 10
             await self.groupSend(gameManager.gameName, "scores", [player.score for player in players])
-            await self.groupSend(gameManager.gameName, "messages", {"first": players[0].name + " is Disconnected", "second": "Winner is " + players[1].name})
+            await self.groupSend(gameManager.gameName, "messages", {"first": players[0].name, "second":players[1].name, "type":"disconnect"})
             gameManager.winner = players[1]
             return True
         elif not players[1].connected:
             players[0].score = 10
             players[1].score = 0
             await self.groupSend(gameManager.gameName, "scores", [player.score for player in players])
-            await self.groupSend(gameManager.gameName, "messages", {"first": players[1].name + " is Disconnected", "second": "Winner is " + players[0].name})
+            await self.groupSend(gameManager.gameName, "messages", {"first": players[1].name, "second": players[0].name, "type":"disconnect"})
             gameManager.winner = players[0]
             return True
         return False
@@ -455,11 +455,11 @@ class TournamentPlayerConsumer(AsyncWebsocketConsumer):
     async def sendLoopGame(self, gameManager, finalGame):
         await self.groupSend(gameManager.gameName, "names", [player.name for player in gameManager.players])
         await self.groupSend(gameManager.gameName, "scores", [player.score for player in gameManager.players])
-        await self.groupSend(gameManager.gameName, "messages", {"first": "Game Started in :", "second": "3"})
+        await self.groupSend(gameManager.gameName, "messages", {"first": "Game Started in :", "second": "3", "type":"timer"})
         await asyncio.sleep(1)
-        await self.groupSend(gameManager.gameName, "messages", {"first": "Game Started in :", "second": "2"})
+        await self.groupSend(gameManager.gameName, "messages", {"first": "Game Started in :", "second": "2", "type":"timer"})
         await asyncio.sleep(1)
-        await self.groupSend(gameManager.gameName, "messages", {"first": "Game Started in :", "second": "1"})
+        await self.groupSend(gameManager.gameName, "messages", {"first": "Game Started in :", "second": "1", "type":"timer"})
         await asyncio.sleep(1)
         await self.groupSend(gameManager.gameName, "messages", {"first": "", "second": ""})
         playground = gameManager.playground

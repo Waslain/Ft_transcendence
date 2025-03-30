@@ -3,7 +3,7 @@ from users import views
 
 urlpatterns = [
 	path('get/<str:username>/', views.GetUserView.as_view()),
-	path('updateUser/', views.UpdateAvatarView.as_view()),
+	path('updateUser/', views.UpdateUserView.as_view()),
 	path('register/', views.RegisterView.as_view()),
 	path('login/', views.LoginView.as_view()),
 	path('logout/', views.LogoutView.as_view()),

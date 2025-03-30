@@ -1,0 +1,13 @@
+{
+	"login":{
+		"login":"Connectez-vous",
+		"username":"Nom d'utilisateur",
+		"password":"Mot de passe",
+		"description":"Connectez vous a votre compte",
+		"noAccount":"Vous n'avez pas de compte ?",
+		"registerHere":"Creez un compte !",
+		"usernameCheck":"Veuillez entrer un nom d'utilisateur",
+		"passwordCheck":"Veuillez entrer un mot de passe",
+		"invalidCredentials":"Le nom d'utilisateur ou le mot de passe est invalide"
+	}
+}
