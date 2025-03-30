@@ -26,19 +26,15 @@ export const createPlayground = () => {
     ground: { object: new THREE.Mesh(planeGeometry, planeMaterial) },
     northWall: {
       object: new THREE.Mesh(bigCapsuleGeometry, capsuleMaterial),
-      hitbox: new THREE.Box3(),
     },
     southWall: {
       object: new THREE.Mesh(bigCapsuleGeometry, capsuleMaterial),
-      hitbox: new THREE.Box3(),
     },
     westWall: {
       object: new THREE.Mesh(littleCapsuleGeometry, capsuleMaterial),
-      hitbox: new THREE.Box3(),
     },
     eastWall: {
       object: new THREE.Mesh(littleCapsuleGeometry, capsuleMaterial),
-      hitbox: new THREE.Box3(),
     },
   };
 
@@ -53,16 +49,6 @@ export const createPlayground = () => {
   playground.southWall.object.position.set(0, 0.1, 10);
   playground.westWall.object.position.set(-15, 0.1, 0);
   playground.eastWall.object.position.set(15, 0.1, 0);
-
-  for (const object of Object.values(playground)) {
-    if ("hitbox" in object) {
-      object.hitbox.setFromObject(object.object);
-      object.hitbox.min.z -= 0.1;
-      object.hitbox.max.z += 0.1;
-      object.hitbox.min.x -= 0.1;
-      object.hitbox.max.x += 0.1;
-    }
-  }
 
   return playground;
 };

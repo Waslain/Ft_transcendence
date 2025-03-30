@@ -20,7 +20,6 @@ class GameWaitingRoomConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_group_name = "game_waiting_room"
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
-        self.name = self.scope["query_string"].decode("utf-8").split("=")[1]
 
         GameWaitingRoomConsumer.players.append(self)
         GameWaitingRoomConsumer.playersNb += 1
@@ -63,7 +62,6 @@ class TournamentWaitingRoomConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_group_name = "tournament_waiting_room"
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
-        self.name = self.scope["query_string"].decode("utf-8").split("=")[1]
 
         TournamentWaitingRoomConsumer.players.append(self)
         TournamentWaitingRoomConsumer.playersNb += 1
@@ -173,22 +171,17 @@ class TournamentManager:
         self.players : List[Player] = []
 
 @database_sync_to_async
-def save_match_history(usera_id, userb_id, usera_score, userb_score, game_time):
+def sendMatchResult(iduserA, idUserB, scoreUserA, scoreUserB, gameTime):
     try:
-        # Get User objects
-        user_a = User.objects.get(id=usera_id)
-        user_b = User.objects.get(id=userb_id)
-        
-        # Create match history record
+        user_a = User.objects.get(id=iduserA)
+        user_b = User.objects.get(id=idUserB)
         match = MatchHistory.objects.create(
-            user_a=user_a,
-            user_b=user_b,
-            score_a=usera_score,
-            score_b=userb_score,
-            game_time=game_time,
+            user_a = user_a,
+            user_b = user_b,
+            score_a = scoreUserA,
+            score_b = scoreUserB,
+            game_time = gameTime,
         )
-        
-        # Return the created match
         return {
             'status': 'success',
             'match_id': match.id,
@@ -196,15 +189,14 @@ def save_match_history(usera_id, userb_id, usera_score, userb_score, game_time):
             'user_b': match.user_b.username,
             'score_a': match.score_a,
             'score_b': match.score_b,
-            'game_time': game_time,
+            'game_time': gameTime,
         }
     except User.DoesNotExist:
-        print(f"Error saving match history: User with ID {usera_id} or {userb_id} not found")
+        print(f"Error saving match history: User with ID {iduserA} or {idUserB} not found")
         return None
     except Exception as e:
         print(f"Error saving match history: {str(e)}")
         return None
-
 
 class GamePlayerConsumer(AsyncWebsocketConsumer):
     games : Dict[str, GameManager] = {}
@@ -212,19 +204,19 @@ class GamePlayerConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         queryString = parse.parse_qs(self.scope["query_string"].decode())
         self.uuid = queryString["uuid"][0]
-        self.name = queryString["name"][0]
+        self.name = self.scope['user'].username
         self.idUser = self.scope['user'].id
         self.room_group_name = f"pong_room_{self.uuid}"
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
         if not self.uuid in GamePlayerConsumer.games:
-            GamePlayerConsumer.games[self.uuid] = GameManager(None)
+            GamePlayerConsumer.games[self.uuid] = GameManager(self.room_group_name)
         GamePlayerConsumer.games[self.uuid].players.append(Player(self.name, self.idUser, self.channel_name))
         await self.accept()
 
         if len(GamePlayerConsumer.games[self.uuid].players) == 2:
             if GamePlayerConsumer.games[self.uuid].loop is None:
-                GamePlayerConsumer.games[self.uuid].loop = asyncio.create_task(self.sendLoopGame())
+                GamePlayerConsumer.games[self.uuid].loop = asyncio.create_task(self.sendLoopGame(GamePlayerConsumer.games[self.uuid]))
 
     def isEveryoneOffline(self, players):
         for player in players:
@@ -255,41 +247,54 @@ class GamePlayerConsumer(AsyncWebsocketConsumer):
                     if player.name == self.name:
                         key = data["params"].get("key", "")
                         key_type = data["params"].get("type", "")
-                        if key in ("z", "ArrowUp"):
+                        if key in ("w", "ArrowUp"):
                             player.keyUp = key_type == "keydown"
                         elif key in ("s", "ArrowDown"):
                             player.keyDown = key_type == "keydown"
         except json.JSONDecodeError:
             print("Error : Invalid JSON")
 
-    async def updateScore(self, player, ball):
+    async def updateScore(self, gameManager, player, ball):
         player.score += 1
-        await self.groupSend("scores", [player.score for player in GamePlayerConsumer.games[self.uuid].players])
-        if player.score >= 3:
-            await self.groupSend("messages", {"first": "Winner is", "second": player.name})
+        await self.groupSend(gameManager.gameName, "scores", [player.score for player in GamePlayerConsumer.games[self.uuid].players])
+        if player.score >= 10:
+            await self.groupSend(gameManager.gameName, "messages", {"first": "Winner is", "second": player.name})
             return "win"
         ball.setDirection(ball.dx * -1, ball.dz)
         ball.setPos(0, ball.z)
         return None
 
-    async def isPlayerOffline(self, players):
+    async def isPlayerOffline(self, gameManager, players):
         if not players[0].connected:
-            await self.groupSend("messages", {"first": players[0].name + " is Disconnected", "second": "Winner is " + players[1].name})
+            players[0].score = 0
+            players[1].score = 10
+            await self.groupSend(gameManager.gameName, "scores", [player.score for player in players])
+            await self.groupSend(gameManager.gameName, "messages", {"first": players[0].name + " is Disconnected", "second": "Winner is " + players[1].name})
             return True
         elif not players[1].connected:
-            await self.groupSend("messages", {"first": players[1].name + " is Disconnected", "second": "Winner is " + players[0].name})
+            players[0].score = 10
+            players[1].score = 0
+            await self.groupSend(gameManager.gameName, "scores", [player.score for player in players])
+            await self.groupSend(gameManager.gameName, "messages", {"first": players[1].name + " is Disconnected", "second": "Winner is " + players[0].name})
             return True
         return False
 
-    async def sendLoopGame(self):
-        GamePlayerConsumer.games[self.uuid].time = datetime.now()
-        await self.groupSend("names", [player.name for player in GamePlayerConsumer.games[self.uuid].players])
-        await self.groupSend("scores", [player.score for player in GamePlayerConsumer.games[self.uuid].players])
-        playground = GamePlayerConsumer.games[self.uuid].playground
-        ball = GamePlayerConsumer.games[self.uuid].ball
+    async def sendLoopGame(self, gameManager):
+        await self.groupSend(gameManager.gameName, "names", [player.name for player in gameManager.players])
+        await self.groupSend(gameManager.gameName, "scores", [player.score for player in gameManager.players])
+        await self.groupSend(gameManager.gameName, "messages", {"first": "Game Started in :", "second": "3"})
+        await asyncio.sleep(1)
+        await self.groupSend(gameManager.gameName, "messages", {"first": "Game Started in :", "second": "2"})
+        await asyncio.sleep(1)
+        await self.groupSend(gameManager.gameName, "messages", {"first": "Game Started in :", "second": "1"})
+        await asyncio.sleep(1)
+        await self.groupSend(gameManager.gameName, "messages", {"first": "", "second": ""})
+        gameManager.time = datetime.now()
+        playground = gameManager.playground
+        ball = gameManager.ball
         paddle = Paddle()
-        paddleLeft = GamePlayerConsumer.games[self.uuid].players[0].paddle
-        paddleRight = GamePlayerConsumer.games[self.uuid].players[1].paddle
+        paddleLeft = gameManager.players[0].paddle
+        paddleRight = gameManager.players[1].paddle
         paddleLeft.setPos(-(round(playground.radiusWidth - playground.radiusWall - paddle.radiusHeight, 2)), 0)
         paddleRight.setPos(round(playground.radiusWidth - playground.radiusWall - paddle.radiusHeight, 2), 0)
         playgroundWidthLimit = round(playground.radiusWidth - playground.radiusWall - ball.radius, 2)
@@ -298,8 +303,8 @@ class GamePlayerConsumer(AsyncWebsocketConsumer):
         paddleRadius = round(paddle.radiusHeight + paddle.radiusWidth + ball.radius, 2)
 
         while True:
-            await self.groupSend("data", {"ball": GamePlayerConsumer.games[self.uuid].ball.toDict() ,"players": [player.paddle.toDict() for player in GamePlayerConsumer.games[self.uuid].players]})
-            for player in GamePlayerConsumer.games[self.uuid].players:
+            await self.groupSend(gameManager.gameName, "data", {"ball": gameManager.ball.toDict() ,"players": [player.paddle.toDict() for player in gameManager.players]})
+            for player in gameManager.players:
                 player.movePlayer(playground)
             ball.setPos(round(ball.x + ball.dx, 2), round(ball.z + ball.dz, 2))
             if ball.x >= paddleLimit and round(paddleRight.z - paddleRadius, 2) <= ball.z <= round(paddleRight.z + paddleRadius, 2):
@@ -313,29 +318,29 @@ class GamePlayerConsumer(AsyncWebsocketConsumer):
                 speed = math.sqrt(ball.dx**2 + ball.dz**2)
                 ball.setDirection(speed * math.cos(newAngle), speed * math.sin(newAngle))
             if ball.x >= playgroundWidthLimit:
-                if await self.updateScore(GamePlayerConsumer.games[self.uuid].players[0], ball) == "win":
+                if await self.updateScore(gameManager, gameManager.players[0], ball) == "win":
                     break
             elif ball.x <= -(playgroundWidthLimit):
-                if await self.updateScore(GamePlayerConsumer.games[self.uuid].players[1], ball) == "win":
+                if await self.updateScore(gameManager, gameManager.players[1], ball) == "win":
                     break
-            if await self.isPlayerOffline(GamePlayerConsumer.games[self.uuid].players):
+            if await self.isPlayerOffline(gameManager, gameManager.players):
                 break
             if ball.z >= playgroundHeightLimit or ball.z <= -(playgroundHeightLimit):
                 ball.dz *= -1
             await asyncio.sleep(0.01)
-        
-        GamePlayerConsumer.games[self.uuid].time = datetime.now() - GamePlayerConsumer.games[self.uuid].time;
-        await save_match_history(
-            GamePlayerConsumer.games[self.uuid].players[0].idUser,
-            GamePlayerConsumer.games[self.uuid].players[1].idUser,
-            GamePlayerConsumer.games[self.uuid].players[0].score,
-            GamePlayerConsumer.games[self.uuid].players[1].score,
-            GamePlayerConsumer.games[self.uuid].time
+
+        gameManager.time = datetime.now() - gameManager.time;
+        await sendMatchResult(
+            gameManager.players[0].idUser,
+            gameManager.players[1].idUser,
+            gameManager.players[0].score,
+            gameManager.players[1].score,
+            gameManager.time
         )
 
-    async def groupSend(self, name, data):
+    async def groupSend(self, roomName, name, data):
         await self.channel_layer.group_send(
-            self.room_group_name,
+            roomName,
             {
                 'type': 'gameUpdate',
                 name: data
@@ -362,7 +367,7 @@ class TournamentPlayerConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         queryString = parse.parse_qs(self.scope["query_string"].decode())
         self.uuid = queryString["uuid"][0]
-        self.name = queryString["name"][0]
+        self.name = self.scope['user'].username
         self.idUser = self.scope['user'].id
         self.room_group_name = f"tournament_room_{self.uuid}"
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
@@ -445,10 +450,16 @@ class TournamentPlayerConsumer(AsyncWebsocketConsumer):
 
     async def isPlayerOffline(self, gameManager, players):
         if not players[0].connected:
+            players[0].score = 0
+            players[1].score = 10
+            await self.groupSend(gameManager.gameName, "scores", [player.score for player in players])
             await self.groupSend(gameManager.gameName, "messages", {"first": players[0].name + " is Disconnected", "second": "Winner is " + players[1].name})
             gameManager.winner = players[1]
             return True
         elif not players[1].connected:
+            players[0].score = 10
+            players[1].score = 0
+            await self.groupSend(gameManager.gameName, "scores", [player.score for player in players])
             await self.groupSend(gameManager.gameName, "messages", {"first": players[1].name + " is Disconnected", "second": "Winner is " + players[0].name})
             gameManager.winner = players[0]
             return True
@@ -462,9 +473,6 @@ class TournamentPlayerConsumer(AsyncWebsocketConsumer):
         if len(finalGame.players) == 2:
             if finalGame.loop is None:
                 finalGame.loop = asyncio.create_task(self.sendLoopGame(finalGame, None))
-
-    async def sendAllResult(self):
-        print("Senf final result of tournament here !")
 
     async def sendLoopGame(self, gameManager, finalGame):
         await self.groupSend(gameManager.gameName, "names", [player.name for player in gameManager.players])
@@ -517,8 +525,6 @@ class TournamentPlayerConsumer(AsyncWebsocketConsumer):
 
         if finalGame is not None:
             await self.startFinalGame(gameManager, finalGame)
-        else:
-            await self.sendAllResult()
 
     async def groupSend(self, roomName, name, data):
         await self.channel_layer.group_send(

@@ -44,10 +44,9 @@ export default class extends AbstractView {
     return `
     <div class="container py-5 h-100">
       <div class="row-fluid d-flex justify-content-center align-items-center">
-        <h1 class="text-white m-3">Insert name for play!</h1>
+        <h1 class="text-white m-3">Pong Waiting Room</h1>
       </div>
       <div class="row-fluid d-flex justify-content-center align-items-center">
-        <input id="nameInput" style="border-radius: 8px; margin: 10px; height: 40px; width: 210px;" value="" maxlength="20" placeholder="Max character: 20"/>
         <button id="cancelBtn" class="btn-cancel" disabled>Cancel</button>
       </div>
       <br>
@@ -82,13 +81,12 @@ export default class extends AbstractView {
   #waitingRoomSocket;
   #abortController;
 
-  async #webSocketGame(name) {
+  async #webSocketGame() {
     const roomName = "waitingRoom";
     const url =
       "wss://" +
       window.location.hostname +
-      "/ws/pong/waitingRoom/?name=" +
-      encodeURIComponent(name);
+      "/ws/pong/waitingRoom/"
 
     this.#waitingRoomSocket = new WebSocket(url);
 
@@ -107,18 +105,17 @@ export default class extends AbstractView {
           "Current connections: " + data.count;
       }
       if (data.uuid !== undefined) {
-        navigateTo("/pong/" + data.uuid + "?name=" + encodeURIComponent(name));
+        navigateTo("/pong/" + data.uuid);
       }
     };
   }
 
-  async #webSocketTournament(name) {
+  async #webSocketTournament() {
     const roomName = "waitingRoom";
     const url =
       "wss://" +
       window.location.hostname +
-      "/ws/tournament/waitingRoom/?name=" +
-      encodeURIComponent(name);
+      "/ws/tournament/waitingRoom/"
 
     this.#waitingRoomSocket = new WebSocket(url);
 
@@ -137,16 +134,13 @@ export default class extends AbstractView {
           "Current connections: " + data.count;
       }
       if (data.uuid !== undefined) {
-        navigateTo(
-          "/tournament/" + data.uuid + "?name=" + encodeURIComponent(name)
-        );
+        navigateTo("/tournament/" + data.uuid);
       }
     };
   }
 
   async getJavaScript() {
     this.#abortController = new AbortController();
-    const nameInput = document.getElementById("nameInput");
     const playBtnGame = document.getElementById("playBtnGame");
     const connectionCountGame = document.getElementById("connectionCountGame");
     const playBtnTournament = document.getElementById("playBtnTournament");
@@ -158,18 +152,15 @@ export default class extends AbstractView {
     playBtnGame.addEventListener(
       "click",
       async () => {
-        if (nameInput.value.trim() !== "") {
-          nameInput.disabled = true;
-          playBtnGame.disabled = true;
-          playBtnGame.style.color = '#fff';
-          connectionCountGame.hidden = false;
-          playBtnTournament.disabled = true;
-          playBtnTournament.style.color = '#fff';
-          connectionCountTournament.hidden = true;
-          cancelBtn.disabled = false;
+        playBtnGame.disabled = true;
+        playBtnGame.style.color = '#fff';
+        connectionCountGame.hidden = false;
+        playBtnTournament.disabled = true;
+        playBtnTournament.style.color = '#fff';
+        connectionCountTournament.hidden = true;
+        cancelBtn.disabled = false;
 
-          await this.#webSocketGame(nameInput.value);
-        }
+        await this.#webSocketGame();
       },
       {
         signal: this.#abortController.signal,
@@ -178,18 +169,15 @@ export default class extends AbstractView {
     playBtnTournament.addEventListener(
       "click",
       async () => {
-        if (nameInput.value.trim() !== "") {
-          nameInput.disabled = true;
-          playBtnGame.disabled = true;
-          playBtnGame.style.color = '#fff';
-          connectionCountGame.hidden = true;
-          playBtnTournament.disabled = true;
-          playBtnTournament.style.color = '#fff';
-          connectionCountTournament.hidden = false;
-          cancelBtn.disabled = false;
+        playBtnGame.disabled = true;
+        playBtnGame.style.color = '#fff';
+        connectionCountGame.hidden = true;
+        playBtnTournament.disabled = true;
+        playBtnTournament.style.color = '#fff';
+        connectionCountTournament.hidden = false;
+        cancelBtn.disabled = false;
 
-          await this.#webSocketTournament(nameInput.value);
-        }
+        await this.#webSocketTournament();
       },
       {
         signal: this.#abortController.signal,
@@ -198,7 +186,6 @@ export default class extends AbstractView {
     cancelBtn.addEventListener(
       "click",
       () => {
-        nameInput.disabled = false;
         playBtnGame.disabled = false;
         connectionCountGame.hidden = true;
         playBtnTournament.disabled = false;
