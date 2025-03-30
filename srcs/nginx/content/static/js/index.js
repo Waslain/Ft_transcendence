@@ -253,7 +253,7 @@ document.addEventListener("authenticate", (e) => {
 		/* Update sidebar*/
   		document.querySelector("#sidebarItems").innerHTML = `
 		<a href="#" class="nav-item d-flex align-items-center" id="chatBox">
-				<i class="fs-2 bi-chat-left-heart"></i><span>Chat</span>
+				<i class="fs-2 bi-chat-left-heart"></i><div id="msg-hint" class="msg-hint"><i class=" bi bi-circle-fill red-dot"></i></div><span>Chat</span>
 		</a>
 		<a href="/settings" class="nav-item d-flex align-items-center" data-link>
 			<i class="fs-2 bi-gear"></i><span>Settings</span>
@@ -330,6 +330,29 @@ document.addEventListener("authenticate", (e) => {
 			signal: authAbortController.signal,
 		});
 
+		/*Hint redDot for private message*/
+		let hasUnreadMessages = false;
+		const hint = document.getElementById('msg-hint')
+		const redDot = hint.querySelector('.red-dot');
+		redDot.style.display = 'none';
+
+		function toggleChatWindow() {
+			if (chatWindow.style.display === 'block' && hasUnreadMessages) {
+				hasUnreadMessages = false;
+				redDot.style.display = 'none';
+			}
+			if (chatWindow.style.display === 'block') {
+				redDot.style.diaplay = 'none';
+			}
+		}
+
+		setInterval(()=> {
+			if (hasUnreadMessages){
+				redDot.style.display = 'block';
+			}
+			toggleChatWindow();
+		}, 1000); //check every 1 sec;
+
 		// Connectez-vous au WebSocket si ce n'est pas déjà fait
 		if (!chatSocket || chatSocket.readyState !== WebSocket.OPEN) {
 			connectWebSocket();
@@ -346,8 +369,8 @@ document.addEventListener("authenticate", (e) => {
 			Utils.fetchOnlineUsers();
 			Utils.fetchBlockedUsers();
 			// Start a periodic refresh of the online users list
-			setInterval(Utils.fetchOnlineUsers, 30000); // Every 30 seconds
-			setInterval(Utils.fetchBlockedUsers, 60000); // Every 60 seconds
+			setInterval(Utils.fetchOnlineUsers, 5000); // Every 5 seconds
+			setInterval(Utils.fetchBlockedUsers, 30000); // Every 30 seconds
 			};
 		
 			chatSocket.onmessage = function(e) {
@@ -356,6 +379,9 @@ document.addEventListener("authenticate", (e) => {
 				if (data.message) {
 					if (data.message.is_invitation) {
 						chatWindow.style.display = 'block';
+					}
+					if (data.message.is_private) {
+						hasUnreadMessages = true;
 					}
 					// Display the message
 					displayMessage(data.message);

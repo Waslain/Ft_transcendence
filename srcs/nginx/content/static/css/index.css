@@ -174,3 +174,16 @@
 	color: #666;
 	font-style: italic;
 }
+
+.msg-hint {
+    position: relative;
+}
+
+.red-dot {
+    position: absolute;
+    transform:translateX(-200%);
+    transform:translatey(-100%);
+    margin-left: 5px;
+    color: red;
+    width: 10px;
+}
