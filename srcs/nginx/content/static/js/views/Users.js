@@ -311,16 +311,16 @@ export default class extends AbstractView {
 		} else {
 			document.querySelector("#profileBtns").innerHTML = `
 			<div class="row text-center">
-			<div class="col-12 col-md-3 col-sm-3 text-nowrap">
+			<div class="col-12 col-md-3 col-sm-6 text-nowrap">
 				<button type="button" class="btn profile-btn" id="friendBtn"><span id="friendDisplay"></span></button>
 			</div>
-			<div class="col-12 col-md-3 col-sm-3 text-nowrap">
+			<div class="col-12 col-md-3 col-sm-6 text-nowrap">
 				<button type="button" class="btn profile-btn" id="inviteBtn"><i class="bi bi-joystick" style="padding-right: 5px;"></i>Match Invite</button>
 			</div>
-			<div class="col-12 col-md-3 col-sm-3 text-nowrap">
+			<div class="col-12 col-md-3 col-sm-6 text-nowrap">
 			<button type="button" class="btn profile-btn" id="messageBtn"><i class="bi bi-send" style="padding-right: 5px;""></i>Message</button>
 			</div>
-			<div class="col-12 col-md-3 col-sm-3 text-nowrap">
+			<div class="col-12 col-md-3 col-sm-6 text-nowrap">
 				<button type="button" class="btn profile-btn" id="blockBtn"><i class="bi bi-ban" style="padding-right: 5px;"></i><span id="blockDisplay"></span></button>
 			</div>
 		</div>

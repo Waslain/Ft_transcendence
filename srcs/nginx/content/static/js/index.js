@@ -212,13 +212,18 @@ sidebarToggleBtn.addEventListener('click', () =>{
 });
 
 export const invitePlayer = (username) => {
-	chatWindow.style.display = 'block';
-	const inviteEvent = new CustomEvent('invite', {
-		detail: {
-			username: username,
-		},
-	});
-	document.dispatchEvent(inviteEvent);
+	const matchOption = Array.from(chatUserSelect.options).find(option => option.text === username)
+	if (matchOption) {
+		chatWindow.style.display = 'block';
+		const inviteEvent = new CustomEvent('invite', {
+			detail: {
+				username: username,
+			},
+		});
+		document.dispatchEvent(inviteEvent);
+	} else {
+		alert(`Error: User "${username}" is not online`);
+	}
 }
 
 export const privMsg = (userToChat) => {
