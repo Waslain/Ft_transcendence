@@ -436,7 +436,7 @@ document.addEventListener("authenticate", (e) => {
 					acceptButton.textContent = 'Accept';
 					acceptButton.addEventListener('click', function() {
 						// Navigate to game page with invitation info
-						navigateTo(`/pong/${message.username}?name=${localStorage.getItem('username')}`);
+						navigateTo(`/pong/${message.username}`);
 					},
 					{
 						signal: authAbortController.signal,
@@ -521,7 +521,7 @@ document.addEventListener("authenticate", (e) => {
 				joinButton.textContent = 'Join Game';
 				joinButton.addEventListener('click', function() {
 					// Navigate to game page as the inviter
-					navigateTo(`/pong/${localStorage.getItem('username')}?name=${localStorage.getItem('username')}`);
+					navigateTo(`/pong/${localStorage.getItem('username')}`);
 				},
 				{
 					signal: authAbortController.signal,
