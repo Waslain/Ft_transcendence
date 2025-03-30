@@ -437,6 +437,7 @@ document.addEventListener("authenticate", (e) => {
 					acceptButton.addEventListener('click', function() {
 						// Navigate to game page with invitation info
 						navigateTo(`/pong/${message.username}`);
+						chatWindow.style.display = 'none';
 					},
 					{
 						signal: authAbortController.signal,
@@ -522,6 +523,7 @@ document.addEventListener("authenticate", (e) => {
 				joinButton.addEventListener('click', function() {
 					// Navigate to game page as the inviter
 					navigateTo(`/pong/${localStorage.getItem('username')}`);
+					chatWindow.style.display = 'none';
 				},
 				{
 					signal: authAbortController.signal,

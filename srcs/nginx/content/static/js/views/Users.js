@@ -214,7 +214,7 @@ export default class extends AbstractView {
 		document.getElementById('statWins').innerHTML = `Wins<br/><span style="color: #4169e1;">${number_of_wins}</span>`;
 		document.getElementById('statLosses').innerHTML = `Losses<br/><span style="color: #98afc7;">${number_of_losses}</span>`;
 		document.getElementById('statWinRate').innerHTML = `Win Rate<br/><span style="color: orange;">${rate_of_wins}%</span>`;
-		document.getElementById('statGameTime').innerHTML = `Game Time<br/><span style="color: pink;">${game_time} min</span>`;
+		document.getElementById('statGameTime').innerHTML = `Game Time<br/><span style="color: pink;">${game_time} sec</span>`;
 		
         const noDataText = document.getElementById('noDataText');
         const noDataTextBar = document.getElementById('noDataTextBar');
