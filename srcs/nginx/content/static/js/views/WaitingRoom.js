@@ -2,9 +2,16 @@ import AbstractView from "./AbstractView.js";
 import { navigateTo } from "../index.js";
 
 export default class extends AbstractView {
-  constructor() {
+  constructor(params) {
     super();
-    this.setTitle("Transcendence");
+		this.setTitle("Transcendence");
+		this.params = params;
+		this.redirection = {
+			needed: true,
+			auth: false,
+			url: '/users/login',
+			urlAfterLogin: '/pong'
+		}
   }
 
   async getStyle() {
