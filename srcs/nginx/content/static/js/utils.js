@@ -46,7 +46,6 @@ export function fetchOnlineUsers(usersArray) {
         }
         
         // Update UI
-		console.log("Updating online users list:", users);
         updateOnlineUsersList(users);
         
         // Return users for chaining
