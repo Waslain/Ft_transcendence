@@ -225,9 +225,9 @@ class GamePlayerConsumer(AsyncWebsocketConsumer):
                     if player.name == self.name:
                         key = data["params"].get("key", "")
                         key_type = data["params"].get("type", "")
-                        if key in ("w", "ArrowUp"):
+                        if key in ("ArrowUp"):
                             player.keyUp = key_type == "keydown"
-                        elif key in ("s", "ArrowDown"):
+                        elif key in ("ArrowDown"):
                             player.keyDown = key_type == "keydown"
         except json.JSONDecodeError:
             print("Error : Invalid JSON")
