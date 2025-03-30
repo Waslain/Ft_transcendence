@@ -141,10 +141,14 @@ def match_list(request):
 	except Exception as e:
 		return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
+
 @api_view(['POST'])
 # @permission_classes([IsAuthenticated])
 def add_match(request):
+	import logging
+	logger = logging.getLogger(__name__)
 	try:
+		logger.info(f"add_match called with data: {request.body}")
 		data = json.loads(request.body)
 		
 		# Extract data from request
@@ -153,6 +157,7 @@ def add_match(request):
 		usera_score = data.get('usera_score', 0)
 		userb_score = data.get('userb_score', 0)
 		game_time_seconds = data.get('game_time', 0)
+		logger.info(f"Extracted data: user_a={usera_id}, user_b={userb_id}, score_a={usera_score}, score_b={userb_score}, time={game_time_seconds}")
 
 		# Convert game_time to proper interval format
 		from datetime import timedelta
@@ -166,7 +171,9 @@ def add_match(request):
 		try:
 			usera = User.objects.get(id=usera_id)
 			userb = User.objects.get(id=userb_id)
+			logger.info(f"Found users: {usera.username} (ID: {usera.id}), {userb.username} (ID: {userb.id})")
 		except User.DoesNotExist:
+			logger.error(f"User not found: usera_id={usera_id}, userb_id={userb_id}")
 			return JsonResponse({'status': 'error', 'message': 'User not found'}, status=404)
 		
 		# Create match history entry
@@ -177,37 +184,52 @@ def add_match(request):
 			score_b=userb_score,
 			game_time=game_time
 		)
+		logger.info(f"Created match with ID: {match.id}")
+		
 		# Update user statistics based on match result
-		from stats.models import Stats
-		
-		# Get or create stats objects for both users
-		stats_a, created_a = Stats.objects.get_or_create(user=usera)
-		stats_b, created_b = Stats.objects.get_or_create(user=userb)
-		
-		# Determine winner and loser
-		if usera_score > userb_score:
-			# User A won
-			stats_a.wins += 1
-			stats_b.losses += 1
-		elif userb_score > usera_score:
-			# User B won
-			stats_b.wins += 1
-			stats_a.losses += 1
-		# If it's a tie, no wins/losses are updated
-		
-		# Update goals
-		stats_a.goals_scored += usera_score
-		stats_a.goals_taken += userb_score
-		stats_b.goals_scored += userb_score
-		stats_b.goals_taken += usera_score
-		
-		# Update play time (in seconds)
-		stats_a.play_time += game_time_seconds
-		stats_b.play_time += game_time_seconds
-		
-		# Save the updated stats
-		stats_a.save()
-		stats_b.save()
+		try:
+			from stats.models import Stats
+			logger.info("Stats module imported successfully")
+			
+			# Get or create stats objects for both users
+			stats_a, created_a = Stats.objects.get_or_create(user=usera)
+			stats_b, created_b = Stats.objects.get_or_create(user=userb)
+			logger.info(f"Stats objects: A (created={created_a}), B (created={created_b})")
+
+			logger.info(f"Initial stats A: wins={stats_a.wins}, losses={stats_a.losses}")
+			logger.info(f"Initial stats B: wins={stats_b.wins}, losses={stats_b.losses}")
+			# Determine winner and loser
+			if usera_score > userb_score:
+				# User A won
+				stats_a.wins += 1
+				stats_b.losses += 1
+				logger.info("User A won")
+			elif userb_score > usera_score:
+				# User B won
+				stats_b.wins += 1
+				stats_a.losses += 1
+				logger.info("User B won")
+			# If it's a tie, no wins/losses are updated
+			
+			# Update goals
+			stats_a.goals_scored += usera_score
+			stats_a.goals_taken += userb_score
+			stats_b.goals_scored += userb_score
+			stats_b.goals_taken += usera_score
+			
+			# Update play time (in seconds)
+			stats_a.play_time += game_time_seconds
+			stats_b.play_time += game_time_seconds
+			
+			# Save the updated stats
+			stats_a.save()
+			stats_b.save()
+			logger.info(f"Updated stats A: wins={stats_a.wins}, losses={stats_a.losses}")
+			logger.info(f"Updated stats B: wins={stats_b.wins}, losses={stats_b.losses}")
+		except Exception as stats_error:
+			logger.error(f"Error updating stats: {str(stats_error)}")
+			import traceback
+			logger.error(traceback.format_exc())
 		return JsonResponse({'status': 'success', 'match_id': match.id}, status=201)
 		
 	except json.JSONDecodeError:
@@ -215,3 +237,83 @@ def add_match(request):
 	except Exception as e:
 		return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
+def create_match_record(usera_id, userb_id, usera_score, userb_score, game_time_seconds):
+	# Create a match record and update stats - for direct calls from other Django code
+	# Returns the created match object or None on failure
+	import logging
+	logger = logging.getLogger(__name__)
+	
+	try:
+		# Convert game_time to proper interval format
+		from datetime import timedelta
+		if isinstance(game_time_seconds, timedelta):
+			game_time = game_time_seconds
+			# Extract seconds for stats
+			game_time_seconds_int = game_time_seconds.total_seconds()
+		else:
+			# It's a number, create a timedelta
+			game_time = timedelta(seconds=game_time_seconds)
+			game_time_seconds_int = game_time_seconds
+		
+		# Get user objects
+		try:
+			usera = User.objects.get(id=usera_id)
+			userb = User.objects.get(id=userb_id)
+		except User.DoesNotExist:
+			logger.error(f"User not found: usera_id={usera_id}, userb_id={userb_id}")
+			return None
+		
+		# Create match history entry
+		match = MatchHistory.objects.create(
+			user_a=usera,
+			user_b=userb,
+			score_a=usera_score,
+			score_b=userb_score,
+			game_time=game_time
+		)
+		
+		# Update user statistics based on match result
+		try:
+			from stats.models import Stats
+			
+			# Get or create stats objects for both users
+			stats_a, created_a = Stats.objects.get_or_create(user=usera)
+			stats_b, created_b = Stats.objects.get_or_create(user=userb)
+			
+			# Determine winner and loser
+			if usera_score > userb_score:
+				# User A won
+				stats_a.wins += 1
+				stats_b.losses += 1
+			elif userb_score > usera_score:
+				# User B won
+				stats_b.wins += 1
+				stats_a.losses += 1
+			# If it's a tie, no wins/losses are updated
+			
+			# Update goals
+			stats_a.goals_scored += usera_score
+			stats_a.goals_taken += userb_score
+			stats_b.goals_scored += userb_score
+			stats_b.goals_taken += usera_score
+			
+			# Update play time (in seconds)
+			stats_a.play_time += int(game_time_seconds_int)
+			stats_b.play_time += int(game_time_seconds_int)
+			
+			# Save the updated stats
+			stats_a.save()
+			stats_b.save()
+			
+			return match
+		except Exception as stats_error:
+			logger.error(f"Error updating stats: {str(stats_error)}")
+			import traceback
+			logger.error(traceback.format_exc())
+			return match  # Still return the match even if stats update fails
+	
+	except Exception as e:
+		logger.error(f"Error creating match: {str(e)}")
+		import traceback
+		logger.error(traceback.format_exc())
+		return None

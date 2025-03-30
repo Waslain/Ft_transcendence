@@ -11,6 +11,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from django.contrib.auth import get_user_model
 from matchhistory.models import MatchHistory
 from channels.db import database_sync_to_async
+from matchhistory.views import create_match_record
 User = get_user_model()
 
 class GameWaitingRoomConsumer(AsyncWebsocketConsumer):
@@ -171,32 +172,9 @@ class TournamentManager:
         self.players : List[Player] = []
 
 @database_sync_to_async
-def sendMatchResult(iduserA, idUserB, scoreUserA, scoreUserB, gameTime):
-    try:
-        user_a = User.objects.get(id=iduserA)
-        user_b = User.objects.get(id=idUserB)
-        match = MatchHistory.objects.create(
-            user_a = user_a,
-            user_b = user_b,
-            score_a = scoreUserA,
-            score_b = scoreUserB,
-            game_time = gameTime,
-        )
-        return {
-            'status': 'success',
-            'match_id': match.id,
-            'user_a': match.user_a.username,
-            'user_b': match.user_b.username,
-            'score_a': match.score_a,
-            'score_b': match.score_b,
-            'game_time': gameTime,
-        }
-    except User.DoesNotExist:
-        print(f"Error saving match history: User with ID {iduserA} or {idUserB} not found")
-        return None
-    except Exception as e:
-        print(f"Error saving match history: {str(e)}")
-        return None
+def sendMatchResult(usera_id, userb_id, usera_score, userb_score, game_time):
+    # Save match history directly using the matchhistory view function
+    return create_match_record(usera_id, userb_id, usera_score, userb_score, game_time)
 
 class GamePlayerConsumer(AsyncWebsocketConsumer):
     games : Dict[str, GameManager] = {}
