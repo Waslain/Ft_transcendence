@@ -240,6 +240,8 @@ export const privMsg = (userToChat) => {
 
 let chatSocket = null;
 
+export const getChatSocket = () => {return chatSocket;}
+
 let authAbortController = null;
 document.addEventListener("authenticate", (e) => {
 	if (sidebar.className === 'sidebar') {
