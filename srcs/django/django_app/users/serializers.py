@@ -4,17 +4,21 @@ from stats.models import Stats
 
 class ImageSerializer(serializers.ModelSerializer):
 	avatar = serializers.ImageField(required=False, allow_null=True)
+	language = serializers.CharField(required=False, allow_null=True)
 
 	class Meta:
 		model = User
-		fields = ['id', 'avatar']
+		fields = ['id', 'avatar', 'language']
 
 		def update(self, instance, validated_data):
-			value = validated_data.get('avatar');
-			if (value):
-				setattr(instance, 'avatar', value)
+			avatar = validated_data.get('avatar');
+			if (avatar):
+				setattr(instance, 'avatar', avatar)
 			else:
 				setattr(instance, 'avatar', None)
+			language = validated_data.get('language');
+			if (language):
+				setattr(instance, 'language', language)
 
 
 class UserSerializer(serializers.ModelSerializer):

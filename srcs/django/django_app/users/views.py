@@ -24,7 +24,7 @@ class GetUserView(generics.RetrieveAPIView):
 		return Response(serializer.data)
 
 
-class UpdateAvatarView(generics.UpdateAPIView):
+class UpdateUserView(generics.UpdateAPIView):
 	serializer_class = ImageSerializer
 	permission_classes = [permissions.IsAuthenticated]
 
@@ -40,6 +40,7 @@ class UpdateAvatarView(generics.UpdateAPIView):
 		})
 		if instance.avatar:
 			response.data['avatar'] = instance.avatar.url
+		response.data['language'] = instance.language
 		return response
 
 
@@ -99,6 +100,7 @@ class LoginView(APIView):
 		})
 		if user.avatar:
 			response.data['avatar'] = user.avatar.url
+		response.data['language'] = user.language
 		response.set_cookie(
 			key = 'auth_token',
 			value = token.key,
@@ -132,8 +134,8 @@ class SessionView(APIView):
 
 	def get(self, request):
 		if (request.user.is_authenticated):
-			return Response({'IsAuthenticated': True})
-		return Response({'IsAuthenticated': False})
+			return Response({'IsAuthenticated': True, "language": request.user.language})
+		return Response({'IsAuthenticated': False, "language": "en"})
 
 
 class AddFriendView(generics.UpdateAPIView):
