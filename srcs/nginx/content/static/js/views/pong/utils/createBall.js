@@ -8,7 +8,6 @@ export const createBall = () => {
 
   const ball = {
     object: sphere,
-    hitbox: new THREE.Sphere(sphere.position, 0.3),
   };
 
   ball.object.position.set(0, 0.3, 0);

@@ -31,9 +31,7 @@ export const onlineGame = (socket, signal) => {
     ball: createBall(),
     firstMessage: null,
     secondMessage: null,
-    sound: null,
-    wallhit: 1,
-    playerhit: 1,
+    sound: null
   };
 
   scene.add(

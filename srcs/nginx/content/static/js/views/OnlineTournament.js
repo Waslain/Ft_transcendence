@@ -7,6 +7,12 @@ export default class extends Pong {
     super();
     this.params = params;
     this.setTitle("Transcendence");
+    this.redirection = {
+			needed: true,
+			auth: false,
+			url: '/users/login',
+			urlAfterLogin: '/tournament/' + this.params.room_id
+		}
   }
 
   #tournamentRoomSocket;

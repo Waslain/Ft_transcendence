@@ -7,7 +7,6 @@ export const createPlayer = (nb) => {
 
   const player = {
     object: new THREE.Mesh(geometry, material),
-    hitbox: new THREE.Box3(),
     name: "",
     name3D: createText("", 10, 1),
     score: -1,
