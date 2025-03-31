@@ -1,5 +1,6 @@
 import AbstractView from "./AbstractView.js";
-import { invitePlayer, privMsg, navigateTo } from "../index.js"
+import { invitePlayer, privMsg, navigateTo } from "../index.js";
+import { text } from "../index.js";
 
 export default class extends AbstractView {
 	constructor(params) {
@@ -133,7 +134,7 @@ export default class extends AbstractView {
 				<div class="col-12 col-sm-10 col-md-7 col-lg-6 col-xl-5 col-xxl-4">
 					<div class="card widget-card border-light shadow-sm chart-wrapper">
 						<div class="card-body p-4">
-							<h5 class="card-title widget-card-title mb-1 text-center text-white">Win Stats</h5>
+							<h5 class="card-title widget-card-title mb-1 text-center text-white">`+text.profile.winStats+`</h5>
                             <div id="noDataText" class="no-data-text">No data available</div>
 							<canvas id="winsCountChart" style="width: 100%; height: auto;"></canvas>
 						</div>
@@ -142,7 +143,7 @@ export default class extends AbstractView {
 				<div class="col-12 col-sm-10 col-md-7 col-lg-6 col-xl-5 col-xxl-4">
 					<div class="card widget-card border-light shadow-sm chart-wrapper">
 						<div class="card-body p-4">
-							<h5 class="card-title widget-card-title mb-1 text-center text-white">Goals Chart</h5>
+							<h5 class="card-title widget-card-title mb-1 text-center text-white">`+text.profile.goalChart+`</h5>
                             <div id="noDataTextBar" class="no-data-text">No data available</div>
 							<canvas id="goalsChart"></canvas>
 						</div>
@@ -154,7 +155,7 @@ export default class extends AbstractView {
 		<section>
 			<div class="row">
 				<div class="col-12 col-md-3 col-sm-3">
-					<p class="fs-1 fs-sm-2 fs-md-3 fs-lg-5 text-center text-white" id="statWins">Wins</p>
+					<p class="fs-1 fs-sm-2 fs-md-3 fs-lg-5 text-center text-white" id="statWins">`+text.profile.wins+`</p>
 				</div>
 				<div class="col-12 col-md-3 col-sm-3">
 					<p class="fs-1 fs-sm-2 fs-md-3 fs-lg-5 text-center text-white" id="statLosses"></p>
@@ -181,12 +182,12 @@ export default class extends AbstractView {
 									<thead>
 										<tr>
 											<th>ID</th>
-											<th>Player A</th>
-											<th>Player B</th>
-											<th>Score A</th>
-											<th>Score B</th>
-											<th>Game Duration</th>
-											<th>Winner</th>
+											<th>`+text.profile.playerA+`</th>
+											<th>`+text.profile.playerB+`</th>
+											<th>`+text.profile.scoreA+`</th>
+											<th>`+text.profile.scoreB+`</th>
+											<th>`+text.profile.duration+`</th>
+											<th>`+text.profile.winner+`</th>
 										</tr>
 									</thead>
 									<tbody id="table-body"></tbody>
@@ -290,10 +291,10 @@ export default class extends AbstractView {
 			return `${minutes}m${formattedSeconds}s`;
 		}
 		
-		document.getElementById('statWins').innerHTML = `Wins<br/><span style="color: #4169e1;">${number_of_wins}</span>`;
-		document.getElementById('statLosses').innerHTML = `Losses<br/><span style="color: #98afc7;">${number_of_losses}</span>`;
-		document.getElementById('statWinRate').innerHTML = `Win Rate<br/><span style="color: orange;">${rate_of_wins}%</span>`;
-		document.getElementById('statGameTime').innerHTML = `Game Time<br/><span style="color: pink;">${formatGameTime(game_time)}</span>`;
+		document.getElementById('statWins').innerHTML = text.profile.wins+`<br/><span style="color: #4169e1;">${number_of_wins}</span>`;
+		document.getElementById('statLosses').innerHTML = text.profile.losses+`<br/><span style="color: #98afc7;">${number_of_losses}</span>`;
+		document.getElementById('statWinRate').innerHTML = text.profile.winRate+`<br/><span style="color: orange;">${rate_of_wins}%</span>`;
+		document.getElementById('statGameTime').innerHTML = text.profile.gameTime+`<br/><span style="color: pink;">${formatGameTime(game_time)}</span>`;
 		
         const noDataText = document.getElementById('noDataText');
         const noDataTextBar = document.getElementById('noDataTextBar');
@@ -307,7 +308,7 @@ export default class extends AbstractView {
             const winsLossesChart = new Chart(dctx, {
                 type: 'doughnut',  // Doughnut chart type
                 data: {
-                    labels: ['Wins', 'Losses'],  // Labels for the segments
+                    labels: [text.profile.wins, text.profile.losses],  // Labels for the segments
                     datasets: [{
                         label: 'Wins vs Losses',
                         data: [number_of_wins, number_of_losses],  // Data for wins and losses
@@ -344,7 +345,7 @@ export default class extends AbstractView {
             var goalsChart = new Chart(barctx, {
                 type: 'bar',
                 data: {
-                    labels: ['Goals Scored', 'Goals Taken'],
+                    labels: [text.profile.goalsScored, text.profile.goalsTaken],
                     datasets: [{
                         label: 'Goals',
                         data: [goals_scored, goals_taken], // Need to replace with data from API
@@ -360,7 +361,7 @@ export default class extends AbstractView {
                             beginAtZero: true, // Start y-axis from 0
                             title: {
                                 display: true,
-                                text: 'Total Number of Goals'
+                                text: text.profile.text
                             }
                         }
                     },
@@ -383,7 +384,7 @@ export default class extends AbstractView {
 			document.querySelector("#profileBtns").innerHTML = `
 			<div class="row text-center">
 				<div class="col text-nowrap">
-					<button type="button" class="btn profile-btn" id="playGameBtn"><i class="bi bi-controller" style="padding-right: 5px;"></i>Start Play</button>
+					<button type="button" class="btn profile-btn" id="playGameBtn"><i class="bi bi-controller" style="padding-right: 5px;"></i>`+text.profile.play+`</button>
 				</div>
 			</div>
 			`
@@ -394,10 +395,10 @@ export default class extends AbstractView {
 					<button type="button" class="btn profile-btn" id="friendBtn"><span id="friendDisplay"></span></button>
 				</div>
 				<div class="col-12 col-md-3 col-sm-6 text-nowrap">
-					<button type="button" class="btn profile-btn" id="inviteBtn"><i class="bi bi-joystick" style="padding-right: 5px;"></i>Match Invite</button>
+					<button type="button" class="btn profile-btn" id="inviteBtn"><i class="bi bi-joystick" style="padding-right: 5px;"></i>`+text.profile.invite+`</button>
 				</div>
 				<div class="col-12 col-md-3 col-sm-6 text-nowrap">
-				<button type="button" class="btn profile-btn" id="messageBtn"><i class="bi bi-send" style="padding-right: 5px;""></i>Message</button>
+				<button type="button" class="btn profile-btn" id="messageBtn"><i class="bi bi-send" style="padding-right: 5px;""></i>`+text.profile.message+`</button>
 				</div>
 				<div class="col-12 col-md-3 col-sm-6 text-nowrap">
 					<button type="button" class="btn profile-btn" id="blockBtn"><i class="bi bi-ban" style="padding-right: 5px;"></i><span id="blockDisplay"></span></button>
@@ -437,16 +438,16 @@ export default class extends AbstractView {
 		function updateDisplay()
 		{
 			if (friend) {
-				document.getElementById("friendDisplay").innerHTML = '<i class="bi bi-dash-circle" style="padding-right: 5px;"></i><span>Remove Friend</span>';
+				document.getElementById("friendDisplay").innerHTML = '<i class="bi bi-dash-circle" style="padding-right: 5px;"></i><span>'+text.profile.removeFriend+'</span>';
 			}
 			else {
-				document.getElementById("friendDisplay").innerHTML = '<i class="bi bi-plus-circle" style="padding-right: 5px;"></i><span>Add Friend</span>';
+				document.getElementById("friendDisplay").innerHTML = '<i class="bi bi-plus-circle" style="padding-right: 5px;"></i><span>'+text.profile.addFriend+'</span>';
 			}
 			if (blocked) {
-				document.getElementById("blockDisplay").innerText = "Unblock"
+				document.getElementById("blockDisplay").innerText = text.friends.unblock
 			}
 			else {
-				document.getElementById("blockDisplay").innerText = "Block"
+				document.getElementById("blockDisplay").innerText = text.profile.block
 			}
 		}
 

@@ -144,7 +144,7 @@ const updateChatSelector = (instance) => {
 		const chatHeaderTitle = document.getElementById('chatHeaderTitle');
 		if (chatHeaderTitle) {
 			if (selectedValue === 'general') {
-				chatHeaderTitle.textContent = 'General Chat';
+				chatHeaderTitle.textContent = text.chat.general;
 			} else {
 				const selectedOption = instance.options[instance.selectedIndex];
 				chatHeaderTitle.textContent = `Chat with ${selectedOption.text}`;
@@ -166,6 +166,9 @@ export const refreshPage = async () => {
 
 	localStorage.setItem("language", data.language);
 	await updateLanguage();
+
+	document.getElementById("generalChatOption").innerText = text.chat.general
+	document.getElementById("chatInput").placeholder = text.chat.placeholder
 
     const chatUserSelect = document.getElementById('chatUserSelect');
     if (chatUserSelect) {
@@ -486,7 +489,7 @@ document.addEventListener("authenticate", (e) => {
 					// Accept button
 					const acceptButton = document.createElement('button');
 					acceptButton.className = 'btn btn-sm btn-success invitation-btn';
-					acceptButton.textContent = 'Accept';
+					acceptButton.textContent = text.chat.accept;
 					acceptButton.addEventListener('click', function() {
 						// Navigate to game page with invitation info
 						navigateTo(`/pong/${message.username}`);
@@ -499,7 +502,7 @@ document.addEventListener("authenticate", (e) => {
 					// Decline button
 					const declineButton = document.createElement('button');
 					declineButton.className = 'btn btn-sm btn-danger invitation-btn ms-2';
-					declineButton.textContent = 'Decline';
+					declineButton.textContent = text.chat.decline;
 					declineButton.addEventListener('click', function() {
 						// Remove the invitation card
 						messageElement.remove();
@@ -509,7 +512,7 @@ document.addEventListener("authenticate", (e) => {
 							chatSocket.send(JSON.stringify({
 								'type': 'private_message',
 								'recipient_id': message.sender_id,
-								'message': 'declined your game invitation'
+								'message': text.chat.declineMessage
 							}));
 						}
 					},
@@ -556,11 +559,11 @@ document.addEventListener("authenticate", (e) => {
 				
 				// Create message with clickable recipient username
 				const systemText = document.createElement('span');
-				systemText.textContent = 'You have invited ';
+				systemText.textContent = text.chat.inviteMessage1 + ' ';
 				confirmationInfo.appendChild(systemText);
 				
 				const postText = document.createElement('span');
-				postText.textContent = ' to play a game.';
+				postText.textContent = ' ' + text.chat.inviteMessage2;
 				confirmationInfo.appendChild(postText);
 				
 				invitationCard.appendChild(confirmationInfo);
@@ -572,7 +575,7 @@ document.addEventListener("authenticate", (e) => {
 				// Join button
 				const joinButton = document.createElement('button');
 				joinButton.className = 'btn btn-sm btn-primary invitation-btn';
-				joinButton.textContent = 'Join Game';
+				joinButton.textContent = text.chat.join;
 				joinButton.addEventListener('click', function() {
 					// Navigate to game page as the inviter
 					navigateTo(`/pong/${localStorage.getItem('username')}`);
@@ -585,7 +588,7 @@ document.addEventListener("authenticate", (e) => {
 				// Cancel button
 				const cancelButton = document.createElement('button');
 				cancelButton.className = 'btn btn-sm btn-outline-secondary invitation-btn ms-2';
-				cancelButton.textContent = 'Cancel';
+				cancelButton.textContent = text.chat.cancel;
 				cancelButton.addEventListener('click', function() {
 					// Remove the invitation card
 					messageElement.remove();
@@ -595,7 +598,7 @@ document.addEventListener("authenticate", (e) => {
 						chatSocket.send(JSON.stringify({
 							'type': 'private_message',
 							'recipient_id': message.recipient_id,
-							'message': 'cancelled the game invitation'
+							'message': text.chat.cancelMessage
 						}));
 					}
 				},
@@ -636,7 +639,7 @@ document.addEventListener("authenticate", (e) => {
 				if (message.is_own) {
 					// Message sent by current user
 					const prefix = document.createElement('em');
-					prefix.textContent = `Me → `;
+					prefix.textContent = text.chat.me+` → `;
 					messageContent.appendChild(prefix);
 					
 					// Add clickable recipient username
@@ -693,7 +696,7 @@ document.addEventListener("authenticate", (e) => {
 					}
 					
 					const arrow = document.createElement('em');
-					arrow.textContent = " → Me: ";
+					arrow.textContent = " → "+text.chat.me+": ";
 					messageContent.appendChild(arrow);
 				}
 			} else {
@@ -701,7 +704,7 @@ document.addEventListener("authenticate", (e) => {
 				if (message.is_own) {
 					// Own message in general chat
 					const sender = document.createElement('strong');
-					sender.textContent = 'Me: ';
+					sender.textContent = text.chat.me+': ';
 					messageContent.appendChild(sender);
 				} else {
 					// Other user's message in general chat

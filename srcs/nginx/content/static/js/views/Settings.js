@@ -41,7 +41,7 @@ export default class extends AbstractView {
                   <form id="updateForm">
   
                     <div class="d-flex align-items-center mb-3 pb-1">
-                      <span class="h1 fw-bold mb-0">Settings</span>
+                      <span class="h1 fw-bold mb-0">`+text.settings.settings+`</span>
                     </div>
   
   

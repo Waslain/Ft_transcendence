@@ -1,13 +1,106 @@
 {
+	"sidebar":{
+		"signout":"Se déconnecter"
+	},
 	"login":{
-		"login":"Connectez-vous",
+		"login":"Se connecter",
 		"username":"Nom d'utilisateur",
 		"password":"Mot de passe",
-		"description":"Connectez vous a votre compte",
-		"noAccount":"Vous n'avez pas de compte ?",
-		"registerHere":"Creez un compte !",
+		"description":"Connectez-vous à votre compte",
+		"noAccount":"Vous n'avez pas de compte?",
+		"registerHere":"Inscrivez-vous ici!",
 		"usernameCheck":"Veuillez entrer un nom d'utilisateur",
 		"passwordCheck":"Veuillez entrer un mot de passe",
 		"invalidCredentials":"Le nom d'utilisateur ou le mot de passe est invalide"
+	},
+	"register":{
+		"register":"Inscrivez-vous",
+		"description":"Creer un nouveau compte",
+		"confirmPassword":"Confirmez le mot de passe",
+		"usernameValidation":"Le mot de passe peut uniquement contenir des caractères alphanumériques et les caractères spéciaux - _ @ + .",
+		"confirmPasswordCheck":"Les mot de passe doivent correspondre",
+		"avatar":"Choisissez un avatar (optionnel):",
+		"remove":"Retirer",
+		"userExists":"Un utilisateur avec ce nom existe déjà"
+	},
+	"settings":{
+		"settings":"Options",
+		"update":"Mettre à jour",
+		"updateAvatar":"Mettre à jour l'avatar:",
+		"updateLanguage":"Changer la langue:",
+		"english":"Anglais",
+		"french":"Français",
+		"response":"Utilisateur mis à jour",
+		"error":"Il y a eu une erreur"
+	},
+	"friends":{
+		"friends":"Amis",
+		"searchbar":"Cherchez un utilisateur",
+		"friendList":"Liste d'Amis",
+		"blockList":"Liste de blocage",
+		"noFriends":"Pas encore d'amis",
+		"noBlock":"Pas de blocages",
+		"unfriend":"Retirer l'ami",
+		"unblock":"Débloquer"
+	},
+	"main":{
+		"phrases":{ 
+			"1":"Bonjour!",
+			"2":"Bienvenue sur",
+			"3":"Transcendence",
+			"4":"Amusez-vous C:"
+		},
+		"start":"Commençons!"
+	},
+	"waitingRoom":{
+		"title":"Salle d'Attente du Pong",
+		"cancel":"Annuler",
+		"play":"Jouer",
+		"text1":"Salle d'Attente pour le Jeu ...",
+		"text2":"Salle d'Attente pour le Tournoi",
+		"back":"Retourner au menu",
+		"connections":"Connections actuelles:"
+	},
+	"pong":{
+		"start":"Le Jeu Commence dans: ",
+		"winner":"Le Gagnant est",
+		"disconnect":"a été Déconnecté"
+	},
+	"profile":{
+		"play":"Jouer au jeu",
+		"invite":"Invitez à jouer",
+		"addFriend":"Ajouter l'ami",
+		"removeFriend":"Retirer l'ami",
+		"message":"Envoyer un message",
+		"block":"Bloquer",
+		"winStats":"Stats de Victoires",
+		"goalChart":"Graphique des Buts",
+		"wins":"Victoires",
+		"losses":"Défaites",
+		"winRate":"Taux de Victoire",
+		"gameTime":"Temps de Jeu",
+		"text":"Nombre Total de Buts",
+		"goalsScored":"Buts Mis",
+		"goalsTaken":"Buts Pris",
+		"playerA":"Joueur A",
+		"playerB":"Joueur B",
+		"scoreA":"Score A",
+		"scoreB":"Score B",
+		"duration":"Durée de la Partie",
+		"winner":"Gagnant"
+	},
+	"chat":{
+		"chat":"Chat",
+		"general":"Chat Général",
+		"placeholder":"Ecrivez un message...",
+		"me":"Moi",
+		"inviteMessage1":"Vous avez invité",
+		"inviteMessage2":"à jouer une partie",
+		"join":"Rejoindre la Partie",
+		"cancel":"Annuler",
+		"cancelMessage":"A annulé l'invitation",
+		"decline":"Decliner",
+		"declineMessage":"A decliné l'invitation",
+		"accept":"Accepter"
 	}
 }
