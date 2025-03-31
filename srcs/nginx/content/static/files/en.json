@@ -66,7 +66,41 @@
 		"winner":"The Winner is",
 		"disconnect":"has been Disconnected"
 	},
+	"profile":{
+		"play":"Play Game",
+		"invite":"Invite to Game",
+		"addFriend":"Add Friend",
+		"removeFriend":"Remove Friend",
+		"message":"Message",
+		"block":"Block",
+		"winStats":"Win Stats",
+		"goalChart":"Goals Chart",
+		"wins":"Wins",
+		"losses":"Losses",
+		"winRate":"Win Rate",
+		"gameTime":"Game Time",
+		"text":"Total Number of Goals",
+		"goalsScored":"Goals Scored",
+		"goalsTaken":"Goals Taken",
+		"playerA":"Player A",
+		"playerB":"Player B",
+		"scoreA":"Score A",
+		"scoreB":"Score B",
+		"duration":"Game Duration",
+		"winner":"Winner"
+	},
 	"chat":{
-		"chat":"Chat"
+		"chat":"Chat",
+		"general":"General Chat",
+		"placeholder":"Type a message...",
+		"me":"Me",
+		"inviteMessage1":"You have invited",
+		"inviteMessage2":"to play a game",
+		"join":"Join Game",
+		"cancel":"Cancel",
+		"cancelMessage":"cancelled the game invitation",
+		"decline":"Decline",
+		"declineMessage":"declined the game invitation",
+		"accept":"Accept"
 	}
 }

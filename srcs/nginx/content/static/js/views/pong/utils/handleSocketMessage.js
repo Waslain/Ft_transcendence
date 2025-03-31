@@ -1,9 +1,9 @@
 import { updateName } from "./updateName.js";
 import { updateScore } from "./updateScore.js";
 import { updateMessage } from "./updateMessage.js";
-import { text } from "../../../index.js"
 import { getChatSocket } from "./../../../index.js";
 import * as Utils from "./../../../utils.js";
+import { text } from "../../../index.js";
 
 const parseMessages = (data) => {
 	if (!('type' in data)) {
@@ -29,7 +29,7 @@ const parseMessages = (data) => {
 export const handleSocketMessage = (objectManager, socket) => {
   socket.onmessage = async (e) => {
     const data = JSON.parse(e.data);
-    console.log(data.action, data.params);
+    //console.log(data.action, data.params);
     switch (data.action) {
       case "names":
         objectManager.player1.name = data.params.names[0];

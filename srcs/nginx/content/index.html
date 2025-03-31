@@ -43,7 +43,7 @@
 			<!-- User selection dropdown -->
 			<div class="mb-2">
 				<select id="chatUserSelect" class="form-select form-select-sm">
-					<option value="general" selected>General Chat</option>
+					<option value="general" id="generalChatOption" selected></option>
 					<!-- Online users will be added here -->
 				</select>
 			</div>
@@ -55,7 +55,7 @@
 			
 			<!-- Input area -->
 			<div id="chatInputBar" class="d-flex mt-2">
-				<input type="text" id="chatInput" class="form-control" placeholder="Type a message..." />
+				<input type="text" id="chatInput" class="form-control"/>
 				<button id="sendButton" class="btn btn-primary ms-2">
 					<i class="bi bi-send"></i>
 				</button>   
