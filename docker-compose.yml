@@ -8,9 +8,10 @@ services:
     networks:
       - transcendence
     volumes:
-      - postgres_data:/var/lib/posgresql/data
+      - ${VOLUME_PATH}/postgres_data:/var/lib/posgresql/data
     env_file:
       - .env
+    user: "999:999"
 
   django:
     build: ./srcs/django
@@ -32,7 +33,7 @@ services:
       DATABASE_PORT: ${DATABASE_PORT}
     volumes:
       - ./srcs/django/django_app:/app
-      - media_data:/media
+      - ${VOLUME_PATH}/media_data:/media
     env_file:
       - .env
 
@@ -42,10 +43,10 @@ services:
     ports:
       - "443:443"
     volumes:
-      - ./srcs/nginx/conf/nginx.conf:/etc/nginx/nginx.conf
-      - ./srcs/nginx/content:/usr/share/nginx/html
-      - ./srcs/nginx/ssl:/etc/nginx/ssl
-      - media_data:/media
+      - ./srcs/nginx/conf/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./srcs/nginx/content:/usr/share/nginx/html:ro
+      - ./srcs/nginx/ssl:/etc/nginx/ssl:ro
+      - ${VOLUME_PATH}/media_data:/media:ro
     networks:
       - transcendence
     depends_on:
@@ -53,7 +54,17 @@ services:
 
 volumes:
   postgres_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${VOLUME_PATH}/postgres_data
   media_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${VOLUME_PATH}/media_data
 
 networks:
   transcendence:

@@ -1,7 +1,14 @@
+VOLUME_PATH = /path/to/sgoinfre
+
 all: run
 
 run:
+	sudo mkdir -p ${VOLUME_PATH}/postgres_data ${VOLUME_PATH}/media_data
+	sudo chown 999:999 ${VOLUME_PATH}/postgres_data
+	sudo chown 1000:1000 ${VOLUME_PATH}/media_data
+	sudo chmod 755 ${VOLUME_PATH}/postgres_data ${VOLUME_PATH}/media_data
 	docker compose -f ./docker-compose.yml up --build
+
 
 stop:
 	@docker compose -f ./docker-compose.yml down
@@ -15,8 +22,8 @@ clean: stop
 	@docker system prune -af
 
 vclean: stop
-	@rm -rf /var/lib/docker/volumes/srcs_postgres_data
-	@rm -rf /var/lib/docker/volumes/srcs_media_data
+	sudo rm -rf ${VOLUME_PATH}/postgres_data
+	sudo rm -rf ${VOLUME_PATH}/media_data
 
 migrate:
 	docker exec django python manage.py migrate
