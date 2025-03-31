@@ -84,7 +84,7 @@ export default class extends AbstractView {
 
   async #webSocketGame() {
     const roomName = "waitingRoom";
-    const url = "wss://" + window.location.hostname + "/ws/pong/waitingRoom/";
+    const url = "wss://" + window.location.hostname + ":8080/ws/pong/waitingRoom/";
 
     this.#waitingRoomSocket = new WebSocket(url);
 
@@ -111,7 +111,7 @@ export default class extends AbstractView {
   async #webSocketTournament() {
     const roomName = "waitingRoom";
     const url =
-      "wss://" + window.location.hostname + "/ws/tournament/waitingRoom/";
+      "wss://" + window.location.hostname + ":8080/ws/tournament/waitingRoom/";
 
     this.#waitingRoomSocket = new WebSocket(url);
 

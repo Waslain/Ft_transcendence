@@ -59,6 +59,7 @@ export default class extends AbstractView {
 				      <select id="language" name="language" class="form-control form-control-lg">
 				        <option value="en">`+text.settings.english+`</option>
 				        <option value="fr">`+text.settings.french+`</option>
+						<option value="es">`+text.settings.spanish+`</option>
 				      </select>
                     </div>
   

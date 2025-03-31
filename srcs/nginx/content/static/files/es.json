@@ -1,0 +1,110 @@
+{
+    "sidebar":{
+        "signout":"Cerrar sesión",
+        "main":"Inicio"
+    },
+    "login":{
+        "login":"Iniciar sesión",
+        "username":"Nombre de usuario",
+        "password":"Contraseña",
+        "description":"Inicia sesión en tu cuenta",
+        "noAccount":"¿No tienes una cuenta?",
+        "registerHere":"¡regístrate aquí!",
+        "usernameCheck":"Por favor, introduce un nombre de usuario",
+        "passwordCheck":"Por favor, introduce una contraseña",
+        "invalidCredentials":"Nombre de usuario o contraseña inválidos"
+    },
+    "register":{
+        "register":"Registrarse",
+        "description":"Crear una nueva cuenta",
+        "confirmPassword":"Confirmar contraseña",
+        "usernameValidation":"El nombre de usuario solo puede contener caracteres alfanuméricos y caracteres especiales - _ @ + .",
+        "confirmPasswordCheck":"Las contraseñas no coinciden",
+        "avatar":"Elige un avatar (opcional):",
+        "remove":"Eliminar",
+        "userExists":"Ya existe un usuario con ese nombre"
+    },
+    "settings":{
+        "settings":"Configuración",
+        "update":"Actualizar",
+        "updateAvatar":"Actualizar avatar:",
+        "updateLanguage":"Cambiar idioma:",
+        "english":"Inglés",
+        "french":"Francés",
+        "spanish":"Español",
+        "traditionChinese": "Chino (Tradicional)",
+        "simplifiedChinese": "Chino (Simplificado)",
+        "response":"Usuario actualizado",
+        "error":"Ha ocurrido un error"
+    },
+    "friends":{
+        "friends":"Amigos",
+        "searchbar":"Buscar usuario",
+        "friendList":"Lista de amigos",
+        "blockList":"Lista de bloqueados",
+        "noFriends":"Aún no tienes amigos",
+        "noBlock":"Aún no has bloqueado a nadie",
+        "unfriend":"Eliminar amigo",
+        "unblock":"Desbloquear"
+    },
+    "main":{
+        "phrases":{ 
+            "1":"¡Hola!",
+            "2":"Bienvenido a",
+            "3":"Transcendence",
+            "4":"¡Diviértete C:"
+        },
+        "start":"¡Comencemos!"
+    },
+    "waitingRoom":{
+        "title":"Sala de espera de Pong",
+        "cancel":"Cancelar",
+        "play":"Jugar",
+        "text1":"Sala de espera para juego...",
+        "text2":"Sala de espera para torneo...",
+        "back":"Volver a la página principal",
+        "connections":"Conexiones actuales: "
+    },
+    "pong":{
+        "start":"El juego comienza en: ",
+        "winner":"El ganador es",
+        "disconnect":"se ha desconectado"
+    },
+    "profile":{
+        "play":"Jugar",
+        "invite":"Invitar a jugar",
+        "addFriend":"Añadir amigo",
+        "removeFriend":"Eliminar amigo",
+        "message":"Mensaje",
+        "block":"Bloquear",
+        "winStats":"Estadísticas de victoria",
+        "goalChart":"Gráfico de goles",
+        "wins":"Victorias",
+        "losses":"Derrotas",
+        "winRate":"Porcentaje de victorias",
+        "gameTime":"Tiempo de juego",
+        "text":"Número total de goles",
+        "goalsScored":"Goles marcados",
+        "goalsTaken":"Goles recibidos",
+        "playerA":"Jugador A",
+        "playerB":"Jugador B",
+        "scoreA":"Puntuación A",
+        "scoreB":"Puntuación B",
+        "duration":"Duración del juego",
+        "winner":"Ganador"
+    },
+    "chat":{
+        "chat":"Chat",
+        "general":"Chat general",
+        "placeholder":"Escribe un mensaje...",
+        "me":"Yo",
+        "inviteMessage1":"Has invitado a",
+        "inviteMessage2":"a jugar una partida",
+        "join":"Unirse al juego",
+        "cancel":"Cancelar",
+        "cancelMessage":"canceló la invitación al juego",
+        "decline":"Rechazar",
+        "declineMessage":"rechazó la invitación al juego",
+        "accept":"Aceptar"
+    }
+}

@@ -292,6 +292,9 @@ document.addEventListener("authenticate", (e) => {
 
 		/* Update sidebar*/
   		document.querySelector("#sidebarItems").innerHTML = `
+		<a href="/" class="nav-item d-flex align-items-center" data-link>
+			<i class="fs-2 bi-house"></i><span>`+text.sidebar.main+`</span>
+		</a>
 		<a href="#" class="nav-item d-flex align-items-center" id="chatBox">
 				<i class="fs-2 bi-chat-left-heart"></i><div id="msg-hint" class="msg-hint"><i class=" bi bi-circle-fill red-dot"></i></div><span>`+text.chat.chat+`</span>
 		</a>
@@ -441,7 +444,7 @@ document.addEventListener("authenticate", (e) => {
 		}
 
 		function displayMessage(message) {
-			console.log(message);
+			//console.log(message);
 			const chatMessages = document.getElementById('chatMessages');
 			
 			// Check if the message is from a blocked user
@@ -643,7 +646,7 @@ document.addEventListener("authenticate", (e) => {
 			// Handle different message formats
 			if (message.is_private) {
 				// Private message format
-				console.log("PRIVATE MESSAGE");
+				//console.log("PRIVATE MESSAGE");
 				if (message.is_own) {
 					// Message sent by current user
 					const prefix = document.createElement('em');

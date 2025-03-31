@@ -1,6 +1,7 @@
 {
 	"sidebar":{
-		"signout":"Se déconnecter"
+		"signout":"Se déconnecter",
+		"main":"Accueil"
 	},
 	"login":{
 		"login":"Se connecter",
@@ -30,6 +31,7 @@
 		"updateLanguage":"Changer la langue:",
 		"english":"Anglais",
 		"french":"Français",
+		"spanish":"Espagnol",
 		"traditionChinese": "Chinois traditionnel",
         "simplifiedChinese": "Chinois simplifié",
 		"response":"Utilisateur mis à jour",

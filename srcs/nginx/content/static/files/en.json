@@ -1,6 +1,7 @@
 {
 	"sidebar":{
-		"signout":"Sign out"
+		"signout":"Sign out",
+		"main":"Home"
 	},
 	"login":{
 		"login":"Log in",
@@ -30,6 +31,7 @@
 		"updateLanguage":"Change language:",
 		"english":"English",
 		"french":"French",
+		"spanish":"Spanish",
 		"traditionChinese": "Chinese (Traditional)",
         "simplifiedChinese": "Chinese (Simplified)",
 		"response":"User updated",
