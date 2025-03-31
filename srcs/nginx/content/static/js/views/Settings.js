@@ -151,8 +151,9 @@ export default class extends AbstractView {
 				if (res.status == 200) {
 					console.log(res.data.message);
 					result.innerText = text.settings.response;
+					console.log(res.data.avatar);
 					if (res.data.avatar) {
-						localStorage.setItem("avatar", "https://localhost" + res.data.avatar);
+						localStorage.setItem("avatar", "https://localhost:8080" + res.data.avatar);
 					}
 					else {
 						localStorage.setItem("avatar", "/static/img/default.png");

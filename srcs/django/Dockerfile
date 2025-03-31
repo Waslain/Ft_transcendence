@@ -27,7 +27,7 @@ COPY --from=builder /usr/local/bin /usr/local/bin/
 COPY script/docker-entry.sh /docker-entry.sh
 RUN chmod +x /docker-entry.sh && chown django:django /docker-entry.sh
 
-RUN mkdir -p /media && chown -R django:django /media
+RUN mkdir -p -m 777 /media
 
 USER django
 

@@ -4,7 +4,7 @@ all: run
 
 run:
 	echo VOLUME_PATH=${VOLUME_PATH} >> .env
-	mkdir -p ${VOLUME_PATH}/postgres_data ${VOLUME_PATH}/media_data
+	mkdir -p -m 777 ${VOLUME_PATH}/postgres_data ${VOLUME_PATH}/media_data
 	#chown 999:999 ${VOLUME_PATH}/postgres_data
 	#chown 1000:1000 ${VOLUME_PATH}/media_data
 	#chmod 755 ${VOLUME_PATH}/postgres_data ${VOLUME_PATH}/media_data
@@ -23,8 +23,8 @@ clean: stop
 	@docker system prune -af
 
 vclean: stop
-	sudo rm -rf ${VOLUME_PATH}/postgres_data
-	sudo rm -rf ${VOLUME_PATH}/media_data
+	rm -rf ${VOLUME_PATH}/postgres_data
+	rm -rf ${VOLUME_PATH}/media_data
 
 migrate:
 	docker exec django python manage.py migrate

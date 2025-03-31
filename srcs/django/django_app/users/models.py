@@ -5,7 +5,7 @@ from django.core.cache import cache
 from django.utils import timezone
 
 class User(AbstractUser):
-	language = models.CharField(max_length=5, default="en");
+	language = models.CharField(max_length=2, default="en");
 	friends = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='is_friend');
 	blocked = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='is_blocked');
 	avatar = models.ImageField(upload_to='images/', blank=True, null=True)

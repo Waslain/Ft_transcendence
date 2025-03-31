@@ -236,7 +236,7 @@ export default class extends AbstractView {
 
 		let avatar = "/static/img/default.png"
 		if (dataUser.avatar) {
-			avatar = "https://localhost" + dataUser.avatar;
+			avatar = "https://localhost:8080" + dataUser.avatar;
 		}
 
 		endpoint = "https://localhost:8080/api/stats/" + username;
