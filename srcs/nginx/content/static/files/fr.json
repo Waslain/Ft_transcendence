@@ -30,6 +30,8 @@
 		"updateLanguage":"Changer la langue:",
 		"english":"Anglais",
 		"french":"Français",
+		"traditionChinese": "Chinois traditionnel",
+        "simplifiedChinese": "Chinois simplifié",
 		"response":"Utilisateur mis à jour",
 		"error":"Il y a eu une erreur"
 	},

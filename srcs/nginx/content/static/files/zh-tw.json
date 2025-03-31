@@ -1,0 +1,108 @@
+{
+	"sidebar":{
+		"signout":"登出"
+	},
+	"login":{
+		"login":"登入",
+		"username":"用戶名稱",
+		"password":"密碼",
+		"description":"登入您的帳戶",
+		"noAccount":"還沒有帳戶？",
+		"registerHere":"由此註冊!",
+		"usernameCheck":"請輸入一個用戶名稱",
+		"passwordCheck":"請輸入一個密碼",
+		"invalidCredentials":"用戶名稱或密碼無效"
+	},
+	"register":{
+		"register":"註冊",
+		"description":"創建一個新帳戶",
+		"confirmPassword":"再次確認密碼",
+		"usernameValidation":"用戶名稱只能包含字母數字和部分特殊符號 - _ @ + .",
+		"confirmPasswordCheck":"輸入密碼不同",
+		"avatar":"選擇玩家頭像(非必須):",
+		"remove":"移除",
+		"userExists":"該用戶名稱已被使用"
+	},
+	"settings":{
+		"settings":"設定",
+		"update":"更新",
+		"updateAvatar":"更新頭像:",
+		"updateLanguage":"更換語言:",
+		"english":"英文",
+		"french":"法文",
+        "traditionChinese": "繁體中文",
+        "simplifiedChinese": "簡體中文",
+		"response":"使用者更新",
+		"error":"出現錯誤"
+	},
+	"friends":{
+		"friends":"朋友",
+		"searchbar":"搜尋用戶",
+		"friendList":"好友名單",
+		"blockList":"黑名單",
+		"noFriends":"暫無新增好友",
+		"noBlock":"沒有封鎖使用者",
+		"unfriend":"取消好友",
+		"unblock":"取消封鎖"
+	},
+	"main":{
+		"phrases":{ 
+			"1":"你好!",
+			"2":"歡迎來到",
+			"3":"超越專案",
+			"4":"遊戲愉快 C:"
+		},
+		"start":"開始!"
+	},
+	"waitingRoom":{
+		"title":"遊戲等待區",
+		"cancel":"取消",
+		"play":"開始",
+		"text1":"單人遊戲等待區...",
+		"text2":"多人遊戲等待區...",
+		"back":"回到首頁",
+		"connections":"當前連線人數: "
+	},
+	"pong":{
+		"start":"遊戲開始倒數: ",
+		"winner":"贏家是",
+		"disconnect":"已經斷線"
+	},
+	"profile":{
+		"play":"開始遊戲",
+		"invite":"邀請單人遊戲",
+		"addFriend":"新增好友",
+		"removeFriend":"取消好友",
+		"message":"訊息",
+		"block":"封鎖",
+		"winStats":"勝負統計",
+		"goalChart":"得分統計",
+		"wins":"勝場",
+		"losses":"輸場",
+		"winRate":"勝率",
+		"gameTime":"總遊戲時長",
+		"text":"總得分",
+		"goalsScored":"得分",
+		"goalsTaken":"失分",
+		"playerA":"玩家 A",
+		"playerB":"玩家 B",
+		"scoreA":"得分 A",
+		"scoreB":"得分 B",
+		"duration":"遊戲時長",
+		"winner":"贏家"
+	},
+	"chat":{
+		"chat":"聊天室",
+		"general":"大眾聊天室",
+		"placeholder":"輸入訊息...",
+		"me":"我",
+		"inviteMessage1":"你邀請了",
+		"inviteMessage2":"一起遊戲",
+		"join":"加入遊戲",
+		"cancel":"取消",
+		"cancelMessage":"取消遊戲邀請",
+		"decline":"拒絕",
+		"declineMessage":"拒絕遊戲邀請",
+		"accept":"同意"
+	}
+}

@@ -30,6 +30,8 @@
 		"updateLanguage":"Change language:",
 		"english":"English",
 		"french":"French",
+		"traditionChinese": "Chinese (Traditional)",
+        "simplifiedChinese": "Chinese (Simplified)",
 		"response":"User updated",
 		"error":"An error occurred"
 	},

@@ -1,0 +1,108 @@
+{
+	"sidebar":{
+		"signout":"登入"
+	},
+	"login":{
+		"login":"登入",
+		"username":"用户名",
+		"password":"密码",
+		"description":"登入账号",
+		"noAccount":"还没有账号",
+		"registerHere":"在此注册!",
+		"usernameCheck":"请输入一个用户名",
+		"passwordCheck":"请输入一个密码",
+		"invalidCredentials":"用户名或密码无效"
+	},
+	"register":{
+		"register":"注册",
+		"description":"建立一个新账号",
+		"confirmPassword":"再次确认密码",
+		"usernameValidation":"用户名只能包含字母数字和部分特殊符号 - _ @ + .",
+		"confirmPasswordCheck":"输入密码不同",
+		"avatar":"选择玩家头像(非必要):",
+		"remove":"移除",
+		"userExists":"用户名已被使用"
+	},
+	"settings":{
+		"settings":"设定",
+		"update":"更新",
+		"updateAvatar":"更新头像:",
+		"updateLanguage":"更换语言:",
+		"english":"英文",
+		"french":"法文",
+        "traditionChinese": "繁体中文",
+        "simplifiedChinese": "简体中文",
+		"response":"用户更新",
+		"error":"出现错误"
+	},
+	"friends":{
+		"friends":"朋友",
+		"searchbar":"搜寻用户",
+		"friendList":"好友名单",
+		"blockList":"黑名单",
+		"noFriends":"暂无新增好友",
+		"noBlock":"无封锁用户",
+		"unfriend":"取消好友",
+		"unblock":"取消封锁"
+	},
+	"main":{
+		"phrases":{ 
+			"1":"你好!",
+			"2":"欢迎来到",
+			"3":"超越专案",
+			"4":"游戏愉快 C:"
+		},
+		"start":"开始!"
+	},
+	"waitingRoom":{
+		"title":"游戏等待区",
+		"cancel":"取消",
+		"play":"开始",
+		"text1":"单人游戏等待区...",
+		"text2":"多人游戏等待区...",
+		"back":"回到首页",
+		"connections":"当前连线人数: "
+	},
+	"pong":{
+		"start":"游戏开始倒数: ",
+		"winner":"赢家是",
+		"disconnect":"已经断线"
+	},
+	"profile":{
+		"play":"开始游戏",
+		"invite":"邀请单人游戏",
+		"addFriend":"新增好友",
+		"removeFriend":"取消好友",
+		"message":"讯息",
+		"block":"封锁",
+		"winStats":"胜负统计",
+		"goalChart":"得分统计",
+		"wins":"胜场",
+		"losses":"输场",
+		"winRate":"胜率",
+		"gameTime":"总游戏时长",
+		"text":"总得分",
+		"goalsScored":"得分",
+		"goalsTaken":"失分",
+		"playerA":"玩家 A",
+		"playerB":"玩家 B",
+		"scoreA":"得分 A",
+		"scoreB":"得分 B",
+		"duration":"游戏时长",
+		"winner":"赢家"
+	},
+	"chat":{
+		"chat":"聊天室",
+		"general":"世界频",
+		"placeholder":"输入讯息...",
+		"me":"我",
+		"inviteMessage1":"你邀请了",
+		"inviteMessage2":"一起游戏",
+		"join":"加入游戏",
+		"cancel":"取消",
+		"cancelMessage":"取消游戏邀请",
+		"decline":"拒绝",
+		"declineMessage":"拒绝游戏邀请",
+		"accept":"同意"
+	}
+}
