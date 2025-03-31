@@ -111,7 +111,7 @@ export default class extends AbstractView {
 				return;
 			}
 
-			var url = "https://localhost/api/users/login/"
+			var url = "https://localhost:8080/api/users/login/"
 			fetch(url, {
 				method: 'POST',
 				body: formData,

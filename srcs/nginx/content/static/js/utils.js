@@ -1,5 +1,5 @@
 export function fetchBlockedUsers() {
-	fetch('https://localhost/api/users/block/list/', {
+	fetch('https://localhost:8080/api/users/block/list/', {
 		method: 'GET',
 	})
 	.then(response => {
@@ -23,7 +23,7 @@ export function fetchBlockedUsers() {
 }
 
 export function fetchOnlineUsers(usersArray) {
-    return fetch('https://localhost/api/users/online/', {
+    return fetch('https://localhost:8080/api/users/online/', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'

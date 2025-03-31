@@ -77,7 +77,7 @@ const router = async () => {
 
   const redirection = view.redirect();
   if (redirection.needed) {
-    var endpoint = "https://localhost/api/users/check-auth/"
+    var endpoint = "https://localhost:8080/api/users/check-auth/"
     const update = await fetch(endpoint, {
       method: 'GET',
     })
@@ -127,7 +127,7 @@ window.addEventListener("popstate", router);
 
 
 const updateLanguage = async () => {
-	const url = "https://localhost/files/" + localStorage.getItem("language") + ".json";
+	const url = "https://localhost:8080/files/" + localStorage.getItem("language") + ".json";
 	text = await fetch(url)
 	.then(response => response.json())
 	.catch(error => console.error(error))
@@ -155,7 +155,7 @@ const updateChatSelector = (instance) => {
 
 export const refreshPage = async () => {
 	/*Check if the user is authenticated*/
-	var url = "https://localhost/api/users/check-auth/"
+	var url = "https://localhost:8080/api/users/check-auth/"
 	const data = await fetch(url, {
 	  method: 'GET',
 	})
@@ -310,7 +310,7 @@ document.addEventListener("authenticate", (e) => {
 
 		document.getElementById('signOut').addEventListener('click', (e) => {
 			e.preventDefault();
-			var url = "https://localhost/api/users/logout/"
+			var url = "https://localhost:8080/api/users/logout/"
 			fetch(url, {
 				method: 'GET',
 			})

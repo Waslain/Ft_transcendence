@@ -80,7 +80,7 @@ export const handleSocketMessage = (objectManager, socket) => {
         const chatSocket = getChatSocket();
         if (chatSocket) {
           const dataUser = await fetch(
-            "https://localhost/api/users/get/" +
+            "https://localhost:8080/api/users/get/" +
               localStorage.getItem("username"),
             {
               method: "GET",

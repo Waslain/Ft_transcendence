@@ -139,7 +139,7 @@ export default class extends AbstractView {
 			}
 
 			updateBtn.disabled = true;
-			var endpoint = "https://localhost/api/users/updateUser/"
+			var endpoint = "https://localhost:8080/api/users/updateUser/"
 			fetch(endpoint, {
 				method: 'PUT',
 				body: formData,

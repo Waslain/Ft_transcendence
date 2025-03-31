@@ -162,7 +162,7 @@ export default class extends AbstractView {
 			}
 
 			registerBtn.disabled = true;
-			var endpoint = "https://localhost/api/users/register/"
+			var endpoint = "https://localhost:8080/api/users/register/"
 			fetch(endpoint, {
 				method: 'POST',
 				body: formData,

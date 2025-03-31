@@ -208,7 +208,7 @@ export default class extends AbstractView {
 		this.#abortController = new AbortController();
 		const username = this.params.username; 
 
-		let endpoint = "https://localhost/api/users/get/" + username;
+		let endpoint = "https://localhost:8080/api/users/get/" + username;
 		const dataUser = await fetch(endpoint, {
 			method: 'GET',
 		})
@@ -239,7 +239,7 @@ export default class extends AbstractView {
 			avatar = "https://localhost" + dataUser.avatar;
 		}
 
-		endpoint = "https://localhost/api/stats/" + username;
+		endpoint = "https://localhost:8080/api/stats/" + username;
 		const data = await fetch(endpoint, {
 			method: 'GET',
 		})
@@ -409,7 +409,7 @@ export default class extends AbstractView {
 			let formData = new FormData();
 			formData.set('username', username);
 
-			const endpoint = "https://localhost/api/users/friends/check/";
+			const endpoint = "https://localhost:8080/api/users/friends/check/";
 			const tmpData = await fetch(endpoint, {
 				method: 'POST',
 				body: formData,
@@ -478,10 +478,10 @@ export default class extends AbstractView {
 
 				let endpoint;
 				if (friend) {
-					endpoint = "https://localhost/api/users/friends/remove/";
+					endpoint = "https://localhost:8080/api/users/friends/remove/";
 				}
 				else {
-					endpoint = "https://localhost/api/users/friends/add/";
+					endpoint = "https://localhost:8080/api/users/friends/add/";
 				}
 				fetch(endpoint, {
 					method: 'PUT',
@@ -517,10 +517,10 @@ export default class extends AbstractView {
 
 				let endpoint;
 				if (blocked) {
-					endpoint = "https://localhost/api/users/block/remove/";
+					endpoint = "https://localhost:8080/api/users/block/remove/";
 				}
 				else {
-					endpoint = "https://localhost/api/users/block/add/";
+					endpoint = "https://localhost:8080/api/users/block/add/";
 				}
 				fetch(endpoint, {
 					method: 'PUT',
@@ -555,7 +555,7 @@ export default class extends AbstractView {
 		}
 
 		/*Match History Table*/
-		endpoint = "https://localhost/api/matchhistory/list/";
+		endpoint = "https://localhost:8080/api/matchhistory/list/";
 		const tableData = await fetch(endpoint, {
 			method: 'GET',
 		})
