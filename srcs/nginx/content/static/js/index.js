@@ -133,26 +133,7 @@ const updateLanguage = async () => {
 	.catch(error => console.error(error))
 }
 
-const updateChatSelector = (instance) => {
-	const selectedValue = instance.value;
-	const chatMessages = document.getElementById('chatMessages');
-	
-	if (chatMessages) {
-		chatMessages.dataset.context = selectedValue;
-		
-		// Update the header title
-		const chatHeaderTitle = document.getElementById('chatHeaderTitle');
-		if (chatHeaderTitle) {
-			if (selectedValue === 'general') {
-				chatHeaderTitle.textContent = text.chat.general;
-			} else {
-				const selectedOption = instance.options[instance.selectedIndex];
-				chatHeaderTitle.textContent = `Chat with ${selectedOption.text}`;
-			}
-		}
-	}
-}
-
+let refreshAbortController = new AbortController();
 export const refreshPage = async () => {
 	/*Check if the user is authenticated*/
 	var url = "https://localhost:8080/api/users/check-auth/"
@@ -167,13 +148,38 @@ export const refreshPage = async () => {
 	localStorage.setItem("language", data.language);
 	await updateLanguage();
 
-	document.getElementById("generalChatOption").innerText = text.chat.general
-	document.getElementById("chatInput").placeholder = text.chat.placeholder
+	document.getElementById("generalChatOption").innerText = text.chat.general;
+	document.getElementById("chatInput").placeholder = text.chat.placeholder;
 
-    const chatUserSelect = document.getElementById('chatUserSelect');
+	const chatUserSelect = document.getElementById('chatUserSelect');
     if (chatUserSelect) {
-        chatUserSelect.removeEventListener('change', updateChatSelector(chatUserSelect));
-        chatUserSelect.addEventListener('change', updateChatSelector(chatUserSelect));
+	if (refreshAbortController) {
+		refreshAbortController.abort();
+		refreshAbortController = null;
+		refreshAbortController = new AbortController();
+	}
+	chatUserSelect.addEventListener('change', function() {
+		const selectedValue = this.value;
+		const chatMessages = document.getElementById('chatMessages');
+		
+		if (chatMessages) {
+			chatMessages.dataset.context = selectedValue;
+			
+			// Update the header title
+			const chatHeaderTitle = document.getElementById('chatHeaderTitle');
+			if (chatHeaderTitle) {
+				if (selectedValue === 'general') {
+					chatHeaderTitle.textContent = text.chat.general;
+				} else {
+					const selectedOption = this.options[this.selectedIndex];
+					chatHeaderTitle.textContent = `Chat with ${selectedOption.text}`;
+				}
+			}
+		}
+	},
+	{
+		signal: refreshAbortController.signal,
+	});
     }
 
 	if (data.IsAuthenticated) {
@@ -435,6 +441,7 @@ document.addEventListener("authenticate", (e) => {
 		}
 
 		function displayMessage(message) {
+			console.log(message);
 			const chatMessages = document.getElementById('chatMessages');
 			
 			// Check if the message is from a blocked user
@@ -636,6 +643,7 @@ document.addEventListener("authenticate", (e) => {
 			// Handle different message formats
 			if (message.is_private) {
 				// Private message format
+				console.log("PRIVATE MESSAGE");
 				if (message.is_own) {
 					// Message sent by current user
 					const prefix = document.createElement('em');
@@ -764,6 +772,7 @@ document.addEventListener("authenticate", (e) => {
 		
 
 		document.getElementById("sendButton").addEventListener("click", function() {
+			console.log('Send button clicked');
 			sendChatMessage();
 		},
 		{
@@ -778,15 +787,18 @@ document.addEventListener("authenticate", (e) => {
 		}
 
 		function sendChatMessage() {
+			console.log('Sending chat message');
 			const chatInput = document.getElementById('chatInput');
 			const message = chatInput.value.trim();
 			const chatMessages = document.getElementById('chatMessages');
 			const chatContext = chatMessages ? chatMessages.dataset.context : 'general';
+			console.log('CHAT CONTEXT:', chatContext);
 			
 			if (message && chatSocket && chatSocket.readyState === WebSocket.OPEN) {
 				// Check if this is a private message
 				if (chatContext && chatContext !== 'general') {
 					// Send private message
+					console.log('Sending private message to', chatContext);
 					chatSocket.send(JSON.stringify({
 						'type': 'private_message',
 						'recipient_id': chatContext,
