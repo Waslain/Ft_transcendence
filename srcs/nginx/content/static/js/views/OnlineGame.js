@@ -23,8 +23,8 @@ export default class extends Pong {
     const roomName = "pongRoom";
     const url =
       "wss://" +
-      window.location.hostname +
-      ":8080/ws/pong/pongRoom/?uuid=" +
+      window.location.host +
+      "/ws/pong/pongRoom/?uuid=" +
       encodeURIComponent(this.params.room_id) +
       "&name=" +
       name;
