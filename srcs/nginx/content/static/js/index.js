@@ -77,7 +77,7 @@ const router = async () => {
 
   const redirection = view.redirect();
   if (redirection.needed) {
-    var endpoint = "https://localhost:8080/api/users/check-auth/"
+    var endpoint = "https://" + location.host + "/api/users/check-auth/"
     const update = await fetch(endpoint, {
       method: 'GET',
     })
@@ -130,7 +130,7 @@ const updateLanguage = async () => {
 	let language = localStorage.getItem("language")
 	if (language === "undefined")
 		language = "en"
-	const url = "https://localhost:8080/files/" + language + ".json";
+	const url = "https://" + location.host + "/files/" + language + ".json";
 	text = await fetch(url)
 	.then(response => response.json())
 	.catch(error => console.error(error))
@@ -139,7 +139,7 @@ const updateLanguage = async () => {
 let refreshAbortController = new AbortController();
 export const refreshPage = async () => {
 	/*Check if the user is authenticated*/
-	var url = "https://localhost:8080/api/users/check-auth/"
+	var url = "https://" + location.host +"/api/users/check-auth/"
 	const data = await fetch(url, {
 	  method: 'GET',
 	})
@@ -322,7 +322,7 @@ document.addEventListener("authenticate", (e) => {
 
 		document.getElementById('signOut').addEventListener('click', (e) => {
 			e.preventDefault();
-			var url = "https://localhost:8080/api/users/logout/"
+			var url = "https://" + location.host + "/api/users/logout/"
 			fetch(url, {
 				method: 'GET',
 			})

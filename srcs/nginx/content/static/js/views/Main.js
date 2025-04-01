@@ -85,7 +85,7 @@ export default class extends AbstractView {
     }
     scrambleText();
 
-    var url = "https://localhost:8080/api/users/check-auth/"
+    var url = "https://" + location.host + "/api/users/check-auth/"
     await fetch(url, {
       method: 'GET',
     })

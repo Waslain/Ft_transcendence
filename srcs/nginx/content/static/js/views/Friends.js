@@ -109,7 +109,7 @@ export default class extends AbstractView {
 		const searchBar = document.getElementById('searchBar');
 		searchBar.addEventListener("keydown", function(event) {
 			if (event.keyCode === 13) {
-				navigateTo("https://localhost:8080/users/profile/" + searchBar.value);
+				navigateTo("https://" + location.host + "/users/profile/" + searchBar.value);
 			}
 		},
 		{
@@ -117,7 +117,7 @@ export default class extends AbstractView {
 		});
 
 		const updateFriendsList = async () => {
-			let endpoint = "https://localhost:8080/api/users/friends/list/";
+			let endpoint = "https://" + location.host + "/api/users/friends/list/";
 			let data = await fetch(endpoint, {
 				method: 'GET',
 			})
@@ -199,7 +199,7 @@ export default class extends AbstractView {
 		}
 
 		const updateBlockList = async () => {
-			let endpoint = "https://localhost:8080/api/users/block/list/";
+			let endpoint = "https://" + location.host + "/api/users/block/list/";
 			let data = await fetch(endpoint, {
 				method: 'GET',
 			})
@@ -279,7 +279,7 @@ export default class extends AbstractView {
 			let formData = new FormData();
 			formData.set('username', username);
 
-			const endpoint = "https://localhost:8080/api/users/friends/remove/";
+			const endpoint = "https://" + location.host + "/api/users/friends/remove/";
 			fetch(endpoint, {
 				method: 'PUT',
 				body: formData,
@@ -304,7 +304,7 @@ export default class extends AbstractView {
 			let formData = new FormData();
 			formData.set('username', username);
 
-			const endpoint = "https://localhost:8080/api/users/block/remove/";
+			const endpoint = "https://" + location.host + "/api/users/block/remove/";
 			fetch(endpoint, {
 				method: 'PUT',
 				body: formData,

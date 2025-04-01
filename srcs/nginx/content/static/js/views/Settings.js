@@ -140,7 +140,7 @@ export default class extends AbstractView {
 			}
 
 			updateBtn.disabled = true;
-			var endpoint = "https://localhost:8080/api/users/updateUser/"
+			var endpoint = "https://" + location.host + "/api/users/updateUser/"
 			fetch(endpoint, {
 				method: 'PUT',
 				body: formData,
@@ -151,9 +151,8 @@ export default class extends AbstractView {
 				if (res.status == 200) {
 					console.log(res.data.message);
 					result.innerText = text.settings.response;
-					console.log(res.data.avatar);
 					if (res.data.avatar) {
-						localStorage.setItem("avatar", "https://localhost:8080" + res.data.avatar);
+						localStorage.setItem("avatar", "https://" + location.host + res.data.avatar);
 					}
 					else {
 						localStorage.setItem("avatar", "/static/img/default.png");

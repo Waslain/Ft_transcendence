@@ -208,7 +208,7 @@ export default class extends AbstractView {
 		this.#abortController = new AbortController();
 		const username = this.params.username; 
 
-		let endpoint = "https://localhost:8080/api/users/get/" + username;
+		let endpoint = "https://" + location.host +"/api/users/get/" + username;
 		const dataUser = await fetch(endpoint, {
 			method: 'GET',
 		})
@@ -236,10 +236,10 @@ export default class extends AbstractView {
 
 		let avatar = "/static/img/default.png"
 		if (dataUser.avatar) {
-			avatar = "https://localhost:8080" + dataUser.avatar;
+			avatar = "https://" + location.host + dataUser.avatar;
 		}
 
-		endpoint = "https://localhost:8080/api/stats/" + username;
+		endpoint = "https://" + location.host + "/api/stats/" + username;
 		const data = await fetch(endpoint, {
 			method: 'GET',
 		})
@@ -409,7 +409,7 @@ export default class extends AbstractView {
 			let formData = new FormData();
 			formData.set('username', username);
 
-			const endpoint = "https://localhost:8080/api/users/friends/check/";
+			const endpoint = "https://" + location.host + "/api/users/friends/check/";
 			const tmpData = await fetch(endpoint, {
 				method: 'POST',
 				body: formData,
@@ -478,10 +478,10 @@ export default class extends AbstractView {
 
 				let endpoint;
 				if (friend) {
-					endpoint = "https://localhost:8080/api/users/friends/remove/";
+					endpoint = "https://" + location.host + "/api/users/friends/remove/";
 				}
 				else {
-					endpoint = "https://localhost:8080/api/users/friends/add/";
+					endpoint = "https://" + location.host + "/api/users/friends/add/";
 				}
 				fetch(endpoint, {
 					method: 'PUT',
@@ -517,10 +517,10 @@ export default class extends AbstractView {
 
 				let endpoint;
 				if (blocked) {
-					endpoint = "https://localhost:8080/api/users/block/remove/";
+					endpoint = "https://" + location.host + "/api/users/block/remove/";
 				}
 				else {
-					endpoint = "https://localhost:8080/api/users/block/add/";
+					endpoint = "https://" + location.host + "/api/users/block/add/";
 				}
 				fetch(endpoint, {
 					method: 'PUT',
@@ -555,7 +555,7 @@ export default class extends AbstractView {
 		}
 
 		/*Match History Table*/
-		endpoint = "https://localhost:8080/api/matchhistory/list/";
+		endpoint = "https://" + location.host + "/api/matchhistory/list/";
 		const tableData = await fetch(endpoint, {
 			method: 'GET',
 		})
