@@ -3,10 +3,9 @@ import { navigateTo } from "../index.js";
 import { text } from "../index.js";
 
 export default class extends AbstractView {
-  constructor(params) {
+  constructor() {
     super();
     this.setTitle("Transcendence");
-    this.params = params;
     this.redirection = {
       needed: true,
       auth: false,
@@ -47,13 +46,8 @@ export default class extends AbstractView {
     <div class="container py-5 h-100">
       <div class="row-fluid d-flex justify-content-center align-items-center">
         <h1 class="text-white m-3">` +
-      text.waitingRoom.title +
+      text.waitingRoom.localTitle +
       `</h1>
-      </div>
-      <div class="row-fluid d-flex justify-content-center align-items-center">
-        <button id="cancelBtn" class="btn-cancel" disabled>` +
-      text.waitingRoom.cancel +
-      `</button>
       </div>
       <br>
       <section>
@@ -61,10 +55,46 @@ export default class extends AbstractView {
           <div class="col-12 col-sm-10 col-md-6 col-lg-5 col-xl-5 col-xxl-5 mb-4">
             <div class="card widget-card border-light shadow-sm box-wrapper">
               <div class="card-header text-center text-white border-light fw-medium align-items-cente fs-5">` +
-      text.waitingRoom.text1 +
+      text.waitingRoom.localGameText +
       `</div>
               <div class="card-body d-flex justify-content-center align-items-center">
-                  <button id="playBtnGame" class="btn btn-play m-3">` +
+                  <button id="playBtnLocalGame" class="btn btn-play m-3">` +
+      text.waitingRoom.play +
+      `</button>
+              </div>
+              <div class="card-footer border-light"></div>
+            </div>
+          </div>
+          <div class="col-12 col-sm-10 col-md-6 col-lg-5 col-xl-5 col-xxl-5 mb-4">
+            <div class="card widget-card border-light shadow-sm box-wrapper">
+              <div class="card-header text-center text-white border-light fw-medium align-items-cente fs-5">` +
+      text.waitingRoom.localTournamentText +
+      `</div>
+              <div class="card-body d-flex justify-content-center align-items-center">
+                <button id="playBtnLocalTournament" class="btn btn-play m-3">` +
+      text.waitingRoom.play +
+      `</button>
+              </div>
+              <div class="card-footer border-light"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <div class="row-fluid d-flex justify-content-center align-items-center">
+        <h1 class="text-white m-3">` +
+      text.waitingRoom.onlineTitle +
+      `</h1>
+      </div>
+      <br>
+      <section>
+        <div class="row justify-content-center">
+          <div class="col-12 col-sm-10 col-md-6 col-lg-5 col-xl-5 col-xxl-5 mb-4">
+            <div class="card widget-card border-light shadow-sm box-wrapper">
+              <div class="card-header text-center text-white border-light fw-medium align-items-cente fs-5">` +
+      text.waitingRoom.onlineGameText +
+      `</div>
+              <div class="card-body d-flex justify-content-center align-items-center">
+                  <button id="playBtnOnlineGame" class="btn btn-play m-3">` +
       text.waitingRoom.play +
       `</button>
                   <div id="connectionCountGame" class="text-white" hidden>Current connections: 0</div>
@@ -75,10 +105,10 @@ export default class extends AbstractView {
           <div class="col-12 col-sm-10 col-md-6 col-lg-5 col-xl-5 col-xxl-5 mb-4">
             <div class="card widget-card border-light shadow-sm box-wrapper">
               <div class="card-header text-center text-white border-light fw-medium align-items-cente fs-5">` +
-      text.waitingRoom.text2 +
+      text.waitingRoom.onlineTournamentText +
       `</div>
               <div class="card-body d-flex justify-content-center align-items-center">
-                <button id="playBtnTournament" class="btn btn-play m-3">` +
+                <button id="playBtnOnlineTournament" class="btn btn-play m-3">` +
       text.waitingRoom.play +
       `</button>
                 <div id="connectionCountTournament" class="text-white" hidden>Current connections: 0</div>
@@ -88,6 +118,12 @@ export default class extends AbstractView {
           </div>
         </div>
       </section>
+      <div class="row-fluid d-flex justify-content-center align-items-center">
+        <button id="cancelBtn" class="btn-cancel" disabled>` +
+      text.waitingRoom.cancel +
+      `</button>
+      </div>
+      <br>
 			<a href="/" class="nav__link d-flex justify-content-center align-items-center" data-link>` +
       text.waitingRoom.back +
       `</a>
@@ -152,22 +188,50 @@ export default class extends AbstractView {
 
   async getJavaScript() {
     this.#abortController = new AbortController();
-    const playBtnGame = document.getElementById("playBtnGame");
+    const playBtnLocalGame = document.getElementById("playBtnLocalGame");
+    const playBtnLocalTournament = document.getElementById(
+      "playBtnLocalTournament"
+    );
+    const playBtnOnlineGame = document.getElementById("playBtnOnlineGame");
     const connectionCountGame = document.getElementById("connectionCountGame");
-    const playBtnTournament = document.getElementById("playBtnTournament");
+    const playBtnOnlineTournament = document.getElementById(
+      "playBtnOnlineTournament"
+    );
     const connectionCountTournament = document.getElementById(
       "connectionCountTournament"
     );
     const cancelBtn = document.getElementById("cancelBtn");
 
-    playBtnGame.addEventListener(
+    playBtnLocalGame.addEventListener(
+      "click",
+      () => {
+        navigateTo("/pong/localGame");
+      },
+      {
+        signal: this.#abortController.signal,
+      }
+    );
+    playBtnLocalTournament.addEventListener(
+      "click",
+      () => {
+        navigateTo("/pong/localTournament");
+      },
+      {
+        signal: this.#abortController.signal,
+      }
+    );
+    playBtnOnlineGame.addEventListener(
       "click",
       async () => {
-        playBtnGame.disabled = true;
-        playBtnGame.style.color = "#fff";
+        playBtnLocalGame.disabled = true;
+        playBtnLocalGame.style.color = "#fff";
+        playBtnLocalTournament.disabled = true;
+        playBtnLocalTournament.style.color = "#fff";
+        playBtnOnlineGame.disabled = true;
+        playBtnOnlineGame.style.color = "#fff";
         connectionCountGame.hidden = false;
-        playBtnTournament.disabled = true;
-        playBtnTournament.style.color = "#fff";
+        playBtnOnlineTournament.disabled = true;
+        playBtnOnlineTournament.style.color = "#fff";
         connectionCountTournament.hidden = true;
         cancelBtn.disabled = false;
 
@@ -177,14 +241,18 @@ export default class extends AbstractView {
         signal: this.#abortController.signal,
       }
     );
-    playBtnTournament.addEventListener(
+    playBtnOnlineTournament.addEventListener(
       "click",
       async () => {
-        playBtnGame.disabled = true;
-        playBtnGame.style.color = "#fff";
+        playBtnLocalGame.disabled = true;
+        playBtnLocalGame.style.color = "#fff";
+        playBtnLocalTournament.disabled = true;
+        playBtnLocalTournament.style.color = "#fff";
+        playBtnOnlineGame.disabled = true;
+        playBtnOnlineGame.style.color = "#fff";
         connectionCountGame.hidden = true;
-        playBtnTournament.disabled = true;
-        playBtnTournament.style.color = "#fff";
+        playBtnOnlineTournament.disabled = true;
+        playBtnOnlineTournament.style.color = "#fff";
         connectionCountTournament.hidden = false;
         cancelBtn.disabled = false;
 
@@ -197,9 +265,11 @@ export default class extends AbstractView {
     cancelBtn.addEventListener(
       "click",
       () => {
-        playBtnGame.disabled = false;
+        playBtnLocalGame.disabled = false;
+        playBtnLocalTournament.disabled = false;
+        playBtnOnlineGame.disabled = false;
         connectionCountGame.hidden = true;
-        playBtnTournament.disabled = false;
+        playBtnOnlineTournament.disabled = false;
         connectionCountTournament.hidden = true;
         cancelBtn.disabled = true;
 
