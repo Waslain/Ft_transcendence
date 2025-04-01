@@ -15,6 +15,8 @@ services:
     healthcheck:
       test:
         ["CMD-SHELL", "pg_isready -U ${DATABASE_USERNAME} -d ${DATABASE_NAME}"]
+      start_period: 10s
+      start_interval: 1s
       interval: 30s
       timeout: 10s
       retries: 3
@@ -45,6 +47,8 @@ services:
       - .env
     healthcheck:
       test: ["CMD", "curl", "-f", "http://django:8000/api/health/"]
+      start_period: 10s
+      start_interval: 1s
       interval: 30s
       timeout: 10s
       retries: 3
