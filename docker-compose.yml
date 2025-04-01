@@ -12,6 +12,12 @@ services:
     env_file:
       - .env
     user: "999:999"
+    healthcheck:
+      test:
+        ["CMD-SHELL", "pg_isready -U ${DATABASE_USERNAME} -d ${DATABASE_NAME}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   django:
     build: ./srcs/django
@@ -19,7 +25,8 @@ services:
     networks:
       - transcendence
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
       DEBUG: ${DEBUG}
@@ -36,6 +43,11 @@ services:
       - ${VOLUME_PATH}/media_data:/media
     env_file:
       - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://django:8000/api/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   nginx:
     build: ./srcs/nginx
@@ -50,7 +62,8 @@ services:
     networks:
       - transcendence
     depends_on:
-      - django
+      django:
+        condition: service_healthy
 
 volumes:
   postgres_data:

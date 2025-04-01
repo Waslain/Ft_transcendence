@@ -3,13 +3,8 @@ VOLUME_PATH = .
 all: run
 
 run:
-	echo VOLUME_PATH=${VOLUME_PATH} >> .env
 	mkdir -p -m 777 ${VOLUME_PATH}/postgres_data ${VOLUME_PATH}/media_data
-	#chown 999:999 ${VOLUME_PATH}/postgres_data
-	#chown 1000:1000 ${VOLUME_PATH}/media_data
-	#chmod 755 ${VOLUME_PATH}/postgres_data ${VOLUME_PATH}/media_data
 	docker compose -f ./docker-compose.yml up --build
-
 
 stop:
 	@docker compose -f ./docker-compose.yml down
@@ -26,7 +21,9 @@ vclean: stop
 	rm -rf ${VOLUME_PATH}/postgres_data
 	rm -rf ${VOLUME_PATH}/media_data
 
+fclean: clean vclean
+
 migrate:
 	docker exec django python manage.py migrate
 
-re: clean all
+re: fclean all

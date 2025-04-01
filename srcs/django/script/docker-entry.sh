@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Apply database migrations"
-sleep 2
+
 python manage.py migrate
 
 echo "Starting server with Daphne"

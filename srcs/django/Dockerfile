@@ -3,6 +3,8 @@ FROM python:3.12-slim AS builder
 RUN mkdir /app
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y curl
+
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV PIP_ROOT_USER_ACTION=ignore
@@ -12,6 +14,8 @@ RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
 FROM python:3.12-slim
+
+RUN apt-get update && apt-get install -y curl
 
 RUN groupadd -r -g 1000 django && useradd -r -g django -u 1000 django
 RUN mkdir /app && chown django:django /app

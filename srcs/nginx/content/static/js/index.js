@@ -11,7 +11,7 @@ import Friends from "./views/Friends.js";
 import * as Utils from "./utils.js";
 
 
-export let text;
+export let text = null;
 
 export const navigateTo = (url) => {
   if (url !== location.pathname) {
@@ -127,7 +127,10 @@ window.addEventListener("popstate", router);
 
 
 const updateLanguage = async () => {
-	const url = "https://localhost:8080/files/" + localStorage.getItem("language") + ".json";
+	let language = localStorage.getItem("language")
+	if (language === "undefined")
+		language = "en"
+	const url = "https://localhost:8080/files/" + language + ".json";
 	text = await fetch(url)
 	.then(response => response.json())
 	.catch(error => console.error(error))
