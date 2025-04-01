@@ -2,7 +2,6 @@ import { updateName } from "./updateName.js";
 import { updateScore } from "./updateScore.js";
 import { updateMessage } from "./updateMessage.js";
 import { getChatSocket } from "./../../../index.js";
-import * as Utils from "./../../../utils.js";
 import { text } from "../../../index.js";
 
 const parseMessages = (data) => {

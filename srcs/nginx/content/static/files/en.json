@@ -1,110 +1,113 @@
 {
-	"sidebar":{
-		"signout":"Sign out",
-		"main":"Home"
-	},
-	"login":{
-		"login":"Log in",
-		"username":"Username",
-		"password":"Password",
-		"description":"Sign in to your account",
-		"noAccount":"Don't have an account?",
-		"registerHere":"register here!",
-		"usernameCheck":"Please enter a username",
-		"passwordCheck":"Please enter a password",
-		"invalidCredentials":"Invalid username or password"
-	},
-	"register":{
-		"register":"Register",
-		"description":"Create a new account",
-		"confirmPassword":"Confirm password",
-		"usernameValidation":"Username can only contain alphanumeric characters and special characters - _ @ + .",
-		"confirmPasswordCheck":"Those passwords didn't match",
-		"avatar":"Choose an avatar (optional):",
-		"remove":"Remove",
-		"userExists":"A user with that username already exists"
-	},
-	"settings":{
-		"settings":"Settings",
-		"update":"Update",
-		"updateAvatar":"Update avatar:",
-		"updateLanguage":"Change language:",
-		"english":"English",
-		"french":"French",
-		"spanish":"Spanish",
-		"traditionChinese": "Chinese (Traditional)",
-        "simplifiedChinese": "Chinese (Simplified)",
-		"response":"User updated",
-		"error":"An error occurred"
-	},
-	"friends":{
-		"friends":"Friends",
-		"searchbar":"Search user",
-		"friendList":"Friend List",
-		"blockList":"Block List",
-		"noFriends":"No friends yet",
-		"noBlock":"No block yet",
-		"unfriend":"Unfriend",
-		"unblock":"Unblock"
-	},
-	"main":{
-		"phrases":{ 
-			"1":"Hello!",
-			"2":"Welcome to",
-			"3":"Transcendence",
-			"4":"Have fun C:"
-		},
-		"start":"Let's Start!"
-	},
-	"waitingRoom":{
-		"title":"Pong Waiting Room",
-		"cancel":"Cancel",
-		"play":"Play",
-		"text1":"Wating Room for Game ...",
-		"text2":"Wating Room for Tournament ...",
-		"back":"Go back to main page",
-		"connections":"Current connections: "
-	},
-	"pong":{
-		"start":"Game Starts in: ",
-		"winner":"The Winner is",
-		"disconnect":"has been Disconnected"
-	},
-	"profile":{
-		"play":"Play Game",
-		"invite":"Invite to Game",
-		"addFriend":"Add Friend",
-		"removeFriend":"Remove Friend",
-		"message":"Message",
-		"block":"Block",
-		"winStats":"Win Stats",
-		"goalChart":"Goals Chart",
-		"wins":"Wins",
-		"losses":"Losses",
-		"winRate":"Win Rate",
-		"gameTime":"Game Time",
-		"text":"Total Number of Goals",
-		"goalsScored":"Goals Scored",
-		"goalsTaken":"Goals Taken",
-		"playerA":"Player A",
-		"playerB":"Player B",
-		"scoreA":"Score A",
-		"scoreB":"Score B",
-		"duration":"Game Duration",
-		"winner":"Winner"
-	},
-	"chat":{
-		"chat":"Chat",
-		"general":"General Chat",
-		"placeholder":"Type a message...",
-		"me":"Me",
-		"inviteMessage1":"You have invited",
-		"inviteMessage2":"to play a game",
-		"join":"Join Game",
-		"cancel":"Cancel",
-		"cancelMessage":"cancelled the game invitation",
-		"decline":"Decline",
-		"declineMessage":"declined the game invitation",
-		"accept":"Accept"
-	}
+  "sidebar": {
+    "signout": "Sign out",
+    "main": "Home"
+  },
+  "login": {
+    "login": "Log in",
+    "username": "Username",
+    "password": "Password",
+    "description": "Sign in to your account",
+    "noAccount": "Don't have an account?",
+    "registerHere": "register here!",
+    "usernameCheck": "Please enter a username",
+    "passwordCheck": "Please enter a password",
+    "invalidCredentials": "Invalid username or password"
+  },
+  "register": {
+    "register": "Register",
+    "description": "Create a new account",
+    "confirmPassword": "Confirm password",
+    "usernameValidation": "Username can only contain alphanumeric characters and special characters - _ @ + .",
+    "confirmPasswordCheck": "Those passwords didn't match",
+    "avatar": "Choose an avatar (optional):",
+    "remove": "Remove",
+    "userExists": "A user with that username already exists"
+  },
+  "settings": {
+    "settings": "Settings",
+    "update": "Update",
+    "updateAvatar": "Update avatar:",
+    "updateLanguage": "Change language:",
+    "english": "English",
+    "french": "French",
+    "spanish": "Spanish",
+    "traditionChinese": "Chinese (Traditional)",
+    "simplifiedChinese": "Chinese (Simplified)",
+    "response": "User updated",
+    "error": "An error occurred"
+  },
+  "friends": {
+    "friends": "Friends",
+    "searchbar": "Search user",
+    "friendList": "Friend List",
+    "blockList": "Block List",
+    "noFriends": "No friends yet",
+    "noBlock": "No block yet",
+    "unfriend": "Unfriend",
+    "unblock": "Unblock"
+  },
+  "main": {
+    "phrases": {
+      "1": "Hello!",
+      "2": "Welcome to",
+      "3": "Transcendence",
+      "4": "Have fun C:"
+    },
+    "start": "Let's Start!"
+  },
+  "waitingRoom": {
+    "localTitle": "Local Pong",
+    "onlineTitle": "Online Pong",
+    "cancel": "Cancel",
+    "play": "Play",
+    "localGameText": "Local Game",
+    "localTournamentText": "Local Tournament",
+    "onlineGameText": "Waiting Room for Online Game ...",
+    "onlineTournamentText": "Waiting Room for Online Tournament ...",
+    "back": "Go back to main page",
+    "connections": "Current connections: "
+  },
+  "pong": {
+    "start": "Game Starts in: ",
+    "winner": "The Winner is",
+    "disconnect": "has been Disconnected"
+  },
+  "profile": {
+    "play": "Play Game",
+    "invite": "Invite to Game",
+    "addFriend": "Add Friend",
+    "removeFriend": "Remove Friend",
+    "message": "Message",
+    "block": "Block",
+    "winStats": "Win Stats",
+    "goalChart": "Goals Chart",
+    "wins": "Wins",
+    "losses": "Losses",
+    "winRate": "Win Rate",
+    "gameTime": "Game Time",
+    "text": "Total Number of Goals",
+    "goalsScored": "Goals Scored",
+    "goalsTaken": "Goals Taken",
+    "playerA": "Player A",
+    "playerB": "Player B",
+    "scoreA": "Score A",
+    "scoreB": "Score B",
+    "duration": "Game Duration",
+    "winner": "Winner"
+  },
+  "chat": {
+    "chat": "Chat",
+    "general": "General Chat",
+    "placeholder": "Type a message...",
+    "me": "Me",
+    "inviteMessage1": "You have invited",
+    "inviteMessage2": "to play a game",
+    "join": "Join Game",
+    "cancel": "Cancel",
+    "cancelMessage": "cancelled the game invitation",
+    "decline": "Decline",
+    "declineMessage": "declined the game invitation",
+    "accept": "Accept"
+  }
 }
