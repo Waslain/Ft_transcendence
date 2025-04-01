@@ -162,7 +162,7 @@ export default class extends AbstractView {
 			}
 
 			registerBtn.disabled = true;
-			var endpoint = "https://localhost:8080/api/users/register/"
+			var endpoint = "https://" + location.host + "/api/users/register/"
 			fetch(endpoint, {
 				method: 'POST',
 				body: formData,
@@ -178,7 +178,7 @@ export default class extends AbstractView {
 				else {
 					localStorage.setItem("username", res.data.username);
 					if (res.data.avatar) {
-						localStorage.setItem("avatar", "https://localhost:8080" + res.data.avatar);
+						localStorage.setItem("avatar", "https://" + location.host + res.data.avatar);
 					}
 					else {
 						localStorage.setItem("avatar", "/static/img/default.png");
