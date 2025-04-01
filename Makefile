@@ -23,6 +23,14 @@ vclean: stop
 
 fclean: clean vclean
 
+test:
+	curl -i -k -N -o output \
+	-H "Connection: Upgrade" \
+	-H "Upgrade: websocket" \
+	-H "Sec-WebSocket-Key: SGVsbG8sIHdvcmxkIQdddd==" \
+	-H "Sec-WebSocket-Version: 13" \
+	https://localhost:8080/ws/pong/pongRoom/?uuid=test
+
 migrate:
 	docker exec django python manage.py migrate
 
