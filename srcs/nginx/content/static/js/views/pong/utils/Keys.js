@@ -4,6 +4,8 @@ export class Keys {
     this.keys = [
       { name: "ArrowUp", bool: false },
       { name: "ArrowDown", bool: false },
+      { name: "w", bool: false },
+      { name: "s", bool: false },
     ];
   }
   keyManager(e) {

@@ -1,6 +1,5 @@
 import AbstractView from "./AbstractView.js";
-import { navigateTo } from "../index.js";
-import { text } from "../index.js";
+import { navigateTo, text } from "../index.js";
 
 export default class extends AbstractView {
   constructor() {
@@ -41,39 +40,38 @@ export default class extends AbstractView {
   }
 
   async getHtml() {
-    return (
-      `
+    const t = text.waitingRoom;
+    return `
     <div class="container py-5 h-100">
       <div class="row-fluid d-flex justify-content-center align-items-center">
-        <h1 class="text-white m-3">` +
-      text.waitingRoom.localTitle +
-      `</h1>
+        <h1 class="text-white m-3">${t.gameTitle}</h1>
       </div>
       <br>
       <section>
         <div class="row justify-content-center">
           <div class="col-12 col-sm-10 col-md-6 col-lg-5 col-xl-5 col-xxl-5 mb-4">
             <div class="card widget-card border-light shadow-sm box-wrapper">
-              <div class="card-header text-center text-white border-light fw-medium align-items-cente fs-5">` +
-      text.waitingRoom.localGameText +
-      `</div>
+              <div class="card-header text-center text-white border-light fw-medium align-items-cente fs-5">${
+                t.localGameText
+              }</div>
               <div class="card-body d-flex justify-content-center align-items-center">
-                  <button id="playBtnLocalGame" class="btn btn-play m-3">` +
-      text.waitingRoom.play +
-      `</button>
+                  <button id="playBtnLocalGame" class="btn btn-play m-3">${
+                    t.play
+                  }</button>
               </div>
               <div class="card-footer border-light"></div>
             </div>
           </div>
           <div class="col-12 col-sm-10 col-md-6 col-lg-5 col-xl-5 col-xxl-5 mb-4">
             <div class="card widget-card border-light shadow-sm box-wrapper">
-              <div class="card-header text-center text-white border-light fw-medium align-items-cente fs-5">` +
-      text.waitingRoom.localTournamentText +
-      `</div>
+              <div class="card-header text-center text-white border-light fw-medium align-items-cente fs-5">${
+                t.onlineGameText
+              }</div>
               <div class="card-body d-flex justify-content-center align-items-center">
-                <button id="playBtnLocalTournament" class="btn btn-play m-3">` +
-      text.waitingRoom.play +
-      `</button>
+                  <button id="playBtnOnlineGame" class="btn btn-play m-3">${
+                    t.play
+                  } </button>
+                  <div id="connectionCountGame" class="text-white" hidden>Current connections: 0</div>
               </div>
               <div class="card-footer border-light"></div>
             </div>
@@ -81,36 +79,39 @@ export default class extends AbstractView {
         </div>
       </section>
       <div class="row-fluid d-flex justify-content-center align-items-center">
-        <h1 class="text-white m-3">` +
-      text.waitingRoom.onlineTitle +
-      `</h1>
+        <h1 class="text-white m-3">${t.tournamentTitle}</h1>
+      </div>
+      <div class="row-fluid d-flex justify-content-center align-items-center">
+        <p class="text-white m-3">${t.alias} :</p>
+        <input id="nameInput" value=${localStorage.getItem(
+          "username"
+        )} style="border-radius: 8px; margin: 10px; height: 40px; width: 210px;" value="" maxlength="20" placeholder="Max character: 20"/>
       </div>
       <br>
       <section>
         <div class="row justify-content-center">
-          <div class="col-12 col-sm-10 col-md-6 col-lg-5 col-xl-5 col-xxl-5 mb-4">
+        <div class="col-12 col-sm-10 col-md-6 col-lg-5 col-xl-5 col-xxl-5 mb-4">
             <div class="card widget-card border-light shadow-sm box-wrapper">
-              <div class="card-header text-center text-white border-light fw-medium align-items-cente fs-5">` +
-      text.waitingRoom.onlineGameText +
-      `</div>
+              <div class="card-header text-center text-white border-light fw-medium align-items-cente fs-5">${
+                t.localTournamentText
+              }</div>
               <div class="card-body d-flex justify-content-center align-items-center">
-                  <button id="playBtnOnlineGame" class="btn btn-play m-3">` +
-      text.waitingRoom.play +
-      `</button>
-                  <div id="connectionCountGame" class="text-white" hidden>Current connections: 0</div>
+                <button id="playBtnLocalTournament" class="btn btn-play m-3">${
+                  t.play
+                } </button>
               </div>
               <div class="card-footer border-light"></div>
             </div>
           </div>
           <div class="col-12 col-sm-10 col-md-6 col-lg-5 col-xl-5 col-xxl-5 mb-4">
             <div class="card widget-card border-light shadow-sm box-wrapper">
-              <div class="card-header text-center text-white border-light fw-medium align-items-cente fs-5">` +
-      text.waitingRoom.onlineTournamentText +
-      `</div>
+              <div class="card-header text-center text-white border-light fw-medium align-items-cente fs-5">${
+                t.onlineTournamentText
+              }</div>
               <div class="card-body d-flex justify-content-center align-items-center">
-                <button id="playBtnOnlineTournament" class="btn btn-play m-3">` +
-      text.waitingRoom.play +
-      `</button>
+                <button id="playBtnOnlineTournament" class="btn btn-play m-3">${
+                  t.play
+                }</button>
                 <div id="connectionCountTournament" class="text-white" hidden>Current connections: 0</div>
               </div>
               <div class="card-footer border-light"></div>
@@ -119,16 +120,13 @@ export default class extends AbstractView {
         </div>
       </section>
       <div class="row-fluid d-flex justify-content-center align-items-center">
-        <button id="cancelBtn" class="btn-cancel" disabled>` +
-      text.waitingRoom.cancel +
-      `</button>
+        <button id="cancelBtn" class="btn-cancel" disabled>${t.cancel}</button>
       </div>
       <br>
-			<a href="/" class="nav__link d-flex justify-content-center align-items-center" data-link>` +
-      text.waitingRoom.back +
-      `</a>
-		`
-    );
+			<a href="/" class="nav__link d-flex justify-content-center align-items-center" data-link>${
+        t.back
+      }</a>
+		`;
   }
 
   #waitingRoomSocket;
@@ -178,7 +176,7 @@ export default class extends AbstractView {
       const data = JSON.parse(e.data);
       if (data.count !== undefined) {
         document.getElementById("connectionCountTournament").textContent =
-          "Current connections: " + data.count;
+          text.waitingRoom.connections + data.count;
       }
       if (data.uuid !== undefined) {
         navigateTo("/tournament/" + data.uuid);

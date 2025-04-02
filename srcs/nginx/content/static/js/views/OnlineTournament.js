@@ -19,15 +19,13 @@ export default class extends Pong {
   #abortController;
   #objectManager;
 
-  async #webSocket(name) {
+  async #webSocket() {
     const roomName = "tournamentRoom";
     const url =
       "wss://" +
       window.location.host +
       "/ws/tournament/tournamentRoom/?uuid=" +
-      encodeURIComponent(this.params.room_id) +
-      "&name=" +
-      name;
+      encodeURIComponent(this.params.room_id);
 
     this.#tournamentRoomSocket = new WebSocket(url);
 
@@ -42,8 +40,7 @@ export default class extends Pong {
 
   async getJavaScript() {
     this.#abortController = new AbortController();
-    const searchParams = new URLSearchParams(window.location.search);
-    await this.#webSocket(searchParams.get("name") || "Anonymous");
+    await this.#webSocket();
 
     this.#objectManager = onlineGame(
       this.#tournamentRoomSocket,
