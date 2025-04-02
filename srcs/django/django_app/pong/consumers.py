@@ -9,7 +9,6 @@ from datetime import datetime
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 from django.contrib.auth import get_user_model
-from matchhistory.models import MatchHistory
 from channels.db import database_sync_to_async
 from matchhistory.views import create_match_record
 User = get_user_model()
@@ -172,9 +171,126 @@ class TournamentManager:
         self.players : List[Player] = []
 
 @database_sync_to_async
-def sendMatchResult(usera_id, userb_id, usera_score, userb_score, game_time):
-    # Save match history directly using the matchhistory view function
-    return create_match_record(usera_id, userb_id, usera_score, userb_score, game_time)
+def sendMatchResult(stats):
+    return create_match_record(stats["players"]["first"]["id"], stats["players"]["second"]["id"],
+                               stats["players"]["first"]["score"], stats["players"]["second"]["score"],
+                               stats["time"])
+
+class LocalGamePlayerConsumer(AsyncWebsocketConsumer):
+    players = []
+
+    async def connect(self):
+        self.game = GameManager(None)
+        self.game.players.append(Player(self.scope['user'].username, self.scope['user'].id, None))
+        self.game.players.append(Player(self.scope['user'].username + "(1)", self.scope['user'].id, None))
+        self.game.loop = asyncio.create_task(self.sendLoopGame(self.game))
+        LocalGamePlayerConsumer.players.append(self)
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        self.game.loop.cancel()
+        LocalGamePlayerConsumer.players.remove(self)
+
+    async def receive(self, text_data):
+        try:
+            data = json.loads(text_data)
+            if not isinstance(data, dict) or "action" not in data or "params" not in data:
+                return
+            if data["action"] == "keys":
+                key = data["params"].get("key", "")
+                key_type = data["params"].get("type", "")
+                if key in ("w"):
+                    self.game.players[0].keyUp = key_type == "keydown"
+                elif key in ("s"):
+                    self.game.players[0].keyDown = key_type == "keydown"
+                elif key in ("ArrowUp"):
+                    self.game.players[1].keyUp = key_type == "keydown"
+                elif key in ("ArrowDown"):
+                    self.game.players[1].keyDown = key_type == "keydown"
+        except json.JSONDecodeError:
+            print("Error : Invalid JSON")
+
+    async def updateScore(self, gameManager, player, ball):
+        player.score += 1
+        await self.gameUpdate({"scores": [player.score for player in gameManager.players]})
+        if player.score >= 10:
+            await self.gameUpdate({"messages": {"first": "Winner is", "second": player.name, "type":"winner"}})
+            return "win"
+        ball.setDirection(ball.dx * -1, ball.dz)
+        ball.setPos(0, ball.z)
+        return None
+
+    async def sendLoopGame(self, gameManager):
+        await self.gameUpdate({"names": [player.name for player in gameManager.players]})
+        await self.gameUpdate({"scores": [player.score for player in gameManager.players]})
+        await self.gameUpdate({"messages": {"first": "Game Starts in :", "second": "3", "type": "timer"}})
+        await asyncio.sleep(1)
+        await self.gameUpdate({"messages": {"first": "Game Starts in :", "second": "2", "type": "timer"}})
+        await asyncio.sleep(1)
+        await self.gameUpdate({"messages": {"first": "Game Starts in :", "second": "1", "type": "timer"}})
+        await asyncio.sleep(1)
+        await self.gameUpdate({"messages": {"first": "", "second": ""}})
+        gameManager.time = datetime.now()
+        playground = gameManager.playground
+        ball = gameManager.ball
+        paddle = Paddle()
+        paddleLeft = gameManager.players[0].paddle
+        paddleRight = gameManager.players[1].paddle
+        paddleLeft.setPos(-(round(playground.radiusWidth - playground.radiusWall - paddle.radiusHeight, 2)), 0)
+        paddleRight.setPos(round(playground.radiusWidth - playground.radiusWall - paddle.radiusHeight, 2), 0)
+        playgroundWidthLimit = round(playground.radiusWidth - playground.radiusWall - ball.radius, 2)
+        playgroundHeightLimit = round(playground.radiusHeight - playground.radiusWall - ball.radius, 2)
+        paddleLimit = round(playground.radiusWidth - playground.diffBorderPlayer - paddle.radiusWidth - ball.radius, 2)
+        paddleRadius = round(paddle.radiusHeight + paddle.radiusWidth + ball.radius, 2)
+
+        while True:
+            await self.gameUpdate({"data": {"ball": gameManager.ball.toDict() ,"players": [player.paddle.toDict() for player in gameManager.players]}})
+            for player in gameManager.players:
+                player.movePlayer(playground)
+            ball.setPos(round(ball.x + ball.dx, 2), round(ball.z + ball.dz, 2))
+            if ball.x >= paddleLimit and round(paddleRight.z - paddleRadius, 2) <= ball.z <= round(paddleRight.z + paddleRadius, 2):
+                relIntersect = (ball.z - paddleRight.z) / paddle.radiusHeight
+                newAngle = relIntersect * math.radians(45)
+                speed = math.sqrt(ball.dx**2 + ball.dz**2)
+                ball.setDirection(-(speed) * math.cos(newAngle), speed * math.sin(newAngle))
+            elif ball.x <= -(paddleLimit) and round(paddleLeft.z - paddleRadius, 2) <= ball.z <= round(paddleLeft.z + paddleRadius, 2):
+                relIntersect = (ball.z - paddleLeft.z) / paddle.radiusHeight
+                newAngle = relIntersect * math.radians(45)
+                speed = math.sqrt(ball.dx**2 + ball.dz**2)
+                ball.setDirection(speed * math.cos(newAngle), speed * math.sin(newAngle))
+            if ball.x >= playgroundWidthLimit:
+                if await self.updateScore(gameManager, gameManager.players[0], ball) == "win":
+                    break
+            elif ball.x <= -(playgroundWidthLimit):
+                if await self.updateScore(gameManager, gameManager.players[1], ball) == "win":
+                    break
+            if ball.z >= playgroundHeightLimit or ball.z <= -(playgroundHeightLimit):
+                ball.dz *= -1
+            await asyncio.sleep(0.01)
+
+        gameManager.time = datetime.now() - gameManager.time;
+        await sendMatchResult({
+            "players" : {
+                "first" : {"id": gameManager.players[0].idUser,
+                           "score": gameManager.players[0].score},
+                "second" : {"id": gameManager.players[1].idUser,
+                            "score": gameManager.players[1].score}},
+            "time": gameManager.time}
+        )
+
+    async def gameUpdate(self, event):
+        if "names" in event:
+            await self.send(text_data=json.dumps({"action": "names", "params": {"names": event["names"]}}))
+            return
+        if "scores" in event:
+            await self.send(text_data=json.dumps({"action": "scores", "params": {"scores": event["scores"]}}))
+            return
+        if "data" in event:
+            await self.send(text_data=json.dumps({"action": "loop", "params": {"data": event["data"]}}))
+            return
+        if "messages" in event:
+            await self.send(text_data=json.dumps({"action": "message", "params": {"messages": event["messages"]}}))
+            return
 
 class GamePlayerConsumer(AsyncWebsocketConsumer):
     games : Dict[str, GameManager] = {}
@@ -308,12 +424,13 @@ class GamePlayerConsumer(AsyncWebsocketConsumer):
             await asyncio.sleep(0.01)
 
         gameManager.time = datetime.now() - gameManager.time;
-        await sendMatchResult(
-            gameManager.players[0].idUser,
-            gameManager.players[1].idUser,
-            gameManager.players[0].score,
-            gameManager.players[1].score,
-            gameManager.time
+        await sendMatchResult({
+            "players" : {
+                "first" : {"id": gameManager.players[0].idUser,
+                           "score": gameManager.players[0].score},
+                "second" : {"id": gameManager.players[1].idUser,
+                            "score": gameManager.players[1].score}},
+            "time": gameManager.time}
         )
 
     async def groupSend(self, roomName, name, data):
@@ -408,9 +525,9 @@ class TournamentPlayerConsumer(AsyncWebsocketConsumer):
                     if player.name == self.name:
                         key = data["params"].get("key", "")
                         key_type = data["params"].get("type", "")
-                        if key in ("z", "ArrowUp"):
+                        if key in ("ArrowUp"):
                             player.keyUp = key_type == "keydown"
-                        elif key in ("s", "ArrowDown"):
+                        elif key in ("ArrowDown"):
                             player.keyDown = key_type == "keydown"
         except json.JSONDecodeError:
             print("Error : Invalid JSON")
