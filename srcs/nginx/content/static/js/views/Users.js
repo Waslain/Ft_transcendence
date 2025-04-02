@@ -135,7 +135,7 @@ export default class extends AbstractView {
 					<div class="card widget-card border-light shadow-sm chart-wrapper">
 						<div class="card-body p-4">
 							<h5 class="card-title widget-card-title mb-1 text-center text-white">`+text.profile.winStats+`</h5>
-                            <div id="noDataText" class="no-data-text">No data available</div>
+                            <div id="noDataText" class="no-data-text">`+text.profile.noDataAvaliable+`</div>
 							<canvas id="winsCountChart" style="width: 100%; height: auto;"></canvas>
 						</div>
 					</div>
@@ -144,7 +144,7 @@ export default class extends AbstractView {
 					<div class="card widget-card border-light shadow-sm chart-wrapper">
 						<div class="card-body p-4">
 							<h5 class="card-title widget-card-title mb-1 text-center text-white">`+text.profile.goalChart+`</h5>
-                            <div id="noDataTextBar" class="no-data-text">No data available</div>
+                            <div id="noDataTextBar" class="no-data-text">`+text.profile.noDataAvaliable+`</div>
 							<canvas id="goalsChart"></canvas>
 						</div>
 					</div>
@@ -173,7 +173,7 @@ export default class extends AbstractView {
 			<div class="row-fluid d-flex justify-content-center">
 				<div class="col-10">
 					<div class="card widget-card d-flex border-light table-wrapper">
-						<div class="card-header border-light text-center text-white">Match History</div>
+						<div class="card-header border-light text-center text-white">`+text.profile.matchHistory+`</div>
 						<div class="card-body">
 							<div id="table-loading" class="table-loading text-white">Loading data...</div>
 							<div id="table-error" class="table-error text-white" style="display: none;"></div>
@@ -585,7 +585,7 @@ export default class extends AbstractView {
 		function displayMatchData(data) {
 			document.getElementById('table-loading').style.display = 'none';
 			if (!data || !data.matches || data.matches.length === 0) {
-				showError('No match data available');
+				showError('noMatchDataAvailable');
 				return;
 			}
 			const tableBody = document.getElementById('table-body');
@@ -644,9 +644,10 @@ export default class extends AbstractView {
 			}
 		}
 
-		function showError(message) {
+		function showError(key) {
 			const errorElement = document.getElementById('table-error');
-			errorElement.textContent = message;
+			const errorMessage = text.profile[key];
+			errorElement.textContent = errorMessage;
 			errorElement.style.display = 'block';
 			document.getElementById('table-container').style.display = 'none';
 		}

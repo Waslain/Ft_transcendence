@@ -60,6 +60,8 @@ export default class extends AbstractView {
 				        <option value="en">`+text.settings.english+`</option>
 				        <option value="fr">`+text.settings.french+`</option>
 						<option value="es">`+text.settings.spanish+`</option>
+						<option value="zh-cn">`+text.settings.simplifiedChinese+`</option>
+						<option value="zh-tw">`+text.settings.traditionChinese+`</option>
 				      </select>
                     </div>
   
@@ -95,6 +97,8 @@ export default class extends AbstractView {
 
 		language.value = localStorage.getItem("language");
 
+		const currentAvatar = localStorage.getItem('avatar');
+
 		const showPreview = () => {
 			avatarPreview.style.display = 'block';
 			removeBtn.style.display = 'block';
@@ -107,13 +111,30 @@ export default class extends AbstractView {
 			preview.style.display = 'none';
 		}
 
+		let update = false
+		let image_set = false
+
+		if (currentAvatar !== "/static/img/default.png") {
+			avatarPreview.src = currentAvatar;
+			showPreview();
+		}
+
 		// display the chosen image
 		avatar.addEventListener('change', function(event) {
 			const [file] = avatar.files
 			if (file) {
 				showPreview();
 				avatarPreview.src = URL.createObjectURL(file);
+				image_set = true
+				update = true;
 			}
+		},
+		{
+			signal: this.#abortController.signal,
+		});
+
+		language.addEventListener('change', function(event) {
+			update = true;
 		},
 		{
 			signal: this.#abortController.signal,
@@ -123,6 +144,8 @@ export default class extends AbstractView {
 		removeBtn.addEventListener('click', function(event) {
 			hidePreview();
 			updateForm.reset();
+			image_set = true
+			update = true;
 		},
 		{
 			signal: this.#abortController.signal,
@@ -134,10 +157,13 @@ export default class extends AbstractView {
 			event.preventDefault();
 
 			result.innerText = "";
-			const formData = new FormData(this)
-			if (!formData.get('avatar').name) {
-				formData.set('avatar', '')
+			if (!update) {
+				return ;
 			}
+
+			const formData = new FormData(this)
+			formData.append('image_set', image_set);
+			console.log(formData);
 
 			updateBtn.disabled = true;
 			var endpoint = "https://" + location.host + "/api/users/updateUser/"

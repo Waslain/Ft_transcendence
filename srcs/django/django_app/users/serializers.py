@@ -5,20 +5,25 @@ from stats.models import Stats
 class ImageSerializer(serializers.ModelSerializer):
 	avatar = serializers.ImageField(required=False, allow_null=True)
 	language = serializers.CharField(required=False, allow_null=True)
+	image_set = serializers.BooleanField(write_only=True);
 
 	class Meta:
 		model = User
-		fields = ['id', 'avatar', 'language']
+		fields = ['id', 'avatar', 'language', 'image_set']
 
-		def update(self, instance, validated_data):
-			avatar = validated_data.get('avatar');
+	def update(self, instance, validated_data):
+		avatar = validated_data.get('avatar');
+		image_set = validated_data.get('image_set');
+		if image_set is True:
 			if (avatar):
 				setattr(instance, 'avatar', avatar)
 			else:
 				setattr(instance, 'avatar', None)
-			language = validated_data.get('language');
-			if (language):
-				setattr(instance, 'language', language)
+		language = validated_data.get('language');
+		if (language):
+			setattr(instance, 'language', language)
+		instance.save();
+		return instance
 
 
 class UserSerializer(serializers.ModelSerializer):
