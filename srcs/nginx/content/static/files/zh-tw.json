@@ -1,6 +1,7 @@
 {
 	"sidebar":{
-		"signout":"登出"
+		"signout":"登出",
+		"main":"首頁"
 	},
 	"login":{
 		"login":"登入",
@@ -30,6 +31,7 @@
 		"updateLanguage":"更換語言:",
 		"english":"英文",
 		"french":"法文",
+		"spanish":"西班牙文",
         "traditionChinese": "繁體中文",
         "simplifiedChinese": "簡體中文",
 		"response":"使用者更新",
@@ -55,13 +57,16 @@
 		"start":"開始!"
 	},
 	"waitingRoom":{
-		"title":"遊戲等待區",
-		"cancel":"取消",
-		"play":"開始",
-		"text1":"單人遊戲等待區...",
-		"text2":"多人遊戲等待區...",
-		"back":"回到首頁",
-		"connections":"當前連線人數: "
+		"localTitle": "本地遊戲",
+		"onlineTitle": "線上遊戲",
+		"cancel": "取消",
+		"play": "開始",
+		"localGameText": "本地雙人遊戲",
+		"localTournamentText": "本地四人遊戲",
+		"onlineGameText": "線上雙人遊戲等待區...",
+		"onlineTournamentText": "線上四人遊戲等待區...",
+		"back": "回到首頁",
+		"connections": "當前連線人數: "
 	},
 	"pong":{
 		"start":"遊戲開始倒數: ",
@@ -77,11 +82,14 @@
 		"block":"封鎖",
 		"winStats":"勝負統計",
 		"goalChart":"得分統計",
+		"noDataAvaliable":"暂无资料",
 		"wins":"勝場",
 		"losses":"輸場",
 		"winRate":"勝率",
 		"gameTime":"總遊戲時長",
 		"text":"總得分",
+		"matchHistory":"對戰紀錄",
+		"noMatchDataAvailable":"暫無資料",
 		"goalsScored":"得分",
 		"goalsTaken":"失分",
 		"playerA":"玩家 A",

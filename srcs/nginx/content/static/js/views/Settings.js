@@ -60,6 +60,8 @@ export default class extends AbstractView {
 				        <option value="en">`+text.settings.english+`</option>
 				        <option value="fr">`+text.settings.french+`</option>
 						<option value="es">`+text.settings.spanish+`</option>
+						<option value="zh-cn">`+text.settings.simplifiedChinese+`</option>
+						<option value="zh-tw">`+text.settings.traditionChinese+`</option>
 				      </select>
                     </div>
   
