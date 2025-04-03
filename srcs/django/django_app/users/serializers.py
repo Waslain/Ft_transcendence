@@ -49,6 +49,7 @@ class UserSerializer(serializers.ModelSerializer):
 		user = User.objects.create_user(**validated_data)
 		user.set_password(validated_data['password'])
 		user.stats = Stats.objects.create(user=user);
+		user.password_set = True
 		user.save()
 		return user
 		
