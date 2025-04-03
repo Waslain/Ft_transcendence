@@ -5,6 +5,7 @@
   },
   "login": {
     "login": "登录",
+    "login42": "使用 42 登录",
     "username": "用户名",
     "password": "密码",
     "description": "登录到您的帐户",
@@ -70,7 +71,8 @@
     "connections": "当前连接："
   },
   "pong": {
-    "start": "游戏将在以下时间开始：",
+    "start": "游戏将在以下时间开始 :",
+    "vs": "下一场比赛 :",
     "winner": "获胜者是",
     "disconnect": "已断开连接"
   },

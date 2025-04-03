@@ -71,7 +71,8 @@
     "connections": "Current connections: "
   },
   "pong": {
-    "start": "Game Starts in: ",
+    "start": "Game Starts in :",
+    "vs": "Next Match :",
     "winner": "The Winner is",
     "disconnect": "has been Disconnected"
   },

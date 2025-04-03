@@ -8,6 +8,10 @@ const parseMessages = (data) => {
   if (!("type" in data)) {
     return data;
   }
+  if (data.type === "vs") {
+    data.first = text.pong.vs;
+    return data;
+  }
   if (data.type === "timer") {
     data.first = text.pong.start;
     return data;
@@ -27,7 +31,7 @@ const parseMessages = (data) => {
 export const handleSocketMessage = (objectManager, socket) => {
   socket.onmessage = async (e) => {
     const data = JSON.parse(e.data);
-    //console.log(data.action, data.params);
+    // console.log(data.action, data.params);
     switch (data.action) {
       case "names":
         objectManager.player1.name = data.params.names[0];
