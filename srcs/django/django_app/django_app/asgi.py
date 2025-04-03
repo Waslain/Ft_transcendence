@@ -17,6 +17,7 @@ from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.auth import AuthMiddlewareStack
 from django_app.middleware import TokenAuthMiddlewareStack
+from django_app.middleware import RouteNotFoundMiddleware
 import chat.routing
 import pong.routing
 
@@ -24,8 +25,10 @@ import pong.routing
 application = ProtocolTypeRouter({
     "http": get_asgi_application(),
     "websocket": TokenAuthMiddlewareStack(
-        URLRouter(
-            chat.routing.websocket_urlpatterns + pong.routing.websocket_urlpatterns
-        )
+        RouteNotFoundMiddleware(
+            URLRouter(
+                chat.routing.websocket_urlpatterns + pong.routing.websocket_urlpatterns
+            )
+		)
     ),
 })

@@ -51,7 +51,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
 		@database_sync_to_async
 		def update_user_offline_status():
 			self.scope['user'].last_online = datetime.datetime.now()
-			self.scope['user'].remove_online_status()
+			try:
+				self.scope['user'].remove_online_status()
+			except:
+				pass
 		
 		await update_user_offline_status()
 

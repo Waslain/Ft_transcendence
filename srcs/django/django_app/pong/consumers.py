@@ -16,9 +16,12 @@ User = get_user_model()
 
 @database_sync_to_async
 def changeInGameUserValue(self, value):
-    user = User.objects.get(id=self.scope['user'].id)
-    user.in_game = value
-    user.save()
+    try:
+        user = User.objects.get(id=self.scope['user'].id)
+        user.in_game = value
+        user.save()
+    except:
+        pass
 
 class GameWaitingRoomConsumer(AsyncWebsocketConsumer):
     playersNb = 0

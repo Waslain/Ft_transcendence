@@ -42,3 +42,20 @@ class UserActivityMiddleware:
 			request.user.update_online_status()
 			
 		return response
+
+
+class RouteNotFoundMiddleware:
+	def __init__(self, inner):
+		self.inner = inner
+
+	async def __call__(self, scope, receive, send):
+		try:
+			return await self.inner(scope, receive, send)
+		except ValueError as e:
+			if (
+				"No route found for path" in str(e)
+				and scope["type"] == "websocket"
+			):
+				await send({"type": "websocket.close"})
+			else:
+				raise e
