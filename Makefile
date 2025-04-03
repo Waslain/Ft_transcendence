@@ -31,7 +31,4 @@ test:
 	-H "Sec-WebSocket-Version: 13" \
 	https://localhost:8080/ws/pong/pongRoom/?uuid=test
 
-migrate:
-	docker exec django python manage.py migrate
-
 re: fclean all

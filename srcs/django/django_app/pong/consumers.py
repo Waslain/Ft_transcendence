@@ -364,6 +364,7 @@ class LocalTournamentPlayerConsumer(AsyncWebsocketConsumer):
         return None
 
     async def sendLoopGame(self, gameManager):
+        await self.gameUpdate({"tournamentMatch": [{"name": player.name, "id": player.idUser} for player in gameManager.players]})
         await self.gameUpdate({"names": [player.name for player in gameManager.players]})
         await self.gameUpdate({"scores": [player.score for player in gameManager.players]})
         await self.gameUpdate({"messages": {"first": "Game Starts in :", "second": "3", "type": "timer"}})
@@ -440,6 +441,9 @@ class LocalTournamentPlayerConsumer(AsyncWebsocketConsumer):
             return
         if "messages" in event:
             await self.send(text_data=json.dumps({"action": "message", "params": {"messages": event["messages"]}}))
+            return
+        if "tournamentMatch" in event:
+            await self.send(text_data=json.dumps({"action": "tournamentMatch", "params": {"players": event["tournamentMatch"]}}))
             return
 
 class GamePlayerConsumer(AsyncWebsocketConsumer):
@@ -798,7 +802,6 @@ class TournamentPlayerConsumer(AsyncWebsocketConsumer):
         if "messages" in event:
             await self.send(text_data=json.dumps({"action": "message", "params": {"messages": event["messages"]}}))
             return
-
         if "tournamentMatch" in event:
             await self.send(text_data=json.dumps({"action": "tournamentMatch", "params": {"players": event["tournamentMatch"]}}))
             return
