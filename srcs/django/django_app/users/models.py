@@ -11,6 +11,7 @@ class User(AbstractUser):
 	avatar = models.ImageField(upload_to='images/', blank=True, null=True)
 	auth_token_42 = models.CharField(max_length=64, blank=True, null=True)
 	password_set = models.BooleanField(default=False)
+	in_game = models.BooleanField(default=False)
 	def update_online_status(self):
 		#Update user's online status in cache
 		cache.set(f'user_{self.id}_last_activity', timezone.now(), 300)  # Store for 5 minutes
