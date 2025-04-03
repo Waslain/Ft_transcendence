@@ -5,6 +5,7 @@
   },
   "login": {
     "login": "Se connecter",
+    "login42": "Connectez-vous avec 42",
     "username": "Nom d'utilisateur",
     "password": "Mot de passe",
     "description": "Connectez-vous à votre compte",
@@ -70,7 +71,8 @@
     "connections": "Connexions actuelles : "
   },
   "pong": {
-    "start": "Début du jeu dans : ",
+    "start": "Début du jeu dans :",
+    "vs": "Prochain Match :",
     "winner": "Le gagnant est",
     "disconnect": "a été déconnecté"
   },

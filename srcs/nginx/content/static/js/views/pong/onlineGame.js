@@ -68,6 +68,32 @@ export const onlineGame = (socket, signal) => {
   let interval = null;
   let key = null;
 
+  document.getElementById("w").addEventListener(
+    "mousedown",
+    () => {
+      interval = setInterval(() => {
+        key = "w";
+        keys.keyManager({ type: "keydown", key: "w" });
+      }, 100);
+    },
+    {
+      signal: signal,
+    }
+  );
+
+  document.getElementById("s").addEventListener(
+    "mousedown",
+    () => {
+      interval = setInterval(() => {
+        key = "s";
+        keys.keyManager({ type: "keydown", key: "s" });
+      }, 100);
+    },
+    {
+      signal: signal,
+    }
+  );
+
   document.getElementById("ArrowUp").addEventListener(
     "mousedown",
     () => {

@@ -1,8 +1,8 @@
-import LocalPong from "./pong/LocalPong.js";
+import Pong from "./pong/Pong.js";
 import { onlineGame } from "./pong/onlineGame.js";
 import { cleanScene } from "./pong/utils/cleanScene.js";
 
-export default class extends LocalPong {
+export default class extends Pong {
   constructor() {
     super();
     this.setTitle("Transcendence");

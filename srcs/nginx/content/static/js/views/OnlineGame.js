@@ -11,7 +11,7 @@ export default class extends Pong {
       needed: true,
       auth: false,
       url: "/users/login",
-      urlAfterLogin: "/pong/" + this.params.room_id,
+      urlAfterLogin: `/pong/${this.params.room_id}`,
     };
   }
 
@@ -21,12 +21,10 @@ export default class extends Pong {
 
   async #webSocket() {
     const roomName = "pongRoom";
-    const url =
-      "wss://" +
-      window.location.host +
-      "/ws/pong/pongRoom/?uuid=" +
-      encodeURIComponent(this.params.room_id);
-
+    const url = `
+      wss://${window.location.host}/ws/pong/pongRoom/?uuid=${encodeURIComponent(
+      this.params.room_id
+    )}`;
     this.#pongRoomSocket = new WebSocket(url);
 
     this.#pongRoomSocket.onopen = (e) => {
@@ -40,6 +38,7 @@ export default class extends Pong {
 
   async getJavaScript() {
     this.#abortController = new AbortController();
+    document.getElementById("keyBoxLeft").hidden = true;
     await this.#webSocket();
 
     this.#objectManager = onlineGame(

@@ -83,9 +83,9 @@ export default class extends AbstractView {
       </div>
       <div class="row-fluid d-flex justify-content-center align-items-center">
         <p class="text-white m-3">${t.alias} :</p>
-        <input id="nameInput" value=${localStorage.getItem(
+        <input id="nameInput" style="border-radius: 8px; margin: 10px; height: 40px; width: 210px;" value="" maxlength="20" placeholder=${localStorage.getItem(
           "username"
-        )} style="border-radius: 8px; margin: 10px; height: 40px; width: 210px;" value="" maxlength="20" placeholder="Max character: 20"/>
+        )}>
       </div>
       <br>
       <section>
@@ -134,7 +134,7 @@ export default class extends AbstractView {
 
   async #webSocketGame() {
     const roomName = "waitingRoom";
-    const url = "wss://" + window.location.host + "/ws/pong/waitingRoom/";
+    const url = `wss://${window.location.host}/ws/pong/waitingRoom/`;
 
     this.#waitingRoomSocket = new WebSocket(url);
 
@@ -153,14 +153,16 @@ export default class extends AbstractView {
           text.waitingRoom.connections + data.count;
       }
       if (data.uuid !== undefined) {
-        navigateTo("/pong/" + data.uuid);
+        navigateTo(`/pong/${data.uuid}`);
       }
     };
   }
 
-  async #webSocketTournament() {
+  async #webSocketTournament(name) {
     const roomName = "waitingRoom";
-    const url = "wss://" + window.location.host + "/ws/tournament/waitingRoom/";
+    const url = `wss://${
+      window.location.host
+    }/ws/tournament/waitingRoom/?name=${encodeURIComponent(name)}`;
 
     this.#waitingRoomSocket = new WebSocket(url);
 
@@ -179,7 +181,7 @@ export default class extends AbstractView {
           text.waitingRoom.connections + data.count;
       }
       if (data.uuid !== undefined) {
-        navigateTo("/tournament/" + data.uuid);
+        navigateTo(`/tournament/${data.uuid}?name=${encodeURIComponent(name)}`);
       }
     };
   }
@@ -187,11 +189,12 @@ export default class extends AbstractView {
   async getJavaScript() {
     this.#abortController = new AbortController();
     const playBtnLocalGame = document.getElementById("playBtnLocalGame");
+    const playBtnOnlineGame = document.getElementById("playBtnOnlineGame");
+    const connectionCountGame = document.getElementById("connectionCountGame");
+    const nameInput = document.getElementById("nameInput");
     const playBtnLocalTournament = document.getElementById(
       "playBtnLocalTournament"
     );
-    const playBtnOnlineGame = document.getElementById("playBtnOnlineGame");
-    const connectionCountGame = document.getElementById("connectionCountGame");
     const playBtnOnlineTournament = document.getElementById(
       "playBtnOnlineTournament"
     );
@@ -204,15 +207,6 @@ export default class extends AbstractView {
       "click",
       () => {
         navigateTo("/pong/localGame");
-      },
-      {
-        signal: this.#abortController.signal,
-      }
-    );
-    playBtnLocalTournament.addEventListener(
-      "click",
-      () => {
-        navigateTo("/pong/localTournament");
       },
       {
         signal: this.#abortController.signal,
@@ -239,6 +233,20 @@ export default class extends AbstractView {
         signal: this.#abortController.signal,
       }
     );
+
+    playBtnLocalTournament.addEventListener(
+      "click",
+      () => {
+        navigateTo(
+          `/pong/localTournament?name=${
+            nameInput.value || localStorage.getItem("username")
+          }`
+        );
+      },
+      {
+        signal: this.#abortController.signal,
+      }
+    );
     playBtnOnlineTournament.addEventListener(
       "click",
       async () => {
@@ -254,12 +262,15 @@ export default class extends AbstractView {
         connectionCountTournament.hidden = false;
         cancelBtn.disabled = false;
 
-        await this.#webSocketTournament();
+        await this.#webSocketTournament(
+          nameInput.value || localStorage.getItem("username")
+        );
       },
       {
         signal: this.#abortController.signal,
       }
     );
+
     cancelBtn.addEventListener(
       "click",
       () => {

@@ -6,12 +6,17 @@ export default class extends Pong {
   constructor(params) {
     super();
     this.params = params;
+    this.searchParams = new URLSearchParams(window.location.search);
     this.setTitle("Transcendence");
     this.redirection = {
       needed: true,
       auth: false,
       url: "/users/login",
-      urlAfterLogin: "/tournament/" + this.params.room_id,
+      urlAfterLogin: `/tournament/${encodeURIComponent(
+        this.params.room_id
+      )}?name=${encodeURIComponent(
+        this.searchParams.get("name") || "Anonymous"
+      )}`,
     };
   }
 
@@ -19,13 +24,13 @@ export default class extends Pong {
   #abortController;
   #objectManager;
 
-  async #webSocket() {
+  async #webSocket(name) {
     const roomName = "tournamentRoom";
-    const url =
-      "wss://" +
-      window.location.host +
-      "/ws/tournament/tournamentRoom/?uuid=" +
-      encodeURIComponent(this.params.room_id);
+    const url = `wss://${
+      window.location.host
+    }/ws/tournament/tournamentRoom/?uuid=${encodeURIComponent(
+      this.params.room_id
+    )}&name=${encodeURIComponent(name)}`;
 
     this.#tournamentRoomSocket = new WebSocket(url);
 
@@ -40,7 +45,8 @@ export default class extends Pong {
 
   async getJavaScript() {
     this.#abortController = new AbortController();
-    await this.#webSocket();
+    document.getElementById("keyBoxLeft").hidden = true;
+    await this.#webSocket(this.searchParams.get("name") || "Anonymous");
 
     this.#objectManager = onlineGame(
       this.#tournamentRoomSocket,

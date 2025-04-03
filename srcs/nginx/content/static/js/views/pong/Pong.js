@@ -26,9 +26,14 @@ export default class extends AbstractView {
 				border-radius: 15px;
 				border: 2px solid #999;
 				box-shadow: 0 0 30px #ffffff60;
-				bottom: 15px;
-				right: 15px;
 				user-select: none;
+				bottom: 15px;
+			}
+			.keybox.left {
+				left: 15px;
+			}
+			.keybox.right {
+				right: 15px;
 			}
 			.keyboard {
 					display: grid;
@@ -101,7 +106,13 @@ export default class extends AbstractView {
   async getHtml() {
     return `
 			<div>
-				<div class="keybox">
+				<div id="keyBoxLeft" class="keybox left">
+					<div class="keyboard">
+						<div class="key" id="w">w</div>
+						<div class="key" id="s">s</div>
+					</div>
+				</div>
+				<div id="keyBoxRight" class="keybox right">
 					<div class="keyboard">
 						<div class="key" id="ArrowUp">↑</div>
 						<div class="key" id="ArrowDown">↓</div>
