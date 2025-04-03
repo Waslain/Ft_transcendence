@@ -109,7 +109,7 @@ export default class extends AbstractView {
 				},
 				body: JSON.stringify({
 					"code": code,
-					"redirect_uri": "https://" + location.host + "/users/login"
+					"redirect_uri": location.origin + location.pathname
 				})
 			})
 			.then(response => response.json().then(json => ({
@@ -176,7 +176,7 @@ export default class extends AbstractView {
 				return;
 			}
 
-			const url = "https://api.intra.42.fr/oauth/authorize" + "?client_id=" + client_id + "&redirect_uri=https%3A%2F%2F" + location.hostname + "%3A" + location.port + "%2Fusers%2Flogin&response_type=code"
+			const url = "https://api.intra.42.fr/oauth/authorize" + "?client_id=" + client_id + "&redirect_uri=" + encodeURIComponent(location) + "&response_type=code"
 			window.location.href = url;
 		},
 		{
