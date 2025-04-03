@@ -43,6 +43,9 @@ export default class extends AbstractView {
     const t = text.waitingRoom;
     return `
     <div class="container py-5 h-100">
+      <p id="inGame" style="color: red; text-align: center;" hidden >${
+        t.alreadyInGame
+      }</p>
       <div class="row-fluid d-flex justify-content-center align-items-center">
         <h1 class="text-white m-3">${t.gameTitle}</h1>
       </div>
@@ -186,8 +189,32 @@ export default class extends AbstractView {
     };
   }
 
+  async getInGameUserValue() {
+    let user = null;
+    try {
+      const dataUser = await fetch(
+        "https://" +
+          window.location.host +
+          "/api/users/get/" +
+          localStorage.getItem("username"),
+        {
+          method: "GET",
+        }
+      );
+      if (!dataUser.ok) {
+        throw new Error(`HTTP error! Status: ${dataUser.status}`);
+      }
+      user = await dataUser.json();
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+    if (user) return user.in_game;
+    return false;
+  }
+
   async getJavaScript() {
     this.#abortController = new AbortController();
+    const inGame = document.getElementById("inGame");
     const playBtnLocalGame = document.getElementById("playBtnLocalGame");
     const playBtnOnlineGame = document.getElementById("playBtnOnlineGame");
     const connectionCountGame = document.getElementById("connectionCountGame");
@@ -205,7 +232,11 @@ export default class extends AbstractView {
 
     playBtnLocalGame.addEventListener(
       "click",
-      () => {
+      async () => {
+        if (await this.getInGameUserValue()) {
+          inGame.hidden = false;
+          return;
+        }
         navigateTo("/pong/localGame");
       },
       {
@@ -215,6 +246,10 @@ export default class extends AbstractView {
     playBtnOnlineGame.addEventListener(
       "click",
       async () => {
+        if (await this.getInGameUserValue()) {
+          inGame.hidden = false;
+          return;
+        }
         playBtnLocalGame.disabled = true;
         playBtnLocalGame.style.color = "#fff";
         playBtnLocalTournament.disabled = true;
@@ -236,7 +271,11 @@ export default class extends AbstractView {
 
     playBtnLocalTournament.addEventListener(
       "click",
-      () => {
+      async () => {
+        if (await this.getInGameUserValue()) {
+          inGame.hidden = false;
+          return;
+        }
         navigateTo(
           `/pong/localTournament?name=${
             nameInput.value || localStorage.getItem("username")
@@ -250,6 +289,10 @@ export default class extends AbstractView {
     playBtnOnlineTournament.addEventListener(
       "click",
       async () => {
+        if (await this.getInGameUserValue()) {
+          inGame.hidden = false;
+          return;
+        }
         playBtnLocalGame.disabled = true;
         playBtnLocalGame.style.color = "#fff";
         playBtnLocalTournament.disabled = true;
