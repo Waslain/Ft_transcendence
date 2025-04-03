@@ -9,7 +9,7 @@ class User(AbstractUser):
 	friends = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='is_friend');
 	blocked = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='is_blocked');
 	avatar = models.ImageField(upload_to='images/', blank=True, null=True)
-	auth_token_42 = models.CharField(max_length=64, blank=True, null=True)
+	login_42 = models.CharField(max_length=8, blank=True, null=True)
 	password_set = models.BooleanField(default=False)
 	in_game = models.BooleanField(default=False)
 	def update_online_status(self):

@@ -60,12 +60,12 @@ export default class extends AbstractView {
 
                     <div class="pt-1 mb-4">
                       <button data-mdb-button-init data-mdb-ripple-init class="btn btn-sumbit btn-lg btn-block" id="loginBtn" type="submit">`+text.login.login+`</button>
-					<div id="response" style="color:#dd0000"></div>
                     </div>
   
                     <div class="pt-1 mb-4">
 					  <button data-mdb-button-init data-mdb-ripple-init class="btn btn-sumbit btn-lg btn-block" id="login42Btn" type="button">`+text.login.login42+`</button>
                     </div>
+					<div id="response" style="color:#dd0000"></div>
 
                     <p class="mb-5 pb-lg-2" style="color: #fff;">`+text.login.noAccount+`
 					<a href="/users/register" class="nav-link" style="color:rgb(92, 160, 255); width:fit-content" data-link>`+text.login.registerHere+`</a>
@@ -121,12 +121,15 @@ export default class extends AbstractView {
 				}
 				else if (res.status === 202) {
 					console.log(res.data.message);
+					const url = "https://" + location.host + "/users/register?42auth"
+						+ "&username=" + res.data.username
+						+ "&avatar=" + res.data.avatar;
+					navigateTo(url);
 				}
 				else {
 					localStorage.setItem("username", res.data.username);
 					if (res.data.avatar) {
 						localStorage.setItem("avatar", "https://" + location.host + res.data.avatar);
-						console.log(res.data.avatar);
 					}
 					else {
 						localStorage.setItem("avatar", "/static/img/default.png");

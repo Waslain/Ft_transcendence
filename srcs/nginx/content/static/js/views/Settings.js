@@ -49,7 +49,7 @@ export default class extends AbstractView {
 				      <label for="avatar">`+text.settings.updateAvatar+`</label>
                       <input type="file" id="avatar" name="avatar" class="form-control form-control-lg" accept="image/*">
         			  <div class="row-fluid d-flex align-items-center" style="padding-top:15px; margin-left:20px display: none" id="preview">
-					    <img id="avatarPreview" src="#" width="100" height="100" class="rounded-circle" style="display:none">
+					    <img id="avatarPreview" src="#" width="100" height="100" class="rounded-circle" style="display:none; object-fit: cover">
                       <button data-mdb-button-init data-mdb-ripple-init class="btn btn-dark btn-lg btn-block" type="button" id="removeBtn" style="display:none;margin-left:30px">`+text.register.remove+`</button>
 				      </div>
                     </div>
@@ -63,6 +63,17 @@ export default class extends AbstractView {
 						<option value="zh-cn">`+text.settings.simplifiedChinese+`</option>
 						<option value="zh-tw">`+text.settings.traditionChinese+`</option>
 				      </select>
+                    </div>
+	
+                    <div data-mdb-input-init class="form-outline mb-4">
+				      <label for="password">`+text.settings.updatePassword+`</label>
+                      <input type="password" id="password" name="password" autocomplete="off" class="form-control form-control-lg" placeholder="`+text.login.password+`" maxlength="20">
+					  <div id="passwordCheck" style="color:#dd0000"></div>
+                    </div>
+
+                    <div data-mdb-input-init class="form-outline mb-4">
+                      <input type="password" id="confirmPassword" name="confirmPassword" autocomplete="off" class="form-control form-control-lg" placeholder="`+text.register.confirmPassword+`" maxlength="20">
+					  <div id="confirmPasswordCheck" style="color:#dd0000"></div>
                     </div>
   
                     <div class="pt-1 mb-4">
@@ -94,6 +105,9 @@ export default class extends AbstractView {
 		const avatarPreview = document.getElementById('avatarPreview');
 		const removeBtn = document.getElementById('removeBtn');
 		const result = document.getElementById('result');
+		const password = document.getElementById('password');
+		const confirmPassword = document.getElementById('confirmPassword');
+		const confirmPasswordCheck = document.getElementById('confirmPasswordCheck');
 
 		language.value = localStorage.getItem("language");
 
@@ -151,6 +165,12 @@ export default class extends AbstractView {
 			signal: this.#abortController.signal,
 		});
 		
+		password.addEventListener('change', function(event) {
+			update = true;
+		},
+		{
+			signal: this.#abortController.signal,
+		});
 
 		// submit the file
 		updateForm.addEventListener('submit', function(event) {
@@ -163,7 +183,16 @@ export default class extends AbstractView {
 
 			const formData = new FormData(this)
 			formData.append('image_set', image_set);
-			console.log(formData);
+
+			confirmPasswordCheck.innerText = "";
+			if (formData.get("password") === "") {
+				formData.delete('password');
+			}
+			else if (formData.get("password") !== formData.get("confirmPassword")) {
+				confirmPasswordCheck.innerText = text.register.confirmPasswordCheck;
+				return ;
+			}
+			formData.delete('confirmPassword');
 
 			updateBtn.disabled = true;
 			var endpoint = "https://" + location.host + "/api/users/updateUser/"

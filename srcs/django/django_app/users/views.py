@@ -36,7 +36,7 @@ class Login42View(APIView):
 				"redirect_uri": request.data['redirect_uri'],
 			})
 		except:
-			return Response({"message":"Call to the 42 API failed"})
+			return Response({"message":"Call to the 42 API failed"}, status=401)
 		data = json.loads(r.text)
 		if 'error' in data:
 			return Response({"message": data['error']}, status=401);
@@ -48,21 +48,21 @@ class Login42View(APIView):
 				"Authorization":"Bearer " + access_token
 			})
 		except:
-			return Response({"message":"Call to the 42 API failed"})
+			return Response({"message":"Call to the 42 API failed"}, status=401)
 		data = json.loads(r.text)
 		if 'error' in data:
 			return Response({"message": data['error']}, status=401);
 
-		# If a user is already linked to this token, log him
+		# If a user is already linked to this account, log him
 		try:
-			user = User.objects.get(auth_token_42=access_token)
+			user = User.objects.get(login_42=data['login'])
 		except:
 			user = None
 		if user:
 			token, created = Token.objects.get_or_create(user=user)
 			response = Response({
-				'message': 'Successfully logged in',
-				'username': user.username,
+			'message': 'Successfully logged in',
+			'username': user.username,
 			})
 			if user.avatar:
 				response.data['avatar'] = user.avatar.url
@@ -82,12 +82,24 @@ class Login42View(APIView):
 		except:
 			user = None
 		if user:
-			return Response({
+			response = Response({
 				"message": "User already exists",
+				"username": data['login'],
+				"avatar": data['image']['versions']['small']
 			}, status=202)
+			response.set_cookie(
+				key = 'auth_token_42',
+				value = access_token,
+				max_age = 300,
+				secure = True,
+				httponly = True,
+				samesite = 'Lax'
+			)
+			return response
 
 		# Create a new user with the 42 intra infos
 		user = User.objects.create_user(username=data['login'], password="0")
+		user.login_42 = username=data['login']
 		user.set_password("0")
 		user.stats = Stats.objects.create(user=user);
 		img_tmp = NamedTemporaryFile(delete=True)
@@ -142,7 +154,10 @@ class UpdateUserView(generics.UpdateAPIView):
 
 	def update(self, request, *args, **kwargs):
 		token_key = request.COOKIES['auth_token']
-		instance = Token.objects.get(key=token_key).user
+		try:
+			instance = Token.objects.get(key=token_key).user
+		except:
+			return Response({"message":"User doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
 		serializer = self.get_serializer(instance, data=request.data)
 		serializer.is_valid(raise_exception=True)
 		self.perform_update(serializer)
@@ -162,9 +177,25 @@ class RegisterView(generics.CreateAPIView):
 	authentication_classes = []
 
 	def create(self, request):
+		data = request.data
+		if 'auth_token_42' in request.COOKIES:
+			auth_token_42 = request.COOKIES['auth_token_42'];
+		else:
+			auth_token_42 = None
 		serializer = self.get_serializer(data=request.data)
 		serializer.is_valid(raise_exception=True)
-		self.perform_create(serializer)
+		res = serializer.create(auth_token_42)
+		if res is not None:
+			res.set_cookie(
+				key = 'auth_token_42',
+				value = token.key,
+				max_age = -1,
+				secure = True,
+				httponly = True,
+				samesite = 'Lax'
+			)
+			return res
+
 		headers = self.get_success_headers(serializer.data)
 		user = authenticate(
 			username=request.data['username'],
@@ -183,6 +214,14 @@ class RegisterView(generics.CreateAPIView):
 		response.set_cookie(
 			key = 'auth_token',
 			value = token.key,
+			secure = True,
+			httponly = True,
+			samesite = 'Lax'
+		)
+		response.set_cookie(
+			key = 'auth_token_42',
+			value = token.key,
+			max_age = -1,
 			secure = True,
 			httponly = True,
 			samesite = 'Lax'
@@ -270,8 +309,9 @@ class AddFriendView(generics.UpdateAPIView):
 		if 'username' not in request.data:
 			return Response({'message':'Must provide a username'}, status=400)
 
-		friend = User.objects.get(username=request.data['username']);
-		if friend is None:
+		try:
+			friend = User.objects.get(username=request.data['username']);
+		except:
 			return Response({'message':'User does not exist'}, status=400)
 		user.friends.add(friend);
 		response = Response({
@@ -294,8 +334,9 @@ class RemoveFriendView(generics.UpdateAPIView):
 		if 'username' not in request.data:
 			return Response({'message':'Must provide a username'}, status=400)
 
-		friend = User.objects.get(username=request.data['username']);
-		if friend is None:
+		try:
+			friend = User.objects.get(username=request.data['username']);
+		except:
 			return Response({'message':'User does not exist'}, status=400)
 		user.friends.remove(friend);
 		response = Response({
@@ -332,8 +373,9 @@ class AddBlockView(generics.UpdateAPIView):
 		if 'username' not in request.data:
 			return Response({'message':'Must provide a username'}, status=400)
 
-		block = User.objects.get(username=request.data['username']);
-		if block is None:
+		try:
+			block = User.objects.get(username=request.data['username']);
+		except:
 			return Response({'message':'User does not exist'}, status=400)
 		user.blocked.add(block);
 		response = Response({
@@ -356,8 +398,9 @@ class RemoveBlockView(generics.UpdateAPIView):
 		if 'username' not in request.data:
 			return Response({'message':'Must provide a username'}, status=400)
 
-		block = User.objects.get(username=request.data['username']);
-		if block is None:
+		try:
+			block = User.objects.get(username=request.data['username']);
+		except:
 			return Response({'message':'User does not exist'}, status=400)
 		user.blocked.remove(block);
 		response = Response({

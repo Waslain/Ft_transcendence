@@ -316,7 +316,7 @@ document.addEventListener("authenticate", (e) => {
 		</a>
 		<hr>
 		<a href="/users/profile" class="nav-item d-flex align-items-center" data-link>
-			<img src="#" id="sidebarAvatar" alt="avatar" width="30" height="30" class="rounded-circle">
+			<img src="#" id="sidebarAvatar" alt="avatar" width="30" height="30" class="rounded-circle" style="object-fit: cover">
 			<span id="sidebarUsername"></span>
 		</a>
 		`
