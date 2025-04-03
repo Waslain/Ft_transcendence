@@ -5,6 +5,7 @@
   },
   "login": {
     "login": "Log in",
+    "login42": "Log in with 42",
     "username": "Username",
     "password": "Password",
     "description": "Sign in to your account",

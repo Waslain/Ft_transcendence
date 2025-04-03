@@ -39,6 +39,8 @@ services:
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       DATABASE_HOST: ${DATABASE_HOST}
       DATABASE_PORT: ${DATABASE_PORT}
+      42_CLIENT_ID: ${API_CLIENT_ID}
+      42_CLIENT_SECRET: ${API_CLIENT_SECRET}
     volumes:
       - ./srcs/django/django_app:/app
       - ${VOLUME_PATH}/media_data:/media

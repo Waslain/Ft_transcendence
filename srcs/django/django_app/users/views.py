@@ -6,10 +6,122 @@ from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from users.serializers import UserSerializer, ImageSerializer, FriendsSerializer, BlockSerializer
 from users.models import User
+from stats.models import Stats
 from rest_framework.decorators import api_view
 from django.core.cache import cache
+import requests
+import json
 import logging
+import os
+from urllib.request import urlopen
+from django.core.files import File
+from django.core.files.temp import NamedTemporaryFile
 logger = logging.getLogger('users')
+
+class Login42View(APIView):
+	permission_classes = [permissions.AllowAny]
+	authentication_classes = []
+
+	def post(self, request):
+		if "code" not in request.data or "redirect_uri" not in request.data:
+			return Response({"message":"Missing parameters"}, status=400)
+
+		# Get an authorization token from the 42 api
+		try:
+			r = requests.post("https://api.intra.42.fr/oauth/token", data={
+				"grant_type": "authorization_code",
+				"client_id": os.environ.get("42_CLIENT_ID"),
+				"client_secret": os.environ.get("42_CLIENT_SECRET"),
+				"code": request.data['code'],
+				"redirect_uri": request.data['redirect_uri'],
+			})
+		except:
+			return Response({"message":"Call to the 42 API failed"})
+		data = json.loads(r.text)
+		if 'error' in data:
+			return Response({"message": data['error']}, status=401);
+
+		# Get the informations of the connected 42 user
+		access_token = data['access_token']
+		try:
+			r = requests.get("https://api.intra.42.fr/v2/me", headers={
+				"Authorization":"Bearer " + access_token
+			})
+		except:
+			return Response({"message":"Call to the 42 API failed"})
+		data = json.loads(r.text)
+		if 'error' in data:
+			return Response({"message": data['error']}, status=401);
+
+		# If a user is already linked to this token, log him
+		try:
+			user = User.objects.get(auth_token_42=access_token)
+		except:
+			user = None
+		if user:
+			token, created = Token.objects.get_or_create(user=user)
+			response = Response({
+				'message': 'Successfully logged in',
+				'username': user.username,
+			})
+			if user.avatar:
+				response.data['avatar'] = user.avatar.url
+			response.data['language'] = user.language
+			response.set_cookie(
+				key = 'auth_token',
+				value = token.key,
+				secure = True,
+				httponly = True,
+				samesite = 'Lax'
+			)
+			return response
+
+		# If a user already exists with the same username, redirect to the register page
+		try:
+			user = User.objects.get(username=data['login'])
+		except:
+			user = None
+		if user:
+			return Response({
+				"message": "User already exists",
+			}, status=202)
+
+		# Create a new user with the 42 intra infos
+		user = User.objects.create_user(username=data['login'], password="0")
+		user.set_password("0")
+		user.stats = Stats.objects.create(user=user);
+		img_tmp = NamedTemporaryFile(delete=True)
+		img_tmp.write(urlopen(data['image']['versions']['small']).read())
+		img_tmp.flush()
+		user.avatar.save(f"image_{user.username}", File(img_tmp))
+		user.auth_token_42 = access_token;
+		user.save()
+
+		token, created = Token.objects.get_or_create(user=user)
+		response = Response({
+			'message': 'Successfully logged in',
+			'username': user.username,
+		}, status=201)
+		if user.avatar:
+			response.data['avatar'] = user.avatar.url
+		response.data['language'] = user.language
+		response.set_cookie(
+			key = 'auth_token',
+			value = token.key,
+			secure = True,
+			httponly = True,
+			samesite = 'Lax'
+		)
+		return response
+
+
+class Get42ClientIdView(APIView):
+	permission_classes = [permissions.AllowAny]
+	authentication_classes = []
+
+	def get(self, request):
+		return Response({"client_id": os.environ.get("42_CLIENT_ID")})
+
 
 class GetUserView(generics.RetrieveAPIView):
 	serializer_class = UserSerializer
@@ -85,6 +197,12 @@ class LoginView(APIView):
 	def post(self, request):
 		if 'username' not in request.data or 'password' not in request.data:
 			return Response({'message':'Username and Password must be set'}, status=400)
+		try:
+			user = User.objects.get(username=request.data['username'])
+		except:
+			return Response({'message':'Invalid username or password'}, status=401)
+		if user.password_set is False:
+			return Response({'message':"User didn't set a password"}, status=401)
 		user = authenticate(
 			username=request.data['username'],
 			password=request.data['password']
