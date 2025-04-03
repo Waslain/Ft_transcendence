@@ -1,108 +1,117 @@
 {
-	"sidebar":{
-		"signout":"登入"
-	},
-	"login":{
-		"login":"登入",
-		"username":"用户名",
-		"password":"密码",
-		"description":"登入账号",
-		"noAccount":"还没有账号",
-		"registerHere":"在此注册!",
-		"usernameCheck":"请输入一个用户名",
-		"passwordCheck":"请输入一个密码",
-		"invalidCredentials":"用户名或密码无效"
-	},
-	"register":{
-		"register":"注册",
-		"description":"建立一个新账号",
-		"confirmPassword":"再次确认密码",
-		"usernameValidation":"用户名只能包含字母数字和部分特殊符号 - _ @ + .",
-		"confirmPasswordCheck":"输入密码不同",
-		"avatar":"选择玩家头像(非必要):",
-		"remove":"移除",
-		"userExists":"用户名已被使用"
-	},
-	"settings":{
-		"settings":"设定",
-		"update":"更新",
-		"updateAvatar":"更新头像:",
-		"updateLanguage":"更换语言:",
-		"english":"英文",
-		"french":"法文",
-        "traditionChinese": "繁体中文",
-        "simplifiedChinese": "简体中文",
-		"response":"用户更新",
-		"error":"出现错误"
-	},
-	"friends":{
-		"friends":"朋友",
-		"searchbar":"搜寻用户",
-		"friendList":"好友名单",
-		"blockList":"黑名单",
-		"noFriends":"暂无新增好友",
-		"noBlock":"无封锁用户",
-		"unfriend":"取消好友",
-		"unblock":"取消封锁"
-	},
-	"main":{
-		"phrases":{ 
-			"1":"你好!",
-			"2":"欢迎来到",
-			"3":"超越专案",
-			"4":"游戏愉快 C:"
-		},
-		"start":"开始!"
-	},
-	"waitingRoom":{
-		"title":"游戏等待区",
-		"cancel":"取消",
-		"play":"开始",
-		"text1":"单人游戏等待区...",
-		"text2":"多人游戏等待区...",
-		"back":"回到首页",
-		"connections":"当前连线人数: "
-	},
-	"pong":{
-		"start":"游戏开始倒数: ",
-		"winner":"赢家是",
-		"disconnect":"已经断线"
-	},
-	"profile":{
-		"play":"开始游戏",
-		"invite":"邀请单人游戏",
-		"addFriend":"新增好友",
-		"removeFriend":"取消好友",
-		"message":"讯息",
-		"block":"封锁",
-		"winStats":"胜负统计",
-		"goalChart":"得分统计",
-		"wins":"胜场",
-		"losses":"输场",
-		"winRate":"胜率",
-		"gameTime":"总游戏时长",
-		"text":"总得分",
-		"goalsScored":"得分",
-		"goalsTaken":"失分",
-		"playerA":"玩家 A",
-		"playerB":"玩家 B",
-		"scoreA":"得分 A",
-		"scoreB":"得分 B",
-		"duration":"游戏时长",
-		"winner":"赢家"
-	},
-	"chat":{
-		"chat":"聊天室",
-		"general":"世界频",
-		"placeholder":"输入讯息...",
-		"me":"我",
-		"inviteMessage1":"你邀请了",
-		"inviteMessage2":"一起游戏",
-		"join":"加入游戏",
-		"cancel":"取消",
-		"cancelMessage":"取消游戏邀请",
-		"decline":"拒绝",
-		"declineMessage":"拒绝游戏邀请",
-		"accept":"同意"
-	}
+  "sidebar": {
+    "signout": "注销",
+    "main": "主页"
+  },
+  "login": {
+    "login": "登录",
+    "username": "用户名",
+    "password": "密码",
+    "description": "登录到您的帐户",
+    "noAccount": "没有帐户？",
+    "registerHere": "在这里注册！",
+    "usernameCheck": "请输入用户名",
+    "passwordCheck": "请输入密码",
+    "invalidCredentials": "无效的用户名或密码"
+  },
+  "register": {
+    "register": "注册",
+    "description": "创建一个新帐户",
+    "confirmPassword": "确认密码",
+    "usernameValidation": "用户名只能包含字母数字字符和特殊字符 - _ @ + .",
+    "confirmPasswordCheck": "密码不匹配",
+    "avatar": "选择一个头像（可选）：",
+    "remove": "移除",
+    "userExists": "已存在该用户名的用户"
+  },
+  "settings": {
+    "settings": "设置",
+    "update": "更新",
+    "updateAvatar": "更新头像：",
+    "updateLanguage": "更改语言：",
+    "english": "英语",
+    "french": "法语",
+    "spanish": "西班牙语",
+    "traditionChinese": "中文（繁体）",
+    "simplifiedChinese": "中文（简体）",
+    "response": "用户已更新",
+    "error": "发生错误"
+  },
+  "friends": {
+    "friends": "朋友",
+    "searchbar": "搜索用户",
+    "friendList": "朋友列表",
+    "blockList": "封锁列表",
+    "noFriends": "还没有朋友",
+    "noBlock": "还没有封锁",
+    "unfriend": "删除好友",
+    "unblock": "解封"
+  },
+  "main": {
+    "phrases": {
+      "1": "你好！",
+      "2": "欢迎来到",
+      "3": "Transcendence",
+      "4": "玩得开心 :C"
+    },
+    "start": "开始吧！"
+  },
+  "waitingRoom": {
+    "gameTitle": "乒乓",
+    "tournamentTitle": "锦标赛",
+    "cancel": "取消",
+    "play": "玩",
+    "alias": "锦标赛别名",
+    "localGameText": "本地游戏",
+    "localTournamentText": "本地锦标赛",
+    "onlineGameText": "在线游戏",
+    "onlineTournamentText": "在线锦标赛",
+    "back": "返回主页",
+    "connections": "当前连接："
+  },
+  "pong": {
+    "start": "游戏将在以下时间开始：",
+    "winner": "获胜者是",
+    "disconnect": "已断开连接"
+  },
+  "profile": {
+    "play": "游戏",
+    "invite": "邀请游戏",
+    "addFriend": "添加好友",
+    "removeFriend": "删除好友",
+    "message": "消息",
+    "block": "封锁",
+    "winStats": "胜利统计",
+    "goalChart": "进球图表",
+    "noDataAvaliable": "暂无数据",
+    "wins": "胜利",
+    "losses": "失败",
+    "winRate": "胜率",
+    "gameTime": "游戏时间",
+    "text": "总进球数",
+    "matchHistory": "比赛历史",
+    "noMatchDataAvailable": "暂无数据",
+    "goalsScored": "进球数",
+    "goalsTaken": "失球数",
+    "playerA": "玩家A",
+    "playerB": "玩家B",
+    "scoreA": "分数A",
+    "scoreB": "分数B",
+    "duration": "比赛时长",
+    "winner": "获胜者"
+  },
+  "chat": {
+    "chat": "聊天",
+    "general": "聊天室",
+    "placeholder": "输入消息...",
+    "me": "我",
+    "inviteMessage1": "你邀请了",
+    "inviteMessage2": "来玩一局",
+    "join": "加入游戏",
+    "cancel": "取消",
+    "cancelMessage": "取消了邀请",
+    "decline": "拒绝",
+    "declineMessage": "拒绝了邀请",
+    "accept": "接受"
+  }
 }

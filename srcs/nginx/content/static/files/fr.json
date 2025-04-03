@@ -1,110 +1,117 @@
 {
-	"sidebar":{
-		"signout":"Se déconnecter",
-		"main":"Accueil"
-	},
-	"login":{
-		"login":"Se connecter",
-		"username":"Nom d'utilisateur",
-		"password":"Mot de passe",
-		"description":"Connectez-vous à votre compte",
-		"noAccount":"Vous n'avez pas de compte?",
-		"registerHere":"Inscrivez-vous ici!",
-		"usernameCheck":"Veuillez entrer un nom d'utilisateur",
-		"passwordCheck":"Veuillez entrer un mot de passe",
-		"invalidCredentials":"Le nom d'utilisateur ou le mot de passe est invalide"
-	},
-	"register":{
-		"register":"Inscrivez-vous",
-		"description":"Creer un nouveau compte",
-		"confirmPassword":"Confirmez le mot de passe",
-		"usernameValidation":"Le mot de passe peut uniquement contenir des caractères alphanumériques et les caractères spéciaux - _ @ + .",
-		"confirmPasswordCheck":"Les mot de passe doivent correspondre",
-		"avatar":"Choisissez un avatar (optionnel):",
-		"remove":"Retirer",
-		"userExists":"Un utilisateur avec ce nom existe déjà"
-	},
-	"settings":{
-		"settings":"Options",
-		"update":"Mettre à jour",
-		"updateAvatar":"Mettre à jour l'avatar:",
-		"updateLanguage":"Changer la langue:",
-		"english":"Anglais",
-		"french":"Français",
-		"spanish":"Espagnol",
-		"traditionChinese": "Chinois traditionnel",
-        "simplifiedChinese": "Chinois simplifié",
-		"response":"Utilisateur mis à jour",
-		"error":"Il y a eu une erreur"
-	},
-	"friends":{
-		"friends":"Amis",
-		"searchbar":"Cherchez un utilisateur",
-		"friendList":"Liste d'Amis",
-		"blockList":"Liste de blocage",
-		"noFriends":"Pas encore d'amis",
-		"noBlock":"Pas de blocages",
-		"unfriend":"Retirer l'ami",
-		"unblock":"Débloquer"
-	},
-	"main":{
-		"phrases":{ 
-			"1":"Bonjour!",
-			"2":"Bienvenue sur",
-			"3":"Transcendence",
-			"4":"Amusez-vous C:"
-		},
-		"start":"Commençons!"
-	},
-	"waitingRoom":{
-		"title":"Salle d'Attente du Pong",
-		"cancel":"Annuler",
-		"play":"Jouer",
-		"text1":"Salle d'Attente pour le Jeu ...",
-		"text2":"Salle d'Attente pour le Tournoi",
-		"back":"Retourner au menu",
-		"connections":"Connections actuelles:"
-	},
-	"pong":{
-		"start":"Le Jeu Commence dans: ",
-		"winner":"Le Gagnant est",
-		"disconnect":"a été Déconnecté"
-	},
-	"profile":{
-		"play":"Jouer au jeu",
-		"invite":"Invitez à jouer",
-		"addFriend":"Ajouter l'ami",
-		"removeFriend":"Retirer l'ami",
-		"message":"Envoyer un message",
-		"block":"Bloquer",
-		"winStats":"Stats de Victoires",
-		"goalChart":"Graphique des Buts",
-		"wins":"Victoires",
-		"losses":"Défaites",
-		"winRate":"Taux de Victoire",
-		"gameTime":"Temps de Jeu",
-		"text":"Nombre Total de Buts",
-		"goalsScored":"Buts Mis",
-		"goalsTaken":"Buts Pris",
-		"playerA":"Joueur A",
-		"playerB":"Joueur B",
-		"scoreA":"Score A",
-		"scoreB":"Score B",
-		"duration":"Durée de la Partie",
-		"winner":"Gagnant"
-	},
-	"chat":{
-		"chat":"Chat",
-		"general":"Chat Général",
-		"placeholder":"Ecrivez un message...",
-		"me":"Moi",
-		"inviteMessage1":"Vous avez invité",
-		"inviteMessage2":"à jouer une partie",
-		"join":"Rejoindre la Partie",
-		"cancel":"Annuler",
-		"cancelMessage":"A annulé l'invitation",
-		"decline":"Decliner",
-		"declineMessage":"A decliné l'invitation",
-		"accept":"Accepter"
-	}
+  "sidebar": {
+    "signout": "Se déconnecter",
+    "main": "Accueil"
+  },
+  "login": {
+    "login": "Se connecter",
+    "username": "Nom d'utilisateur",
+    "password": "Mot de passe",
+    "description": "Connectez-vous à votre compte",
+    "noAccount": "Pas de compte ?",
+    "registerHere": "inscrivez-vous ici !",
+    "usernameCheck": "Veuillez entrer un nom d'utilisateur",
+    "passwordCheck": "Veuillez entrer un mot de passe",
+    "invalidCredentials": "Nom d'utilisateur ou mot de passe invalide"
+  },
+  "register": {
+    "register": "S'inscrire",
+    "description": "Créer un nouveau compte",
+    "confirmPassword": "Confirmez le mot de passe",
+    "usernameValidation": "Le nom d'utilisateur ne peut contenir que des caractères alphanumériques et les caractères spéciaux - _ @ + .",
+    "confirmPasswordCheck": "Les mots de passe ne correspondent pas",
+    "avatar": "Choisissez un avatar (optionnel) :",
+    "remove": "Supprimer",
+    "userExists": "Un utilisateur avec ce nom existe déjà"
+  },
+  "settings": {
+    "settings": "Paramètres",
+    "update": "Mettre à jour",
+    "updateAvatar": "Mettre à jour l'avatar :",
+    "updateLanguage": "Changer la langue :",
+    "english": "Anglais",
+    "french": "Français",
+    "spanish": "Espagnol",
+    "traditionChinese": "Chinois (Traditionnel)",
+    "simplifiedChinese": "Chinois (Simplifié)",
+    "response": "Utilisateur mis à jour",
+    "error": "Une erreur est survenue"
+  },
+  "friends": {
+    "friends": "Amis",
+    "searchbar": "Rechercher un utilisateur",
+    "friendList": "Liste d'amis",
+    "blockList": "Liste des bloqués",
+    "noFriends": "Pas encore d'amis",
+    "noBlock": "Aucun utilisateur bloqué",
+    "unfriend": "Retirer de la liste d'amis",
+    "unblock": "Débloquer"
+  },
+  "main": {
+    "phrases": {
+      "1": "Bonjour !",
+      "2": "Bienvenue sur",
+      "3": "Transcendence",
+      "4": "Amusez-vous bien :C"
+    },
+    "start": "C'est parti !"
+  },
+  "waitingRoom": {
+    "gameTitle": "Pong",
+    "tournamentTitle": "Tournoi",
+    "cancel": "Annuler",
+    "play": "Jouer",
+    "alias": "Nom d'alias pour le tournoi",
+    "localGameText": "Partie locale",
+    "localTournamentText": "Tournoi local",
+    "onlineGameText": "Partie en ligne",
+    "onlineTournamentText": "Tournoi en ligne",
+    "back": "Retour à la page principale",
+    "connections": "Connexions actuelles : "
+  },
+  "pong": {
+    "start": "Début du jeu dans : ",
+    "winner": "Le gagnant est",
+    "disconnect": "a été déconnecté"
+  },
+  "profile": {
+    "play": "Jouer",
+    "invite": "Inviter à jouer",
+    "addFriend": "Ajouter un ami",
+    "removeFriend": "Retirer de la liste d'amis",
+    "message": "Message",
+    "block": "Bloquer",
+    "winStats": "Statistiques de victoire",
+    "goalChart": "Graphique des buts",
+    "noDataAvaliable": "Aucune donnée disponible",
+    "wins": "Victoires",
+    "losses": "Défaites",
+    "winRate": "Taux de victoire",
+    "gameTime": "Temps de jeu",
+    "text": "Nombre total de buts",
+    "matchHistory": "Historique des matchs",
+    "noMatchDataAvailable": "Aucune donnée disponible",
+    "goalsScored": "Buts marqués",
+    "goalsTaken": "Buts encaissés",
+    "playerA": "Joueur A",
+    "playerB": "Joueur B",
+    "scoreA": "Score A",
+    "scoreB": "Score B",
+    "duration": "Durée du match",
+    "winner": "Gagnant"
+  },
+  "chat": {
+    "chat": "Chat",
+    "general": "Chat général",
+    "placeholder": "Écrire un message...",
+    "me": "Moi",
+    "inviteMessage1": "Vous avez invité",
+    "inviteMessage2": "à jouer une partie",
+    "join": "Rejoindre la partie",
+    "cancel": "Annuler",
+    "cancelMessage": "a annulé l'invitation",
+    "decline": "Refuser",
+    "declineMessage": "a refusé l'invitation",
+    "accept": "Accepter"
+  }
 }

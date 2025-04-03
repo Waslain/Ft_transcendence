@@ -4,9 +4,11 @@ import Register from "./views/Register.js";
 import Users from "./views/Users.js";
 import Settings from "./views/Settings.js";
 import WaitingRoom from "./views/WaitingRoom.js";
+import LocalGame from "./views/LocalGame.js";
+import LocalTournament from "./views/LocalTournament.js"
 import OnlineGame from "./views/OnlineGame.js";
-import { loadAndSetFont } from "./views/pong/utils/font.js";
 import OnlineTournament from "./views/OnlineTournament.js";
+import { loadAndSetFont } from "./views/pong/utils/font.js";
 import Friends from "./views/Friends.js";
 import * as Utils from "./utils.js";
 
@@ -41,11 +43,13 @@ const router = async () => {
     { path: "/users/login", view: Login },
     { path: "/users/register", view: Register },
     { path: "/users/profile/:username", view: Users },
-    { path: "/settings", view: Settings},
+    { path: "/settings", view: Settings },
     { path: "/pong", view: WaitingRoom },
+    { path: "/pong/localGame", view: LocalGame },
+    { path: "/pong/localTournament", view: LocalTournament },
     { path: "/pong/:room_id", view: OnlineGame },
     { path: "/tournament/:room_id", view: OnlineTournament },
-	{ path: "/friends", view: Friends },
+    { path: "/friends", view: Friends },
   ];
 
   const potentialMatches = routes.map((route) => {
@@ -415,8 +419,8 @@ document.addEventListener("authenticate", (e) => {
 			Utils.fetchOnlineUsers();
 			Utils.fetchBlockedUsers();
 			// Start a periodic refresh of the online users list
-			onlineUsersIntervalId = setInterval(Utils.fetchOnlineUsers, 5000); // Every 5 seconds
-			blockedUsersIntervalId = setInterval(Utils.fetchBlockedUsers, 30000); // Every 30 seconds
+			// onlineUsersIntervalId = setInterval(Utils.fetchOnlineUsers, 5000); // Every 5 seconds
+			// blockedUsersIntervalId = setInterval(Utils.fetchBlockedUsers, 30000); // Every 30 seconds
 			};
 		
 			chatSocket.onmessage = function(e) {

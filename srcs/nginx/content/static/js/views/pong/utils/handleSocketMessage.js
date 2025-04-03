@@ -2,29 +2,27 @@ import { updateName } from "./updateName.js";
 import { updateScore } from "./updateScore.js";
 import { updateMessage } from "./updateMessage.js";
 import { getChatSocket } from "./../../../index.js";
-import * as Utils from "./../../../utils.js";
 import { text } from "../../../index.js";
 
 const parseMessages = (data) => {
-	if (!('type' in data)) {
-		return (data);
-	}
-	if (data.type === "timer") {
-		data.first = text.pong.start;
-		return data;
-	}
-	if (data.type === "winner") {
-		data.first = text.pong.winner;
-		return data;
-	}
-	if (data.type === "disconnect") {
-		data.first = data.first + " " + text.pong.disconnect;
-		data.second = text.pong.winner + " " + data.second;
-		return data;
-	}
-	return (data);
-}
-
+  if (!("type" in data)) {
+    return data;
+  }
+  if (data.type === "timer") {
+    data.first = text.pong.start;
+    return data;
+  }
+  if (data.type === "winner") {
+    data.first = text.pong.winner;
+    return data;
+  }
+  if (data.type === "disconnect") {
+    data.first = data.first + " " + text.pong.disconnect;
+    data.second = text.pong.winner + " " + data.second;
+    return data;
+  }
+  return data;
+};
 
 export const handleSocketMessage = (objectManager, socket) => {
   socket.onmessage = async (e) => {
@@ -68,7 +66,7 @@ export const handleSocketMessage = (objectManager, socket) => {
         );
         break;
       case "message":
-	const messages = parseMessages(data.params.messages);
+        const messages = parseMessages(data.params.messages);
         updateMessage(
           objectManager,
           messages.first,
@@ -80,7 +78,9 @@ export const handleSocketMessage = (objectManager, socket) => {
         const chatSocket = getChatSocket();
         if (chatSocket) {
           const dataUser = await fetch(
-            "https://localhost:8080/api/users/get/" +
+            "https://" +
+              window.location.host +
+              "/api/users/get/" +
               localStorage.getItem("username"),
             {
               method: "GET",
