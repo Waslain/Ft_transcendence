@@ -58,6 +58,7 @@
     "start": "开始吧！"
   },
   "waitingRoom": {
+    "alreadyInGame": "已在游戏中！",
     "gameTitle": "乒乓",
     "tournamentTitle": "锦标赛",
     "cancel": "取消",

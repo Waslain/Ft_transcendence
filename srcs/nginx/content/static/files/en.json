@@ -59,6 +59,7 @@
     "start": "Let's Start!"
   },
   "waitingRoom": {
+    "alreadyInGame": "Already in Game !",
     "gameTitle": "Pong",
     "tournamentTitle": "Tournament",
     "cancel": "Cancel",

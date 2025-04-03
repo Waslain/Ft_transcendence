@@ -53,7 +53,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = User
-		fields = ['id', 'username', 'password', 'avatar', 'is_online', 'avatarUrl', 'login_42']
+		fields = ['id', 'username', 'password', 'avatar', 'is_online', 'in_game', 'avatarUrl', 'login_42']
+
 
 	def validate_username(self, value):
 		if len(value) > 20:
