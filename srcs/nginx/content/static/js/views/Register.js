@@ -67,7 +67,7 @@ export default class extends AbstractView {
 					  <label>`+text.register.avatar+`</label>
                       <input type="file" id="avatar" name="avatar" class="form-control form-control-lg" accept="image/*">
         			  <div class="row-fluid d-flex align-items-center" style="padding-top:15px; margin-left:20px display: none" id="preview">
-					    <img id="avatarPreview" src="#" width="100" height="100" class="rounded-circle" style="display:none">
+					    <img id="avatarPreview" src="#" width="100" height="100" class="rounded-circle" style="display:none; object-fit: cover">
                       <button data-mdb-button-init data-mdb-ripple-init class="btn btn-dark btn-lg btn-block" type="button" id="removeBtn" style="display:none;margin-left:30px">`+text.register.remove+`</button>
 				      </div>
                     </div>
@@ -97,6 +97,8 @@ export default class extends AbstractView {
 		const preview = document.getElementById('preview');
 		const avatarPreview = document.getElementById('avatarPreview');
 		const removeBtn = document.getElementById('removeBtn');
+		const searchParams = new URLSearchParams(location.search);
+		let avatarUrl;
 
 		const showPreview = () => {
 			avatarPreview.style.display = 'block';
@@ -108,6 +110,15 @@ export default class extends AbstractView {
 			avatarPreview.style.display = 'none';
 			removeBtn.style.display = 'none';
 			preview.style.display = 'none';
+		}
+
+		if (searchParams.has("username")) {
+			username.value = searchParams.get(["username"]);
+		}
+		if (searchParams.has("avatar")) {
+			avatarUrl = searchParams.get("avatar");
+			avatarPreview.src = avatarUrl;
+			showPreview();
 		}
 
 		avatar.addEventListener('change', function(event) {
@@ -142,6 +153,9 @@ export default class extends AbstractView {
 			formData.delete("confirmPassword");
 			if (!formData.get('avatar').name) {
 				formData.delete("avatar");
+			}
+			if (avatarUrl) {
+				formData.append("avatarUrl", avatarUrl);
 			}
 			let inputCheck = false;
 
@@ -214,6 +228,11 @@ export default class extends AbstractView {
 		{
 			signal: this.#abortController.signal,
 		});
+
+		if (searchParams.has("42auth")) {
+			const msg = text.register.userExists;
+			document.getElementById('usernameCheck').innerText = msg;
+		}
 	}
 
 	async cleanUp() {

@@ -123,8 +123,11 @@ export default class extends AbstractView {
 	return `
 	<div class="container py-5 h-100">
 		<div class="row-fluid d-flex justify-content-center align-items-center">
-				<img src="#" id="avatarDisplay" alt="user's image" width="50" height="50" class="rounded-circle" style="border: solid #fff;">
+				<img src="#" id="avatarDisplay" alt="user's image" width="50" height="50" class="rounded-circle" style="border: solid #fff; object-fit: cover">
 				<h2 class="d-sm-inline mx-3 mb-0 text-white" id=usernameDisplay></h2>
+		</div>
+		<div class="row-fluid d-flex justify-content-center align-items-center">
+		  <h5 class="d-sm-inline mx-3 mb-0 text-white" id="loginDisplay"></h5>
 		</div>
 		<br>
 		<div id="profileBtns"></div>
@@ -265,8 +268,15 @@ export default class extends AbstractView {
 			return;
 		}
 
+		const login_42 = dataUser.login_42;
+		let displayLogin = "";
+		if (login_42) {
+			displayLogin = "(" + login_42 + ")"
+		}
+
 		document.querySelector("#mainView").innerHTML = await this.getProfileHtml();
 		document.getElementById('usernameDisplay').innerText = username;
+		document.getElementById('loginDisplay').innerText = displayLogin;
 		document.getElementById('avatarDisplay').src = avatar;
 
 		const number_of_wins = data.wins;
