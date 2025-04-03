@@ -192,6 +192,7 @@ export default class extends AbstractView {
 			})
 			.catch(error => {
 				console.error(error);
+				registerBtn.disabled = false;
 			})
 		},
 		{

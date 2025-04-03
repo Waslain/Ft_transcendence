@@ -16,4 +16,6 @@ urlpatterns = [
 	path('block/remove/', views.RemoveBlockView.as_view()),
 	path('block/list/', views.BlockListView.as_view()),
 	path('online/', views.get_online_users, name='online_users'),
+	path('login42/', views.Login42View.as_view()),
+	path('client_id/', views.Get42ClientIdView.as_view()),
 ]
