@@ -14,11 +14,18 @@ from channels.db import database_sync_to_async
 from matchhistory.views import create_match_record
 User = get_user_model()
 
+@database_sync_to_async
+def changeInGameUserValue(self, value):
+    user = User.objects.get(id=self.scope['user'].id)
+    user.in_game = value
+    user.save()
+
 class GameWaitingRoomConsumer(AsyncWebsocketConsumer):
     playersNb = 0
     players = []
 
     async def connect(self):
+        await changeInGameUserValue(self, True)
         self.room_group_name = "game_waiting_room"
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
@@ -29,6 +36,7 @@ class GameWaitingRoomConsumer(AsyncWebsocketConsumer):
 
 
     async def disconnect(self, close_code):
+        await changeInGameUserValue(self, False)
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
         GameWaitingRoomConsumer.players.remove(self)
@@ -61,6 +69,7 @@ class TournamentWaitingRoomConsumer(AsyncWebsocketConsumer):
     players = []
 
     async def connect(self):
+        await changeInGameUserValue(self, True)
         self.room_group_name = "tournament_waiting_room"
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
 
@@ -71,6 +80,7 @@ class TournamentWaitingRoomConsumer(AsyncWebsocketConsumer):
 
 
     async def disconnect(self, close_code):
+        await changeInGameUserValue(self, False)
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
         TournamentWaitingRoomConsumer.players.remove(self)
@@ -182,6 +192,7 @@ class LocalGamePlayerConsumer(AsyncWebsocketConsumer):
     players = []
 
     async def connect(self):
+        await changeInGameUserValue(self, True)
         self.game = GameManager(None)
         self.game.players.append(Player(self.scope['user'].username, self.scope['user'].id, None))
         self.game.players.append(Player(self.scope['user'].username + "(1)", self.scope['user'].id, None))
@@ -190,6 +201,7 @@ class LocalGamePlayerConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
     async def disconnect(self, close_code):
+        await changeInGameUserValue(self, False)
         self.game.loop.cancel()
         LocalGamePlayerConsumer.players.remove(self)
 
@@ -298,6 +310,7 @@ class LocalTournamentPlayerConsumer(AsyncWebsocketConsumer):
     players = []
 
     async def connect(self):
+        await changeInGameUserValue(self, True)
         queryString = parse.parse_qs(self.scope["query_string"].decode())
         self.game = GameManager(None)
         self.game.players.append(Player(queryString.get("name", ["Anonymous"])[0], self.scope['user'].id, None))
@@ -310,6 +323,7 @@ class LocalTournamentPlayerConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
     async def disconnect(self, close_code):
+        await changeInGameUserValue(self, False)
         self.game.loop.cancel()
         LocalGamePlayerConsumer.players.remove(self)
 
@@ -432,6 +446,7 @@ class GamePlayerConsumer(AsyncWebsocketConsumer):
     games : Dict[str, GameManager] = {}
 
     async def connect(self):
+        await changeInGameUserValue(self, True)
         queryString = parse.parse_qs(self.scope["query_string"].decode())
         self.uuid = queryString.get("uuid", ["0"])[0]
         self.name = self.scope['user'].username
@@ -455,6 +470,7 @@ class GamePlayerConsumer(AsyncWebsocketConsumer):
         return True
 
     async def disconnect(self, close_code):
+        await changeInGameUserValue(self, False)
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
         if self.uuid in GamePlayerConsumer.games:
             for player in GamePlayerConsumer.games[self.uuid].players:
@@ -596,6 +612,7 @@ class TournamentPlayerConsumer(AsyncWebsocketConsumer):
     games : Dict[str, GameManager] = {}
 
     async def connect(self):
+        await changeInGameUserValue(self, True)
         queryString = parse.parse_qs(self.scope["query_string"].decode())
         self.uuid = queryString.get("uuid", ["0"])[0]
         self.name = queryString.get("name", ["Anonymous"])[0]
@@ -633,6 +650,7 @@ class TournamentPlayerConsumer(AsyncWebsocketConsumer):
         return True
 
     async def disconnect(self, close_code):
+        await changeInGameUserValue(self, False)
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
         if self.uuid in TournamentPlayerConsumer.games:
             for player in TournamentPlayerConsumer.games[self.uuid].players:

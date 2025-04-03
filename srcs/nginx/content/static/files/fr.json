@@ -58,6 +58,7 @@
     "start": "C'est parti !"
   },
   "waitingRoom": {
+    "alreadyInGame": "Déjà en jeu !",
     "gameTitle": "Pong",
     "tournamentTitle": "Tournoi",
     "cancel": "Annuler",
