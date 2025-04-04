@@ -198,7 +198,7 @@ class LocalGamePlayerConsumer(AsyncWebsocketConsumer):
         await changeInGameUserValue(self, True)
         self.game = GameManager(None)
         self.game.players.append(Player(self.scope['user'].username, self.scope['user'].id, None))
-        self.game.players.append(Player(self.scope['user'].username + "(1)", self.scope['user'].id, None))
+        self.game.players.append(Player("(1)" + self.scope['user'].username, self.scope['user'].id, None))
         self.game.loop = asyncio.create_task(self.sendLoopGame(self.game))
         LocalGamePlayerConsumer.players.append(self)
         await self.accept()
