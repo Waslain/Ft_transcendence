@@ -420,7 +420,7 @@ document.addEventListener("authenticate", (e) => {
 			Utils.fetchBlockedUsers();
 			// Start a periodic refresh of the online users list
 			onlineUsersIntervalId = setInterval(Utils.fetchOnlineUsers, 5000); // Every 5 seconds
-			blockedUsersIntervalId = setInterval(Utils.fetchBlockedUsers, 30000); // Every 30 seconds
+			blockedUsersIntervalId = setInterval(Utils.fetchBlockedUsers, 5000); // Every 5 seconds
 			};
 		
 			chatSocket.onmessage = function(e) {
