@@ -1,6 +1,6 @@
 # Multiplayer Web Pong game built with Django
 
-This project is a web application built using Django 5.1. It includes WebSocket support via Django Channels and features multiple apps such as `chat`, `pong`, `users`, `stats`, and `matchhistory`. The application is containerized using Docker and includes an Nginx reverse proxy.
+This project is a single page web application built using Django 5.1. It includes WebSocket support via Django Channels and features multiple apps such as `chat`, `pong`, `users`, `stats`, and `matchhistory`. The application is containerized using Docker and includes an Nginx reverse proxy.
 
 ## Features
 
